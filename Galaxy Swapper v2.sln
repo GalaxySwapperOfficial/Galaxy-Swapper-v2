@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31702.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Galaxy Swapper v2", "Galaxy Swapper v2\Galaxy Swapper v2.csproj", "{CF8A76C9-724A-4DDE-AD43-713D907D6044}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CF8A76C9-724A-4DDE-AD43-713D907D6044}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF8A76C9-724A-4DDE-AD43-713D907D6044}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF8A76C9-724A-4DDE-AD43-713D907D6044}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF8A76C9-724A-4DDE-AD43-713D907D6044}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E4013828-BA34-495C-91F8-9CD2AAC61092}
+	EndGlobalSection
+EndGlobal

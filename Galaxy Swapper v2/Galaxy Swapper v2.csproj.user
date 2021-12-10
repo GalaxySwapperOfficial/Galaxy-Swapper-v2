@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Compile Update="Workspace\Forms\ID Swapper.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Workspace\Forms\Login Page.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Workspace\Forms\MainView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Workspace\Forms\OptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Workspace\Forms\SwapForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Workspace\Forms\Theme Editor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Workspace\Usercontrols\Cosmetics.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Workspace\Usercontrols\Dashboard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Workspace\Usercontrols\Settings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>
