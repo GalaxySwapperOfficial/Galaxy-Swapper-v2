@@ -1,4 +1,4 @@
-﻿using Galaxy_Swapper_v2.Workspace.Forms;
+using Galaxy_Swapper_v2.Workspace.Forms;
 using Galaxy_Swapper_v2.Workspace.Other;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static Galaxy_Swapper_v2.Workspace.Other.Endpoint;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 {
@@ -34,13 +35,51 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
         private void ExtraControl_Click(object sender, EventArgs e)
         {
             var Sender = (Control)sender;
-            if (Sender.Name == "Plugin")
+            if (Sender.Name == "Plugins")
             {
-                
+                if (MessageBox.Show(this, Endpoint.APIReturn(Endpoints.Languages, "SelectPluginFile"), string.Empty, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
+                {
+                    OpenFileDialog FileSelection = new OpenFileDialog();
+                    FileSelection.Title = "Select A Plugin File";
+                    if (FileSelection.ShowDialog() == DialogResult.OK)
+                    {
+                        string Json = File.ReadAllText(FileSelection.FileName);
+                        if (Json.ValidateJSON() == true)
+                        {
+                            try
+                            {
+                                foreach (var Assets in JObject.Parse(Json)["Assets"])
+                                {
+                                    foreach (var Swap in Assets["Swaps"])
+                                    {
+                                        if (Swap["search"].ToString().Length < Swap["replace"].ToString().Length)
+                                        {
+                                            MessageBox.Show(this, Endpoint.APIReturn(Endpoints.Languages, "PluginAnyLengthError"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                MessageBox.Show(this, Endpoint.APIReturn(Endpoints.Languages, "PluginFileInvalidJson"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                            new SwapForm(Json).ShowDialog();
+                        }
+                        else
+                        {
+                            MessageBox.Show(this, Endpoint.APIReturn(Endpoints.Languages, "PluginFileInvalidJson"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                    }
+                }
+                else
+                    return;
             }
             else if (Sender.Name == "IDSwapper")
             {
-                MessageBox.Show("ID Swapper Currently Unavailable Due To UE5 We Will Add This Feature Back Soon.");
+                new ID_Swapper().ShowDialog();
             }
         }
         private void SearchIcon_Click(object sender, EventArgs e)
@@ -138,6 +177,26 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                         var Flow = ControlHelper.Misc;
                         if (Flow.Controls.Count == 0)
                         {
+                            PictureBox IDSwapper = new PictureBox()
+                            {
+                                SizeMode = PictureBoxSizeMode.StretchImage,
+                                Size = new Size(int.Parse(SettingsController.ConfigReturn("IconSize")), int.Parse(SettingsController.ConfigReturn("IconSize"))),
+                                Name = "IDSwapper",
+                                ImageLocation = Endpoint.APIReturn(Endpoint.Endpoints.IDSwapper, "Icon")
+                            };
+                            PictureBox Plugins = new PictureBox()
+                            {
+                                SizeMode = PictureBoxSizeMode.StretchImage,
+                                Size = new Size(int.Parse(SettingsController.ConfigReturn("IconSize")), int.Parse(SettingsController.ConfigReturn("IconSize"))),
+                                Name = "Plugins",
+                                ImageLocation = Endpoint.APIReturn(Endpoint.Endpoints.Plugins, "Icon")
+                            };
+                            Global.ToolTip(IDSwapper, "ID Swapper");
+                            Global.ToolTip(Plugins, "Plugins");
+                            Plugins.Click += ExtraControl_Click;
+                            IDSwapper.Click += ExtraControl_Click;
+                            Flow.Controls.Add(IDSwapper);
+                            Flow.Controls.Add(Plugins);
                             CreateTab(Endpoint.APIReturn(Endpoint.Endpoints.Misc, null), "Misc", Flow);
                         }
                         panel1.Controls.Add(Flow);
