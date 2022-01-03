@@ -13,6 +13,6 @@ Credits For Everything Used In This Application Below:
 [RestSharp](https://github.com/restsharp/RestSharp) Used To Download Strings <br />
 [Galaxy Swapper Api](https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API) Stores All Our Cosmetic Swaps & Patch Notes & Ect <br />
 <br/>
-*Copyright © Galaxy Swapper @2021 If Any Code Is Used From here Please Credit! Thanks.*
+*Copyright © Galaxy Swapper @2022 If Any Code Is Used From here Please Credit! Thanks.*
 
 <a href="https://t.co/RdrIUHzKw6?amp=1"><img src="https://cdn.discordapp.com/attachments/846121669813862450/874860699564793866/banner.png"></a>
