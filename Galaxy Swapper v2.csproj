@@ -1,0 +1,108 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <RootNamespace>Galaxy_Swapper_v2</RootNamespace>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+    <ApplicationIcon>Workspace\Assets\Logo.ico</ApplicationIcon>
+    <Authors>Wslt#0977</Authors>
+    <Copyright>Copyright © Galaxy Swapper v2</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Workspace\Assets\Arrow.png" />
+    <None Remove="Workspace\Assets\Backpacks.png" />
+    <None Remove="Workspace\Assets\Backpacks_Clicked.png" />
+    <None Remove="Workspace\Assets\Banner.png" />
+    <None Remove="Workspace\Assets\Character.png" />
+    <None Remove="Workspace\Assets\Characters.png" />
+    <None Remove="Workspace\Assets\Characters_Clicked.png" />
+    <None Remove="Workspace\Assets\Close.png" />
+    <None Remove="Workspace\Assets\Dances.png" />
+    <None Remove="Workspace\Assets\Dances_Clicked.png" />
+    <None Remove="Workspace\Assets\Dashboard.png" />
+    <None Remove="Workspace\Assets\Dashboard_Clicked.png" />
+    <None Remove="Workspace\Assets\Embed.png" />
+    <None Remove="Workspace\Assets\Gliders.png" />
+    <None Remove="Workspace\Assets\Gliders_Clicked.png" />
+    <None Remove="Workspace\Assets\LoginPage.png" />
+    <None Remove="Workspace\Assets\Logo.png" />
+    <None Remove="Workspace\Assets\Minimize.png" />
+    <None Remove="Workspace\Assets\Misc.png" />
+    <None Remove="Workspace\Assets\Misc_Clicked.png" />
+    <None Remove="Workspace\Assets\Pickaxes.png" />
+    <None Remove="Workspace\Assets\Pickaxes_Clicked.png" />
+    <None Remove="Workspace\Assets\Plugins.png" />
+    <None Remove="Workspace\Assets\Plugins_Clicked.png" />
+    <None Remove="Workspace\Assets\Remove.png" />
+    <None Remove="Workspace\Assets\Searchbar.png" />
+    <None Remove="Workspace\Assets\Searching.png" />
+    <None Remove="Workspace\Assets\Settings.png" />
+    <None Remove="Workspace\Assets\Settings_Clicked.png" />
+    <None Remove="Workspace\Assets\Wave.png" />
+    <None Remove="Workspace\Assets\Weapons.png" />
+    <None Remove="Workspace\Assets\Weapons_Clicked.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Workspace\Assets\Logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DiscordRichPresence" Version="1.1.3.18" />
+    <PackageReference Include="DotNetZip" Version="1.16.0" />
+    <PackageReference Include="K4os.Compression.LZ4" Version="1.3.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="WindowsAPICodePack.Shell.CommonFileDialogs" Version="1.1.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Workspace\Assets\Arrow.png" />
+    <Resource Include="Workspace\Assets\Backpacks.png" />
+    <Resource Include="Workspace\Assets\Backpacks_Clicked.png" />
+    <Resource Include="Workspace\Assets\Banner.png" />
+    <Resource Include="Workspace\Assets\Character.png" />
+    <Resource Include="Workspace\Assets\Characters.png" />
+    <Resource Include="Workspace\Assets\Characters_Clicked.png" />
+    <Resource Include="Workspace\Assets\Close.png" />
+    <Resource Include="Workspace\Assets\Dances.png" />
+    <Resource Include="Workspace\Assets\Dances_Clicked.png" />
+    <Resource Include="Workspace\Assets\Dashboard.png" />
+    <Resource Include="Workspace\Assets\Dashboard_Clicked.png" />
+    <Resource Include="Workspace\Assets\Embed.png" />
+    <Resource Include="Workspace\Assets\Gliders.png" />
+    <Resource Include="Workspace\Assets\Gliders_Clicked.png" />
+    <Resource Include="Workspace\Assets\LoginPage.png" />
+    <Resource Include="Workspace\Assets\Logo.png" />
+    <Resource Include="Workspace\Assets\Minimize.png" />
+    <Resource Include="Workspace\Assets\Misc.png" />
+    <Resource Include="Workspace\Assets\Misc_Clicked.png" />
+    <Resource Include="Workspace\Assets\Pickaxes.png" />
+    <Resource Include="Workspace\Assets\Pickaxes_Clicked.png" />
+    <Resource Include="Workspace\Assets\Plugins.png" />
+    <Resource Include="Workspace\Assets\Plugins_Clicked.png" />
+    <Resource Include="Workspace\Assets\Remove.png" />
+    <Resource Include="Workspace\Assets\Searchbar.png" />
+    <Resource Include="Workspace\Assets\Searching.png" />
+    <Resource Include="Workspace\Assets\Settings.png" />
+    <Resource Include="Workspace\Assets\Settings_Clicked.png" />
+    <Resource Include="Workspace\Assets\Wave.png" />
+    <Resource Include="Workspace\Assets\Weapons.png" />
+    <Resource Include="Workspace\Assets\Weapons_Clicked.png" />
+  </ItemGroup>
+
+</Project>
