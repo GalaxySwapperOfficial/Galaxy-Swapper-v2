@@ -1,18 +1,35 @@
-# Galaxy-Swapper-v2
-<br>
+## Galaxy Swapper v2
 
-Download Galaxy Swapper v2 Latest Version [here](https://linkvertise.com/98253/GalaxySwapperv2OfficialDownload) <br />
-Everything Was Codded In C# [.NET 5](https://www.galaxyswapperv2.com/Redirects/.NET5-Installer.html) <br />
+Revamp your Fortnite experience with our skin swapper designed for the latest version of Fortnite. This repository contains the source code for Galaxy Swapper v2.
 
-Credits For Everything Used In This Application Below:
+Note: It is recommended to download Galaxy Swapper v2 from [here](https://linkvertise.com/98253/GalaxySwapperv2OfficialDownload) instead of rebuilding it yourself.
 
-[CUE4Parse](https://github.com/FabianFG/CUE4Parse) Used To Export Uassets <br />
-[Fortnite-Api](https://dash.fortnite-api.com/) Used To Grab Latest Aes Key & Cosmetic Icons <br />
-[Siticone](https://www.siticoneframework.com/) Used For Drag Bar & Shadow Form <br />
-[DiscordRichPresence](https://github.com/Lachee/discord-rpc-csharp) Used To Display Game Activity On Discord <br />
-[RestSharp](https://github.com/restsharp/RestSharp) Used To Download Strings <br />
-[Galaxy Swapper Api](https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API) Stores All Our Cosmetic Swaps & Patch Notes & Ect <br />
-<br/>
-*Copyright © Galaxy Swapper @2023 If Any Code Is Used From here Please Credit! Thanks.*
+## What is Galaxy Swapper v2?
 
-<a href="https://t.co/RdrIUHzKw6?amp=1"><img src="https://cdn.discordapp.com/attachments/846121669813862450/874860699564793866/banner.png"></a>
+Galaxy Swapper v2 is a free Fortnite skin changer built in WPF that allows you to modify your game files to replace a cosmetic you own with a cosmetic you desire, all with ease. We have also developed a simple and user-friendly user-interface for your convenience.
+
+## Social media links
+* [Guilded](https://galaxyswapperv2.com/Guilded)
+* [Website](https://galaxyswapperv2.com)
+
+## Packages used in our application
+
+* [CUE4Parse](https://github.com/FabianFG/CUE4Parse)
+* [DotNetZip](https://github.com/haf/DotNetZip.Semverd)
+* [K4os.Compression.LZ4](https://github.com/MiloszKrajewski/K4os.Compression.LZ4)
+* [Newtonsoft.Json](https://www.newtonsoft.com/json)
+* [Serilog](https://serilog.net)
+
+## Endpoints used in our application
+
+* [Fortnite-Api](https://dash.fortnite-api.com)
+
+## Authors
+
+* [@Wslt](https://github.com/CodeWslt)
+
+## License
+
+Galaxy Swapper v2 is licensed under [GNU General Public License v3.0](https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2/blob/main/LICENSE)
+
+<a href="https://galaxyswapperv2.com/Guilded"><img src="https://cdn.discordapp.com/attachments/1122580592370921494/1129255436281983046/ServerBanner2.jpg"></a>
