@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="Galaxy_Swapper_v2.Workspace.Usercontrols.MiscView"
+             xmlns:local="clr-namespace:Galaxy_Swapper_v2.Workspace.Usercontrols"
+             mc:Ignorable="d" 
+             Height="600"
+             Width="985"
+             Loaded="MiscView_Loaded"
+             >
+    <Border Background="#090B0E" CornerRadius="0,0,10,0">
+        <Grid>
+            <ScrollViewer Name="Frontend_Viewer" VerticalScrollBarVisibility="Auto">
+                <WrapPanel Name="Frontend_Items">
+                    <Border x:Name="FOVBorder" Margin="15,0,0,90" Width="200" Height="130" Background="#0B0F16" CornerRadius="10" BorderThickness="1" BorderBrush="#050608" Cursor="Hand" MouseLeftButtonDown="FOV_Click" Visibility="Hidden">
+                        <Grid>
+                            <Image x:Name="FOVIcon" VerticalAlignment="Center" Stretch="Fill" IsEnabled="False" Margin="0, 0, 0, 22">
+                                <Image.Clip>
+                                    <RectangleGeometry RadiusX="5" RadiusY="5" Rect="0,0,198,120" />
+                                </Image.Clip>
+                            </Image>
+                            <TextBlock x:Name="FOVTextblock" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="9" FontWeight="SemiBold" Foreground="#D3D3D6" Margin="0, 5" IsEnabled="False"/>
+                        </Grid>
+                    </Border>
+                </WrapPanel>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</UserControl>

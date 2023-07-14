@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="Galaxy_Swapper_v2.Workspace.Usercontrols.LoginView"
+             Loaded="LoginView_Loaded"
+             Height="648"
+             Width="1048"
+             >
+    <Border Background="#090B0E" CornerRadius="10">
+        <Grid>
+            <!-- Background art -->
+            <Image Source="/Workspace/Assets/LoginPage.png">
+                <Image.Clip>
+                    <RectangleGeometry RadiusX="10" RadiusY="10" Rect="0,0,1048,648" />
+                </Image.Clip>
+            </Image>
+            <Image Name="Character" Source="/Workspace/Assets/Character.png" Margin="0,0,0,0"/>
+
+            <!-- Logo -->
+            <TextBlock Text="Galaxy Swapper v2" TextAlignment="Left" Foreground="#EFEFF0" Margin="70,24,836,601" FontWeight="SemiBold" FontSize="15"/>
+            <Image Source="/Workspace/Assets/Logo.png" Height="35" Width="35" Stretch="Fill" Margin="22,22,991,592" MouseLeftButtonDown="Discord_Click"/>
+
+            <!-- Key Tip -->
+            <TextBlock x:Name="Header" Text="Activate your key" TextAlignment="Left" VerticalAlignment="Stretch" Foreground="#EFEFF0" Margin="43,107,0,518" FontWeight="SemiBold" FontSize="17"/>
+            <TextBlock TextAlignment="Left" Margin="42,135,0,495" VerticalAlignment="Stretch" FontWeight="Light" FontSize="12">
+                <TextBlock x:Name="Tip_1" Text="Don't have a key?" Foreground="#D3D3D6"/>
+                <TextBlock x:Name="Tip_2" Text="Claim a FREE key here." Style="{ StaticResource Highlight }" MouseLeftButtonDown="Key_Click"/>
+            </TextBlock>
+
+            <!-- Activation -->
+            <TextBlock x:Name="Activation" Text="Activation key:" HorizontalAlignment="Left" VerticalAlignment="Stretch" FontSize="12" FontWeight="Light" Foreground="#D3D3D6" Margin="42,194,0,0"/>
+            <PasswordBox x:Name="Password" Password="000000-000000-000000" VerticalContentAlignment="Center" Background="#0B0F16" BorderThickness="1" BorderBrush="#050608" Foreground="#464149" Margin="40,215,526,403" GotFocus="Password_Focus" LostFocus="Password_UnFocus"/>
+            <Button x:Name="Activate" Content="Activate" Margin="311,280,524,325" Background="#3F8BFE" Click="ActivateKey_Click"/>
+            <TextBlock TextAlignment="Left" Margin="43,252,0,378" VerticalAlignment="Stretch" FontWeight="Light" FontSize="12">
+                <TextBlock x:Name="Tip_3" Text="Need help?" Foreground="#D3D3D6"/>
+                <TextBlock x:Name="Tip_4" Text="Join our Discord." Style="{ StaticResource Highlight }" MouseLeftButtonDown="Discord_Click"/>
+            </TextBlock>
+
+            <!-- Controls -->
+            <components:CCloseControl x:Name="CloseButton" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5, 5, 5, 5" MouseLeftButtonDown="Close_Click"/>
+            <components:CMinimizeControl x:Name="MinimizeButton" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5, 5, 45, 5" MouseLeftButtonDown="Minimize_Click"/>
+            <Border x:Name="Drag" Margin="212,-1,90,601" Background="Transparent" MouseLeftButtonDown="Drag_Click"/>
+        </Grid>
+    </Border>
+</UserControl>

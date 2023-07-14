@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="Galaxy_Swapper_v2.Workspace.Usercontrols.DashboardView"
+             xmlns:local="clr-namespace:Galaxy_Swapper_v2.Workspace.Usercontrols"
+             xmlns:components="clr-namespace:Galaxy_Swapper_v2.Workspace.Components"
+             mc:Ignorable="d" 
+             Height="600"
+             Width="985"
+             Loaded="DashboardView_Loaded"
+             >
+    <Border Background="#090B0E" CornerRadius="0,0,10,0">
+        <Grid>
+            <Grid x:Name="Banner" Margin="10,10,10,338" MouseEnter="Banner_MouseEnter" MouseLeave="Banner_MouseLeave" Cursor="Hand" MouseLeftButtonDown="Banner_Click">
+                <Image Height="252" Width="965" Source="/WorkSpace/Assets/Banner.png" IsEnabled="False">
+                    <Image.Clip>
+                        <RectangleGeometry RadiusX="5" RadiusY="5" Rect="0,0,965,252" />
+                    </Image.Clip>
+                </Image>
+                <TextBlock x:Name="Version" Text="Version {0}" Margin="7, 0, 0, 7" HorizontalAlignment="Left" VerticalAlignment="Bottom" FontSize="13" FontWeight="SemiBold" Foreground="#EFEFF0" IsEnabled="False"/>
+                <TextBlock x:Name="ReadMore" Text="Click to read more" Margin="0,0,0,7" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="13" FontWeight="SemiBold" Foreground="#EFEFF0" IsEnabled="False" Visibility="Hidden"/>
+            </Grid>
+            <ScrollViewer x:Name="Viewer" Margin="0,267,0,0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <WrapPanel x:Name="Wrap"/>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</UserControl>
