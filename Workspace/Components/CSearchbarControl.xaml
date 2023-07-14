@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="Galaxy_Swapper_v2.Workspace.Components.CSearchbarControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Galaxy_Swapper_v2.Workspace.Components"
+             mc:Ignorable="d" 
+             x:Name="root"
+             Height="30"
+             Width="260"
+             Margin="8"
+             >
+    <Border Background="#0D1118" BorderBrush="#050608" CornerRadius="10" BorderThickness="1">
+        <Grid>
+            <TextBox Name="Searchbar" Text="Search" HorizontalAlignment="Stretch" VerticalAlignment="Center" FontSize="12" FontWeight="Normal" Foreground="#464149" Background="Transparent" BorderThickness="0" Margin="25, 0, 0, 0" GotFocus="Searchbar_GotFocus" LostFocus="Searchbar_LostFocus"/>
+            <Image Source="/Workspace/Assets/Searchbar.png" VerticalAlignment="Center" HorizontalAlignment="Left" Width="15" Height="15" Margin="5, 0"/>
+        </Grid>
+    </Border>
+</UserControl>

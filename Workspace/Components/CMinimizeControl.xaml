@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="Galaxy_Swapper_v2.Workspace.Components.CMinimizeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Galaxy_Swapper_v2.Workspace.Components"
+             mc:Ignorable="d"
+             x:Name="root"
+             Width="40"
+             Height="30"
+             >
+    <Border x:Name="Minimize" Background="Transparent" CornerRadius="2" Cursor="Hand" MouseEnter="Minimize_Hover" MouseLeave="Minimize_Leave">
+        <Image Source="/Workspace/Assets/Minimize.png" Height="15" Width="15" IsEnabled="False" UseLayoutRounding="True"/>
+    </Border>
+</UserControl>
