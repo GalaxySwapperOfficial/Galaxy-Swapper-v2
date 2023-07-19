@@ -1,0 +1,48 @@
+﻿<Window x:Class="Galaxy_Swapper_v2.Workspace.Views.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Galaxy_Swapper_v2.Workspace.Views"
+        xmlns:components="clr-namespace:Galaxy_Swapper_v2.Workspace.Components"
+        mc:Ignorable="d"
+        Title="MainWindow"
+        MinHeight="648"
+        MinWidth="1048"
+        Height="648"
+        Width="1048"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        Background="Transparent"
+        AllowsTransparency="True"
+        Loaded="MainView_Loaded"
+        >
+    <Grid Name="Base">
+        <Border x:Name="Main" Background="#090B0E" CornerRadius="10">
+            <Grid>
+                <Border x:Name="TabHolder" Margin="63,48,0,0"/>
+                <Border Background="#060709" CornerRadius="10,0,0,10" HorizontalAlignment="Left" Width="60">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="3" Opacity="0.2"/>
+                    </Border.Effect>
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <components:CTabControl x:Name="Dashboard" Presence="Dashboard" Icon="/Workspace/Assets/Dashboard.png" IconClicked="/Workspace/Assets/Dashboard_Clicked.png" MouseLeftButtonDown="Tab_Click"/>
+                        <components:CTabControl x:Name="Characters" Presence="Skins" Icon="/Workspace/Assets/Characters.png" IconClicked="/Workspace/Assets/Characters_Clicked.png" MouseLeftButtonDown="Tab_Click"/>
+                        <components:CTabControl x:Name="Backpacks" Presence="BackBlings" Icon="/Workspace/Assets/Backpacks.png" IconClicked="/Workspace/Assets/Backpacks_Clicked.png" MouseLeftButtonDown="Tab_Click"/>
+                        <components:CTabControl x:Name="Pickaxes" Presence="Pickaxes" Icon="/Workspace/Assets/Pickaxes.png" IconClicked="/Workspace/Assets/Pickaxes_Clicked.png" MouseLeftButtonDown="Tab_Click"/>
+                        <components:CTabControl x:Name="Dances" Presence="Emotes" Icon="/Workspace/Assets/Dances.png" IconClicked="/Workspace/Assets/Dances_Clicked.png" MouseLeftButtonDown="Tab_Click"/>
+                        <components:CTabControl x:Name="Gliders" Presence="Gliders" Icon="/Workspace/Assets/Gliders.png" IconClicked="/Workspace/Assets/Gliders_Clicked.png" MouseLeftButtonDown="Tab_Click"/>
+                        <components:CTabControl x:Name="Weapons" Presence="Weapons" Icon="/Workspace/Assets/Weapons.png" IconClicked="/Workspace/Assets/Weapons_Clicked.png" MouseLeftButtonDown="Tab_Click"/>
+                        <components:CTabControl x:Name="Misc" Presence="Misc" Icon="/Workspace/Assets/Misc.png" IconClicked="/Workspace/Assets/Misc_Clicked.png" MouseLeftButtonDown="Tab_Click"/>
+                        <components:CTabControl x:Name="Plugins" Presence="Plugins" Icon="/Workspace/Assets/Plugins.png" IconClicked="/Workspace/Assets/Plugins_Clicked.png" MouseLeftButtonDown="Tab_Click"/>
+                        <components:CTabControl x:Name="Settings" Presence="Settings" Icon="/Workspace/Assets/Settings.png" IconClicked="/Workspace/Assets/Settings_Clicked.png" MouseLeftButtonDown="Tab_Click"/>
+                    </StackPanel>
+                </Border>
+                <components:CCloseControl x:Name="CloseButton" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5,5,5,5" MouseLeftButtonDown="Close_Click"/>
+                <components:CMinimizeControl x:Name="MinimizeButton" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5,5,45,5" MouseLeftButtonDown="Minimize_Click"/>
+                <components:CSearchbarControl x:Name="SearchBar" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5,5,90,5" Visibility="Hidden"/>
+                <Border x:Name="Drag" Margin="60,0,360,601" Background="Transparent" MouseLeftButtonDown="Drag_Click"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
