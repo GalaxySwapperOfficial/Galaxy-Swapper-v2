@@ -21,6 +21,7 @@ namespace Galaxy_Swapper_v2
             DLLS.Initialize();
 
             Log.Information("Successfully initialized properties");
+            Log.Information("This version is open source! If you have been sent this file be carful of any code modifcation that could have been done. https://galaxyswapperv2.com/Guilded");
 
             new MainView().ShowDialog();
 
