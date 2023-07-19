@@ -9,8 +9,10 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <PlatformTarget>x64</PlatformTarget>
     <ApplicationIcon>Workspace\Assets\Logo.ico</ApplicationIcon>
-    <Authors>Wslt#0977</Authors>
+    <Authors>https://www.guilded.gg/u/Wslt</Authors>
     <Copyright>Copyright © Galaxy Swapper v2</Copyright>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <Description>This version is open source! If you have been sent this file be carful of any code modifcation that could have been done. https://galaxyswapperv2.com/Guilded</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

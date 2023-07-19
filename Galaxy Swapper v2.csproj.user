@@ -42,16 +42,13 @@
     <Compile Update="Workspace\Usercontrols\DashboardView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Workspace\Usercontrols\FovView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Workspace\Usercontrols\LoginView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Workspace\Usercontrols\MiscView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="Workspace\Usercontrols\Overlays\DiscordView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Workspace\Usercontrols\Overlays\FovView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Workspace\Usercontrols\Overlays\LanguageSelectionView.xaml.cs">
@@ -119,16 +116,13 @@
     <Page Update="Workspace\Usercontrols\DashboardView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Workspace\Usercontrols\FovView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Workspace\Usercontrols\LoginView.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Workspace\Usercontrols\MiscView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
     <Page Update="Workspace\Usercontrols\Overlays\DiscordView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Workspace\Usercontrols\Overlays\FovView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Usercontrols\Overlays\LanguageSelectionView.xaml">
