@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="Galaxy_Swapper_v2.Workspace.Usercontrols.CosmeticsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Galaxy_Swapper_v2.Workspace.Usercontrols"
+             mc:Ignorable="d" 
+             Height="600"
+             Width="985"
+             Loaded="CosmeticsView_Loaded"
+             >
+    <Border Background="#090B0E" CornerRadius="0,0,10,0">
+        <Grid>
+            <ScrollViewer Name="Frontend_Viewer" VerticalScrollBarVisibility="Auto">
+                <WrapPanel Name="Frontend_Items"/>
+            </ScrollViewer>
+            <ScrollViewer Name="Option_Viewer" VerticalScrollBarVisibility="Auto" Visibility="Hidden">
+                <WrapPanel Name="Option_Items"/>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</UserControl>
