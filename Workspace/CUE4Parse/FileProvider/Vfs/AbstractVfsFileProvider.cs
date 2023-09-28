@@ -18,9 +18,6 @@ using CUE4Parse.UE4.VirtualFileCache;
 using CUE4Parse.UE4.VirtualFileCache.Manifest;
 using CUE4Parse.UE4.VirtualFileSystem;
 using CUE4Parse.Utils;
-using Galaxy_Swapper_v2.Workspace.Properties;
-using Galaxy_Swapper_v2.Workspace.Utilities;
-using Newtonsoft.Json.Linq;
 
 namespace CUE4Parse.FileProvider.Vfs
 {
@@ -129,42 +126,8 @@ namespace CUE4Parse.FileProvider.Vfs
         public async Task<int> SubmitKeyAsync(FGuid guid, FAesKey key) =>
             await SubmitKeysAsync(new Dictionary<FGuid, FAesKey> {{ guid, key }}).ConfigureAwait(false);
 
-        public static void Start()
-        {
-            string invalidmessage = "NDgtSG91ciBrZXkgaXMgbm90IHZhbGlkPyBNYWtlIHN1cmUgdGhlIGtleSBzb3VyY2Ugd2FzIG5vdCByZW1vdmVkIG9yIGRvd25sb2FkIHRoZSByZWFsIHN3YXBwZXIhIGh0dHBzOi8vZ2FsYXh5c3dhcHBlcnYyLmNvbS9HdWlsZGVk".Base64Decode();
-
-            if (!File.Exists($"{Config.Path}\\{"TG9naW5HaXRodWIuanNvbg==".Base64Decode()}"))
-                throw new Exception(invalidmessage);
-
-            string Content = File.ReadAllText($"{Config.Path}\\{"TG9naW5HaXRodWIuanNvbg==".Base64Decode()}");
-
-            if (string.IsNullOrEmpty(Content))
-                throw new Exception(invalidmessage);
-
-            if (!Content.ValidJson())
-                throw new Exception(invalidmessage);
-
-            var Parse = JObject.Parse(Content);
-
-            if (Parse["Username"].Value<string>() != Environment.UserName)
-                throw new Exception(invalidmessage);
-
-            DateTime CurrentDate = DateTime.Now;
-
-            foreach (string Day in Parse["Days"])
-            {
-                if (Day == CurrentDate.ToString("dd/MM/yyyy"))
-                    return;
-            }
-
-            File.Delete($"{Config.Path}\\{"TG9naW5HaXRodWIuanNvbg==".Base64Decode()}");
-            throw new Exception(invalidmessage);
-        }
-
         public async Task<int> SubmitKeysAsync(IEnumerable<KeyValuePair<FGuid, FAesKey>> keys)
         {
-            Start();
-
             var countNewMounts = 0;
             var tasks = new LinkedList<Task<IAesVfsReader?>>();
             foreach (var it in keys)

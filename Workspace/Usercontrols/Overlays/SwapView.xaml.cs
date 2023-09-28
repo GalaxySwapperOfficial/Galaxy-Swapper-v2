@@ -12,6 +12,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -51,7 +53,13 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             Convert.Content = Languages.Read(Languages.Type.View, "SwapView", "Convert");
             Revert.Content = Languages.Read(Languages.Type.View, "SwapView", "Revert");
 
-            if (SwapLogs.IsSwapped(Option.Name))
+            if (Option.UEFNFormat && SwapLogs.IsSwappedUEFNSwapped(Option.Name, out string revertitem))
+            {
+                Message.Display(Languages.Read(Languages.Type.Header, "Warning"), string.Format(Languages.Read(Languages.Type.Message, "UEFNRevert"), revertitem), MessageBoxButton.OK);
+                Memory.MainView.RemoveOverlay();
+                return;
+            }
+            else if (SwapLogs.IsSwapped(Option.Name))
             {
                 Converted.Text = Languages.Read(Languages.Type.View, "SwapView", "ON");
                 Converted.Foreground = Colors.Text;
@@ -68,6 +76,10 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             }
             else
                 Converted.Text = Languages.Read(Languages.Type.View, "SwapView", "OFF");
+
+            if (Settings.Read(Settings.Type.CloseFortnite).Value<bool>())
+                EpicGamesLauncher.Close();
+
             if (!string.IsNullOrEmpty(Option.Message) && Option.Message.ToLower() != "false")
                 Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Option.Message, MessageBoxButton.OK);
             if (!string.IsNullOrEmpty(Option.OptionMessage) && Option.OptionMessage.ToLower() != "false")
@@ -122,15 +134,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 return;
             }
 
-            string paks = Settings.Read(Settings.Type.Installtion).Value<string>();
-            if (string.IsNullOrEmpty(paks) || !Directory.Exists($"{paks}\\FortniteGame\\Content\\Paks") || !File.Exists($"{paks}\\FortniteGame\\Content\\Paks\\global.ucas"))
+            string epicinstallation = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
+            if (string.IsNullOrEmpty(epicinstallation) || !File.Exists(epicinstallation))
             {
-                Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Languages.Read(Languages.Type.Message, "FortniteDirectoryEmpty"), MessageBoxButton.OK);
+                Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Languages.Read(Languages.Type.Message, "EpicGamesLauncherPathEmpty"), MessageBoxButton.OK);
                 return;
             }
 
-            if (Settings.Read(Settings.Type.CloseFortnite).Value<bool>())
-                EpicGamesLauncher.Close();
+            EpicGamesLauncher.Close();
 
             Worker = new BackgroundWorker();
             Worker.RunWorkerCompleted += Worker_Completed;
@@ -159,14 +170,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
                 string paks = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
 
-                if (PaksCheck.Run(paks))
-                    throw new CustomException($"Fortnite game files are currently in use!\nPlease close anything that may be using your game files.");
-
-                Output(Languages.Read(Languages.Type.View, "SwapView", "DownloadingAES"), Type.Info);
-                FortniteApi.Download();
-
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                CProvider.Initialize(paks);
+                CProvider.Initialize();
 
                 List<string> Ucas = new List<string>();
                 List<string> Utocs = new List<string>();
@@ -214,14 +219,23 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     }
                 }
 
+                if (Option.UseMainUEFN)
+                {
+                    Output(Languages.Read(Languages.Type.View, "SwapView", "DownloadingMainUEFN"), Type.Info);
+                    UEFN.DownloadMain(paks);
+                }
+
                 if (Option.Downloadables != null &&  Option.Downloadables.Count > 0)
                 {
-                    Output("Downloading UEFN files", Type.Info);
+                    Output(Languages.Read(Languages.Type.View, "SwapView", "DownloadingUEFN"), Type.Info);
                     foreach (var downloadable in Option.Downloadables)
                     {
                         UEFN.Add(paks, Option.Name, downloadable);
                     }
                 }
+
+                Output(Languages.Read(Languages.Type.View, "SwapView", "ModifyingEpicGamesLauncher"), Type.Info);
+                CustomEpicGamesLauncher.Convert();
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "ConvertingAssets"), Type.Info);
 
@@ -232,7 +246,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                         return;
                 }
 
-                SwapLogs.Add(Option.Name, Option.Icon, Option.OverrideIcon, Option.Exports.Count, Ucas, Utocs);
+                SwapLogs.Add(Option.Name, Option.Icon, Option.OverrideIcon, Option.Exports.Count, Ucas, Utocs, Option.UEFNFormat);
 
                 this.Dispatcher.Invoke(() =>
                 {
@@ -265,16 +279,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 var Stopwatch = new Stopwatch();
                 Stopwatch.Start();
 
-                string paks = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
-
-                if (PaksCheck.Run(paks))
-                    throw new CustomException($"Fortnite game files are currently in use!\nPlease close anything that may be using your game files.");
-
-                Output(Languages.Read(Languages.Type.View, "SwapView", "DownloadingAES"), Type.Info);
-                FortniteApi.Download();
-
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                CProvider.Initialize(paks);
+                CProvider.Initialize();
 
                 foreach (var Asset in Option.Exports)
                 {
@@ -298,7 +304,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
                 if (Option.Downloadables != null && Option.Downloadables.Count > 0)
                 {
-                    Output("Removing UEFN files", Type.Info);
+                    Output(Languages.Read(Languages.Type.View, "SwapView", "RemovingUEFN"), Type.Info);
                     foreach (var downloadable in Option.Downloadables)
                     {
                         UEFN.Remove(Option.Name);

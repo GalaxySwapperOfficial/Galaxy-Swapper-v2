@@ -7,10 +7,6 @@ using System.Text;
 
 namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public class Writer : BinaryWriter
     {
         public long Position

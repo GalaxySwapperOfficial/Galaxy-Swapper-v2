@@ -3,13 +3,10 @@ using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Galaxy_Swapper_v2.Workspace.Generation.Types
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public static class Neutral
     {
         public static void Format(Cosmetic Cosmetic, List<Option> Options, JToken Empty, Generate.Type CacheType, params string[] Types)
@@ -55,6 +52,18 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                                 else
                                     NewOption.Icon = string.Format(Generate.Domain, NewOption.ID);
 
+                                NewOption.Nsfw = Cosmetic.Nsfw;
+                                NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
+
+                                if (Override["Downloadables"] != null)
+                                {
+                                    foreach (var downloadable in Override["Downloadables"])
+                                    {
+                                        if (!downloadable["pak"].KeyIsNullOrEmpty() && !downloadable["sig"].KeyIsNullOrEmpty() && !downloadable["ucas"].KeyIsNullOrEmpty() && !downloadable["utoc"].KeyIsNullOrEmpty())
+                                            NewOption.Downloadables.Add(new Downloadable() { Pak = downloadable["pak"].Value<string>(), Sig = downloadable["sig"].Value<string>(), Ucas = downloadable["ucas"].Value<string>(), Utoc = downloadable["utoc"].Value<string>() });
+                                    }
+                                }
+
                                 foreach (var Asset in Override["Assets"])
                                 {
                                     var NewAsset = new Asset() { Object = Asset["AssetPath"].Value<string>() };
@@ -78,6 +87,62 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                             continue;
                     }
                 }
+            }
+
+            if (!Parse["UEFNFormat"].KeyIsNullOrEmpty() && Parse["UEFNFormat"].Value<bool>())
+            {
+                var parse = Endpoint.Read(Endpoint.Type.UEFN);
+
+                foreach (var option in parse["Swaps"])
+                {
+                    var NewOption = new Option
+                    {
+                        Name = $"{option["Name"].Value<string>()} to {Cosmetic.Name}",
+                        ID = option["ID"].Value<string>(),
+                        OverrideIcon = Cosmetic.Icon,
+                        UEFNFormat = true,
+                        Parse = null // Not needed we will never use it
+                    };
+
+
+                    if (!option["Override"].KeyIsNullOrEmpty())
+                        NewOption.Icon = option["Override"].Value<string>();
+                    else if (!option["Icon"].KeyIsNullOrEmpty())
+                        NewOption.Icon = option["Icon"].Value<string>();
+                    else
+                        NewOption.Icon = string.Format(Generate.Domain, NewOption.ID);
+
+                    if (!Parse["Message"].KeyIsNullOrEmpty())
+                        NewOption.Message = Parse["Message"].Value<string>();
+
+                    if (!option["Message"].KeyIsNullOrEmpty())
+                        NewOption.OptionMessage = option["Message"].Value<string>();
+
+                    NewOption.Nsfw = Cosmetic.Nsfw;
+                    NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
+
+                    foreach (var Asset in option["Assets"])
+                    {
+                        var NewAsset = new Asset() { Object = Asset["AssetPath"].Value<string>() };
+
+                        if (Asset["AssetPathTo"] != null)
+                            NewAsset.OverrideObject = Asset["AssetPathTo"].Value<string>();
+
+                        if (Asset["Buffer"] != null)
+                            NewAsset.OverrideBuffer = Asset["Buffer"].Value<string>();
+
+                        if (Asset["Swaps"] != null)
+                            NewAsset.Swaps = Asset["Swaps"];
+
+                        NewOption.Exports.Add(NewAsset);
+                    }
+
+                    var newfallback = new Asset() { Object = "/Game/Athena/Heroes/Meshes/Bodies/CP_Athena_Body_F_Fallback", OverrideObject = Parse["Object"].Value<string>(), Swaps = Parse["Swaps"] };
+                    NewOption.Exports.Add(newfallback);
+                    Cosmetic.Options.Add(NewOption);
+                }
+
+                return;
             }
 
             var BlackListed = new List<string>();
@@ -183,6 +248,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                 NewOption.Name = $"{Option.Name} to {Cosmetic.Name}";
                 NewOption.OverrideIcon = Cosmetic.Icon;
                 NewOption.Nsfw = Cosmetic.Nsfw;
+                NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
 
                 Cosmetic.Options.Add(NewOption);
             }

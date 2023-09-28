@@ -1,6 +1,7 @@
-﻿namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
+﻿using System;
+
+namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
 {
-    //https://raw.githubusercontent.com/Tamely/SaturnSwapper/b7e423500de448fd93db64ff518df3e5ab8b8cc2/Saturn.Launcher/CityHash.cs
     public static class CityHash
     {
         private const ulong K0 = 14097894508562428199uL;

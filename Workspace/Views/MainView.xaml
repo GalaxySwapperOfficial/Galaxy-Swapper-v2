@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Galaxy_Swapper_v2.Workspace.Views"
         xmlns:components="clr-namespace:Galaxy_Swapper_v2.Workspace.Components"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="MainView"
         MinHeight="648"
         MinWidth="1048"
         Height="648"

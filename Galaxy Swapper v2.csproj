@@ -9,10 +9,8 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <PlatformTarget>x64</PlatformTarget>
     <ApplicationIcon>Workspace\Assets\Logo.ico</ApplicationIcon>
-    <Authors>https://www.guilded.gg/u/Wslt</Authors>
+    <Authors>Wslt#0977</Authors>
     <Copyright>Copyright © Galaxy Swapper v2</Copyright>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
-    <Description>This version is open source! If you have been sent this file be carful of any code modifcation that could have been done. https://galaxyswapperv2.com/Guilded</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -44,6 +42,7 @@
     <None Remove="Workspace\Assets\Minimize.png" />
     <None Remove="Workspace\Assets\Misc.png" />
     <None Remove="Workspace\Assets\Misc_Clicked.png" />
+    <None Remove="Workspace\Assets\oo2core_5_win64.dll" />
     <None Remove="Workspace\Assets\Pickaxes.png" />
     <None Remove="Workspace\Assets\Pickaxes_Clicked.png" />
     <None Remove="Workspace\Assets\Plugins.png" />
@@ -67,7 +66,9 @@
     <PackageReference Include="DotNetZip" Version="1.16.0" />
     <PackageReference Include="K4os.Compression.LZ4" Version="1.3.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="Serilog" Version="2.12.0" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="WindowsAPICodePack.Shell.CommonFileDialogs" Version="1.1.5" />
   </ItemGroup>
@@ -93,6 +94,7 @@
     <Resource Include="Workspace\Assets\Minimize.png" />
     <Resource Include="Workspace\Assets\Misc.png" />
     <Resource Include="Workspace\Assets\Misc_Clicked.png" />
+    <EmbeddedResource Include="Workspace\Assets\oo2core_5_win64.dll" />
     <Resource Include="Workspace\Assets\Pickaxes.png" />
     <Resource Include="Workspace\Assets\Pickaxes_Clicked.png" />
     <Resource Include="Workspace\Assets\Plugins.png" />

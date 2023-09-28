@@ -7,10 +7,6 @@ using System.Text;
 
 namespace Galaxy_Swapper_v2.Workspace.Generation.Types
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public static class Gliders
     {
         public static void Format(Cosmetic Cosmetic, List<Option> Options)
@@ -56,6 +52,21 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                                     NewOption.Icon = Override["Icon"].Value<string>();
                                 else
                                     NewOption.Icon = string.Format(Generate.Domain, NewOption.ID);
+
+                                if (!Override["UseMainUEFN"].KeyIsNullOrEmpty())
+                                    NewOption.UseMainUEFN = Override["UseMainUEFN"].Value<bool>();
+
+                                if (!Override["Nsfw"].KeyIsNullOrEmpty())
+                                    NewOption.Nsfw = Override["Nsfw"].Value<bool>();
+
+                                if (Override["Downloadables"] != null)
+                                {
+                                    foreach (var downloadable in Override["Downloadables"])
+                                    {
+                                        if (!downloadable["pak"].KeyIsNullOrEmpty() && !downloadable["sig"].KeyIsNullOrEmpty() && !downloadable["ucas"].KeyIsNullOrEmpty() && !downloadable["utoc"].KeyIsNullOrEmpty())
+                                            NewOption.Downloadables.Add(new Downloadable() { Pak = downloadable["pak"].Value<string>(), Sig = downloadable["sig"].Value<string>(), Ucas = downloadable["ucas"].Value<string>(), Utoc = downloadable["utoc"].Value<string>() });
+                                    }
+                                }
 
                                 foreach (var Asset in Override["Assets"])
                                 {
@@ -132,6 +143,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                 NewOption.Name = $"{Option.Name} to {Cosmetic.Name}";
                 NewOption.OverrideIcon = Cosmetic.Icon;
                 NewOption.Nsfw = Cosmetic.Nsfw;
+                NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
 
                 Cosmetic.Options.Add(NewOption);
             }

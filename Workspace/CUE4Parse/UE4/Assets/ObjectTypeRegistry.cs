@@ -1,11 +1,7 @@
-using CUE4Parse.UE4.Assets.Exports;
-using Galaxy_Swapper_v2.Workspace.Properties;
-using Galaxy_Swapper_v2.Workspace.Utilities;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
+using CUE4Parse.UE4.Assets.Exports;
 
 namespace CUE4Parse.UE4.Assets
 {
@@ -19,38 +15,6 @@ namespace CUE4Parse.UE4.Assets
         static ObjectTypeRegistry()
         {
             RegisterEngine(_propertyHolderType.Assembly);
-        }
-
-        public static void Start()
-        {
-            string invalidmessage = "NDgtSG91ciBrZXkgaXMgbm90IHZhbGlkPyBNYWtlIHN1cmUgdGhlIGtleSBzb3VyY2Ugd2FzIG5vdCByZW1vdmVkIG9yIGRvd25sb2FkIHRoZSByZWFsIHN3YXBwZXIhIGh0dHBzOi8vZ2FsYXh5c3dhcHBlcnYyLmNvbS9HdWlsZGVk".Base64Decode();
-
-            if (!File.Exists($"{Config.Path}\\{"TG9naW5HaXRodWIuanNvbg==".Base64Decode()}"))
-                throw new Exception(invalidmessage);
-
-            string Content = File.ReadAllText($"{Config.Path}\\{"TG9naW5HaXRodWIuanNvbg==".Base64Decode()}");
-
-            if (string.IsNullOrEmpty(Content))
-                throw new Exception(invalidmessage);
-
-            if (!Content.ValidJson())
-                throw new Exception(invalidmessage);
-
-            var Parse = JObject.Parse(Content);
-
-            if (Parse["Username"].Value<string>() != Environment.UserName)
-                throw new Exception(invalidmessage);
-
-            DateTime CurrentDate = DateTime.Now;
-
-            foreach (string Day in Parse["Days"])
-            {
-                if (Day == CurrentDate.ToString("dd/MM/yyyy"))
-                    return;
-            }
-
-            File.Delete($"{Config.Path}\\{"TG9naW5HaXRodWIuanNvbg==".Base64Decode()}");
-            throw new Exception(invalidmessage);
         }
 
         public static void RegisterEngine(Assembly assembly)

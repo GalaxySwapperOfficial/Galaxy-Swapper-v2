@@ -1,8 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using CUE4Parse.UE4.Exceptions;
 using CUE4Parse.UE4.Objects.Core.Misc;
 using CUE4Parse.UE4.Readers;
 using CUE4Parse.Utils;
+using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 
 namespace CUE4Parse.UE4.IO.Objects
 {
@@ -84,6 +86,63 @@ namespace CUE4Parse.UE4.IO.Objects
             _reserved7 = Ar.Read<uint>();
             _reserved8 = Ar.ReadArray<ulong>(5);
             Ar.Position = Ar.Position.Align(4);
+        }
+
+        public FIoStoreTocHeader(Reader reader)
+        {
+            TocMagic = reader.ReadBytes(16);
+
+            if (!TOC_MAGIC.SequenceEqual(TocMagic))
+                throw new Exception("Invalid utoc magic");
+
+            Version = reader.Read<EIoStoreTocVersion>();
+            _reserved0 = reader.Read<byte>();
+            _reserved1 = reader.Read<ushort>();
+            TocHeaderSize = reader.Read<uint>();
+            TocEntryCount = reader.Read<uint>();
+            TocCompressedBlockEntryCount = reader.Read<uint>();
+            TocCompressedBlockEntrySize = reader.Read<uint>();
+            CompressionMethodNameCount = reader.Read<uint>();
+            CompressionMethodNameLength = reader.Read<uint>();
+            CompressionBlockSize = reader.Read<uint>();
+            DirectoryIndexSize = reader.Read<uint>();
+            PartitionCount = reader.Read<uint>();
+            ContainerId = reader.Read<FIoContainerId>();
+            EncryptionKeyGuid = reader.Read<FGuid>();
+            ContainerFlags = reader.Read<EIoContainerFlags>();
+            _reserved3 = reader.Read<byte>();
+            _reserved4 = reader.Read<ushort>();
+            TocChunkPerfectHashSeedsCount = reader.Read<uint>();
+            PartitionSize = reader.Read<ulong>();
+            TocChunksWithoutPerfectHashCount = reader.Read<uint>();
+            _reserved7 = reader.Read<uint>();
+            _reserved8 = reader.ReadArray<ulong>(5);
+        }
+
+        public bool Compare(FIoStoreTocHeader header)
+        {
+            if (TocHeaderSize != header.TocHeaderSize)
+                return false;
+            if (TocEntryCount != header.TocEntryCount)
+                return false;
+            if (TocHeaderSize != header.TocHeaderSize)
+                return false;
+            if (TocCompressedBlockEntryCount != header.TocCompressedBlockEntryCount)
+                return false;
+            if (TocCompressedBlockEntrySize != header.TocCompressedBlockEntrySize)
+                return false;
+            if (CompressionMethodNameCount != header.CompressionMethodNameCount)
+                return false;
+            if (CompressionMethodNameLength != header.CompressionMethodNameLength)
+                return false;
+            if (CompressionBlockSize != header.CompressionBlockSize)
+                return false;
+            if (DirectoryIndexSize != header.DirectoryIndexSize)
+                return false;
+            if (TocChunkPerfectHashSeedsCount != header.TocChunkPerfectHashSeedsCount)
+                return false;
+
+            return true;
         }
     }
 }

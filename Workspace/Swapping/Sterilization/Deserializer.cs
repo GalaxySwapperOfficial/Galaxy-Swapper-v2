@@ -9,10 +9,6 @@ using System.Text;
 
 namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public class Deserializer
     {
         public Structs.FZenPackageSummary Summary;
@@ -145,20 +141,38 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
             try
             {
                 int SearchIndex = this.NameMap.ToList().FindIndex((string x) => x.ToLower() == Search.ToLower());
-                int ReplaceIndex = AssetDeserializer.NameMap.ToList().FindIndex((string x) => x.ToLower() == Replace.ToLower());
+
                 if (SearchIndex < 0)
                 {
-                    Log.Error($"Failed to find {Search} namemap");
-                    throw new Exception($"Failed to find {Search} namemap!");
+                    Log.Error($"Failed to find {Search} namemap attempting _C ?");
+
+                    SearchIndex = this.NameMap.ToList().FindIndex((string x) => x.ToLower() == $"{Search.ToLower()}_c");
+                    Search = $"{Search}_C";
+
+                    if (SearchIndex < 0)
+                    {
+                        Log.Error($"Failed to find {Search} namemap even with _C");
+                        throw new Exception($"Failed to find {Search} namemap!");
+                    }
                 }
+
+                int ReplaceIndex = AssetDeserializer.NameMap.ToList().FindIndex((string x) => x.ToLower() == Replace.ToLower());
                 if (ReplaceIndex < 0)
                 {
-                    Log.Error($"Failed to find {Replace} namemap");
-                    throw new Exception($"Failed to find {Replace} namemap!");
+                    Log.Error($"Failed to find {Replace} namemap attempting _C ?");
+
+                    ReplaceIndex = AssetDeserializer.NameMap.ToList().FindIndex((string x) => x.ToLower() == $"{Replace.ToLower()}_c");
+                    Replace = $"{Replace}_C";
+
+                    if (ReplaceIndex < 0)
+                    {
+                        Log.Error($"Failed to find {Replace} namemap even with _C");
+                        throw new Exception($"Failed to find {Replace} namemap!");
+                    }
                 }
 
                 this.NameMapHashes[SearchIndex] = AssetDeserializer.NameMapHashes[ReplaceIndex];
-                this.NameMap[SearchIndex] = Replace;
+                this.NameMap[SearchIndex] = AssetDeserializer.NameMap[ReplaceIndex];
 
                 Log.Information($"Replaced {Search} to {Replace} namemap and hashes");
             }

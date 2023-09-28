@@ -1,22 +1,21 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Components;
 using Galaxy_Swapper_v2.Workspace.Utilities;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RestSharp;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Windows;
 
 namespace Galaxy_Swapper_v2.Workspace.Properties
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public static class Account
     {
-        public static readonly string Path = $"{Config.Path}\\LoginGithub.json";
+        public static readonly string Path = $"{App.Config}\\Login.encrypted";
         public static bool Valid()
         {
             try
@@ -25,6 +24,11 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                     return false;
 
                 string Content = File.ReadAllText(Path);
+
+                if (string.IsNullOrEmpty(Content))
+                    return false;
+
+                Content = Content.Decompress();
 
                 if (!Content.ValidJson())
                     return false;
@@ -56,51 +60,43 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
         private const string Domain = "https://galaxyswapperv2.com/Key/Valid.php";
         public static bool Activate(string Activation)
         {
-            using (WebClient WC = new WebClient())
+            var stopwatch = new Stopwatch(); stopwatch.Start();
+
+            using (var client = new RestClient())
             {
-                WC.Headers.Add("version", Global.Version);
-                WC.Headers.Add("apiversion", Global.ApiVersion);
-                WC.Headers.Add("activation", Activation);
-                WC.Headers.Add("auth", "galaxyswapperv2");
+                var request = new RestRequest(new Uri(Domain), Method.Get);
+                request.AddHeader("version", Global.Version);
+                request.AddHeader("apiversion", Global.Version);
+                request.AddHeader("activation", Activation);
+                request.AddHeader("auth", "galaxyswapperv2");
 
-                try
+                Log.Information($"Sending {request.Method} request to {Domain}");
+                var response = client.Execute(request);
+
+                if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    string Response = WC.DownloadString(Domain);
+                    Log.Fatal($"Failed to download response from endpoint! Expected: {HttpStatusCode.OK} Received: {response.StatusCode}");
+                    Message.DisplaySTA("Error", "Webclient caught a exception while downloading response from Endpoint.", MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, close: true);
+                }
 
-                    if (!Response.ValidJson())
-                    {
-                        new CMessageboxControl("Error", $"Endpoint response did not return in a valid JSON format. Contact Wslt about this issue.", System.Windows.MessageBoxButton.OK, new List<string>() { Global.Discord }).ShowDialog();
-                        return false;
-                    }
+                Log.Information($"Finished {request.Method} request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
 
-                    var Parse = JObject.Parse(Response);
-
-                    if (Parse["status"].Value<int>() == 200)
-                    {
-                        Message.Display(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.Message, "LoginSuccess"), Parse["days"].Value<int>()), MessageBoxButton.OK);
-
-                        if (!Create(Parse["days"].Value<int>()))
+                var parse = JsonConvert.DeserializeObject<JObject>(response.Content);
+                
+                switch (parse["status"].Value<int>())
+                {
+                    case 200:
+                        if (!Create(parse["days"].Value<int>()))
                             return false;
 
+                        Message.Display(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.Message, "LoginSuccess"), parse["days"].Value<int>()), MessageBoxButton.OK);
                         return true;
-                    }
-                    else if (Parse["status"].Value<int>() == 409)
-                    {
-                        if (Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Languages.Read(Languages.Type.Message, "LoginInvalid"), MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
-                            Global.Key.UrlStart();
-
+                    case 409:
+                        Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Languages.Read(Languages.Type.Message, "LoginInvalid"), MessageBoxButton.OK);
                         return false;
-                    }
-                    else
-                    {
-                        new CMessageboxControl("Error", Parse["message"].Value<string>(), System.Windows.MessageBoxButton.OK, new List<string>() { Global.Discord }, new List<string>() { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }).ShowDialog();
+                    default:
+                        Message.Display(Languages.Read(Languages.Type.Header, "Error"), parse["message"].Value<string>(), MessageBoxButton.OK, solutions: new () { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
                         return false;
-                    }
-                }
-                catch
-                {
-                    new CMessageboxControl("Error", "Webclient caught a exception while downloading response from Endpoint.", System.Windows.MessageBoxButton.OK, new List<string>() { Global.Discord }, new List<string>() { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }).ShowDialog();
-                    return false;
                 }
             }
         }
@@ -130,7 +126,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                     Days = Array
                 });
 
-                string Content = Object.ToString(Newtonsoft.Json.Formatting.None);
+                string Content = Object.ToString(Newtonsoft.Json.Formatting.None).Compress();
 
                 File.WriteAllText(Path, Content);
                 return true;

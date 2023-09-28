@@ -1,14 +1,13 @@
-﻿using Galaxy_Swapper_v2.Workspace.Utilities;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace Galaxy_Swapper_v2.Workspace.Swapping.Compression.Types
 {
     public static class Oodle
     {
-        [DllImport(DLLData.OODLE_5)]
+        [DllImport("oo2core_5_win64.dll")]
         private static extern int OodleLZ_Compress(OodleFormat format, byte[] decompressedBuffer, long decompressedSize, byte[] compressedBuffer, OodleCompressionLevel compressionLevel, uint a, uint b, uint c, uint threadModule);
-        [DllImport(DLLData.OODLE_5)]
+        [DllImport("oo2core_5_win64.dll")]
         private static extern int OodleLZ_Decompress(byte[] buffer, long bufferSize, byte[] outputBuffer, long outputBufferSize, uint a, uint b, ulong c, uint d, uint e, uint f, uint g, uint h, uint i, uint threadModule);
 
         public static byte[] Compress(byte[] buffer, OodleCompressionLevel CompressionLevel)

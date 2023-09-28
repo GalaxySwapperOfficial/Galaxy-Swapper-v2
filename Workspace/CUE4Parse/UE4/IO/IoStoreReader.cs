@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using CUE4Parse.Encryption.Aes;
 using CUE4Parse.FileProvider.Objects;
 using CUE4Parse.UE4.Exceptions;
@@ -17,6 +10,13 @@ using CUE4Parse.Utils;
 using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
 using Galaxy_Swapper_v2.Workspace.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace CUE4Parse.UE4.IO
 {
@@ -119,7 +119,9 @@ namespace CUE4Parse.UE4.IO
             var Result = Read(ioEntry.Offset, ioEntry.Size);
 
             if (CProvider.SaveExport)
+            {
                 CProvider.Export.ChunkOffsetLengths = TocResource.ChunkOffsetLengths[ioEntry.TocEntryIndex];
+            }
 
             return Result;
         }
@@ -227,7 +229,7 @@ namespace CUE4Parse.UE4.IO
             for (int blockIndex = firstBlockIndex; blockIndex <= lastBlockIndex; blockIndex++)
             {
                 ref var compressionBlock = ref TocResource.CompressionBlocks[blockIndex];
-
+                
                 var rawSize = compressionBlock.CompressedSize.Align(Aes.ALIGN);
                 if (compressedBuffer.Length < rawSize)
                 {

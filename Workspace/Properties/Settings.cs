@@ -7,25 +7,23 @@ using System.IO;
 
 namespace Galaxy_Swapper_v2.Workspace.Properties
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public static class Settings
     {
         public static Dictionary<string, dynamic> Cache = new Dictionary<string, dynamic>();
-        public static readonly string Path = $"{Config.Path}\\Settings.json";
+        public static readonly string Path = $"{App.Config}\\Settings.json";
         public static JObject Parse { get; set; } = default!;
         public enum Type
         {
             Installtion,
+            EpicInstalltion,
             Language,
             RichPresence,
             CloseFortnite,
             KickWarning,
             Reminded,
             CharacterGender,
-            BackpackGender
+            BackpackGender,
+            HideNsfw
         }
         public static void Initialize()
         {
@@ -65,14 +63,16 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
         {
             var Object = JObject.FromObject(new
             {
-                Installtion = EpicGamesLauncher.InstallLocation(),
+                Installtion = EpicGamesLauncher.FortniteInstallation(),
+                EpicInstalltion = EpicGamesLauncher.Installation(),
                 Language = "EN",
                 RichPresence = true,
                 CloseFortnite = true,
                 KickWarning = true,
                 Reminded = string.Empty,
                 CharacterGender = true,
-                BackpackGender = true
+                BackpackGender = true,
+                HideNsfw = false
             });
 
             Parse = Object;

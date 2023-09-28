@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 
 namespace Galaxy_Swapper_v2.Workspace
 {
     public static class Global
     {
-        public const string Version = "1.11";
-        public const string ApiVersion = "1.06";
-        public static string Discord { get; set; } = default!;
-        public static string Website { get; set; } = default!;
-        public static string Download { get; set; } = default!;
-        public static string Key { get; set; } = default!;
+        public const string Version = "1.21";
+        public const string ApiVersion = "1.14";
+        public static string Discord = "https://galaxyswapperv2.com/Discord.php";
+        public static string Website = "https://galaxyswapperv2.com";
+        public static string Download = "https://galaxyswapperv2.com/Downloads/InGame.php";
+        public static string Key = "https://galaxyswapperv2.com/Downloads/Discord.php";
 
         public class CustomException : Exception
         {

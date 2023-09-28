@@ -1,6 +1,9 @@
-﻿using CUE4Parse.Utils;
+﻿using CUE4Parse.UE4.IO.Objects;
+using CUE4Parse.Utils;
 using Galaxy_Swapper_v2.Workspace.Generation;
 using Galaxy_Swapper_v2.Workspace.Properties;
+using Galaxy_Swapper_v2.Workspace.Swapping.Other;
+using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
 using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
@@ -11,6 +14,7 @@ using System.Linq;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 using WindowsAPICodePack.Dialogs;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols
@@ -31,6 +35,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             SwapLogs.Read(out int Count, out int AssetCount, out int Ucas, out int Utoc);
 
             InstallationHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "InstallationHeader");
+            EpicInstallationHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "EpicInstallationHeader");
             SwapLogsHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "SwapLogsHeader");
             SwapLogsDescription.Text = string.Format(Languages.Read(Languages.Type.View, "SettingsView", "SwapLogsDescription"), Count, Ucas, Utoc);
             ShortCutsHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "ShortCutsHeader");
@@ -45,15 +50,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             AutoCloseFortniteDescription.Text = Languages.Read(Languages.Type.View, "SettingsView", "AutoCloseFortniteDescription");
             KickWarningHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "KickWarningHeader");
             KickWarningDescription.Text = Languages.Read(Languages.Type.View, "SettingsView", "KickWarningDescription");
-            CharacterGenderHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "CharacterGenderHeader");
-            CharacterGenderDescription.Text = Languages.Read(Languages.Type.View, "SettingsView", "CharacterGenderDescription");
             BackPackGenderHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "BackPackGenderHeader");
             BackPackGenderDescription.Text = Languages.Read(Languages.Type.View, "SettingsView", "BackPackGenderDescription");
+            NsfwHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "NsfwHeader");
+            NsfwDescription.Text = Languages.Read(Languages.Type.View, "SettingsView", "NsfwDescription");
 
             //Buttons
             EditPath.Content = Languages.Read(Languages.Type.View, "SettingsView", "EditPath");
-            //RemoveBackup.Content = Languages.Read(Languages.Type.View, "SettingsView", "RemoveBackup");
-            ResetSwapData.Content = Languages.Read(Languages.Type.View, "SettingsView", "ResetSwapData");
+            EpicEditPath.Content = Languages.Read(Languages.Type.View, "SettingsView", "EpicEditPath");
             Verify.Content = Languages.Read(Languages.Type.View, "SettingsView", "Verify");
             Show.Content = Languages.Read(Languages.Type.View, "SettingsView", "Show");
             Reset.Content = Languages.Read(Languages.Type.View, "SettingsView", "Reset");
@@ -68,6 +72,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 return;
 
             InstallationDescription.Text = Settings.Read(Settings.Type.Installtion).Value<string>();
+            EpicInstallationDescription.Text = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
 
             if (Settings.Read(Settings.Type.RichPresence).Value<bool>())
                 DiscordRichPresence.IsChecked = true;
@@ -75,10 +80,10 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 AutoCloseFortnite.IsChecked = true;
             if (Settings.Read(Settings.Type.KickWarning).Value<bool>())
                 KickWarning.IsChecked = true;
-            if (Settings.Read(Settings.Type.CharacterGender).Value<bool>())
-                CharacterGender.IsChecked = true;
             if (Settings.Read(Settings.Type.BackpackGender).Value<bool>())
                 BackPackGender.IsChecked = true;
+            if (Settings.Read(Settings.Type.HideNsfw).Value<bool>())
+                Nsfw.IsChecked = true;
 
             IsLoaded = true;
         }
@@ -108,70 +113,76 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             }
         }
 
-        private void RemoveBackup_Click(object sender, RoutedEventArgs e)
+        private void EpicEditPath_Click(object sender, RoutedEventArgs e)
         {
-            if (Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Question"), Languages.Read(Languages.Type.Message, "RemoveBackup"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            using (var dialog = new CommonOpenFileDialog() { IsFolderPicker = true, Title = Languages.Read(Languages.Type.View, "SettingsView", "EpicEditPathTip") })
             {
-                string Installtion = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
-                if (Directory.Exists($"{Installtion}\\Galaxy Swapper v2"))
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    try
+                    string selected = dialog.FileName;
+
+                    if (selected.Contains("\\Epic Games"))
+                        selected = selected.Split("\\Epic Games").First();
+
+                    if (!Directory.Exists($"{selected}\\Epic Games\\Launcher\\Portal\\Binaries\\Win64") || !File.Exists($"{selected}\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe"))
                     {
-                        Directory.Delete($"{Installtion}\\Galaxy Swapper v2", true);
-                    }
-                    catch (Exception Exception)
-                    {
-                        Log.Error(Exception, $"Failed to delete {Installtion}\\Galaxy Swapper v2");
-                        Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "RemoveError"), MessageBoxButton.OK, solutions: Languages.ReadSolutions(Languages.Type.Message, "RemoveError"));
+                        Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "InvalidEpicInstallationSelection"), MessageBoxButton.OK);
                         return;
                     }
+
+                    Settings.Edit(Settings.Type.EpicInstalltion, $"{selected}\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe");
+                    EpicInstallationDescription.Text = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
                 }
-
-                SwapLogs.Clear();
-                SwapLogsDescription.Text = string.Format(Languages.Read(Languages.Type.View, "SettingsView", "SwapLogsDescription"), 0, 0, 0);
-            }
-        }
-
-        private void ResetSwapData_Click(object sender, RoutedEventArgs e)
-        {
-            if (Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Question"), Languages.Read(Languages.Type.Message, "ResetSwapData"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-            {
-                SwapData.Delete();
             }
         }
 
         private void Verify_Click(object sender, RoutedEventArgs e)
         {
-            string Installtion = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
-
-            foreach (string Unkown in Directory.GetDirectories(Installtion))
+            try
             {
-                Log.Information($"Found {Unkown}");
-                if (Directory.GetFiles(Unkown, "*.ucas").Length != 0 || Directory.GetFiles(Unkown, "*.pak").Length != 0)
+                string Installtion = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
+
+                EpicGamesLauncher.Close();
+                CProvider.Dispose();
+
+                Log.Information("Scanning for unknown game files");
+                foreach (string Unkown in Directory.GetDirectories(Installtion))
                 {
-                    try
+                    Log.Information($"Found directory that contains game files: {Unkown}");
+                    if (Directory.GetFiles(Unkown, "*.ucas").Length != 0 || Directory.GetFiles(Unkown, "*.pak").Length != 0)
                     {
                         Directory.Delete(Unkown, true);
-                        Log.Information($"Deleted {Unkown} (Contains ucas or sig)");
+                        Log.Information($"Deleted {Unkown}");
                     }
-                    catch (Exception Exception)
-                    {
-                        Log.Error(Exception, $"Failed to delete {Unkown}");
-                        Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "VerifyError"), Unkown), MessageBoxButton.OK, solutions: Languages.ReadSolutions(Languages.Type.Message, "VerifyError"));
-                        return;
-                    }
+                    else
+                        Log.Information($"Skipped {Unkown} (Does not contain ucas or sig)");
                 }
-                else
-                    Log.Information($"Skipped {Unkown} (Does not contain ucas or sig)");
+
+                foreach (var iostore in new DirectoryInfo(Installtion).GetFiles())
+                {
+                    var ext = iostore.Extension.SubstringAfter('.');
+
+                    if (ext != "backup")
+                        continue;
+
+                    Log.Information($"Deleting: {iostore.FullName}");
+                    File.Delete(iostore.FullName);
+                }
+
+                CustomEpicGamesLauncher.Revert();
+                SwapLogs.Clear();
+                UEFN.Clear();
+
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), Languages.Read(Languages.Type.Message, "Verify"), MessageBoxButton.OK);
+                EpicGamesLauncher.Verify();
+                Environment.Exit(0);
             }
-
-            SwapData.Delete();
-            SwapLogs.Clear();
-            SwapLogsDescription.Text = string.Format(Languages.Read(Languages.Type.View, "SettingsView", "SwapLogsDescription"), 0, 0, 0);
-
-            Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), Languages.Read(Languages.Type.Message, "Verify"), MessageBoxButton.OK);
-            EpicGamesLauncher.Verify();
-            Environment.Exit(0);
+            catch (Exception Exception)
+            {
+                Log.Error(Exception, $"Failed to verify game files");
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "VerifyError"), MessageBoxButton.OK, solutions: Languages.ReadSolutions(Languages.Type.Message, "RemoveError"));
+                return;
+            }
         }
 
         private void Reset_Click(object sender, RoutedEventArgs e)
@@ -190,29 +201,43 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 try
                 {
                     string paks = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
+                    var directoryInfo = new DirectoryInfo(paks);
 
-                    foreach (var iostore in new DirectoryInfo(paks).GetFiles())
+                    //So files aren't in use.
+                    EpicGamesLauncher.Close();
+                    CProvider.Dispose();
+                    PaksCheck.Validate(paks);
+
+                    foreach (FileInfo item in directoryInfo.EnumerateFiles("*.utoc*", SearchOption.TopDirectoryOnly))
                     {
-                        var ext = iostore.Extension.SubstringAfter('.');
+                        FileInfo fileInfo = new FileInfo(item.FullName.SubstringBeforeLast('.') + ".backup");
 
-                        if (ext != "backup")
-                            continue;
-
-                        var oldiostore = new FileInfo(iostore.FullName.Replace(".backup", ".utoc"));
-
-                        if (iostore.Length != oldiostore.Length)
+                        if (fileInfo.Exists)
                         {
-                            Log.Error($"Failed to revert {iostore.Name} due to length missmatch! Outdated?");
-                            continue;
-                        }
+                            var reader = new Reader(item.FullName);
+                            var readerbackup = new Reader(fileInfo.FullName);
 
-                        Log.Information($"Moving: {iostore.FullName}\nTo: {oldiostore.FullName}");
-                        File.Copy(iostore.FullName, oldiostore.FullName, true); //No need to delete backup since Fortnite won't mount it anyways..
+                            var header = new FIoStoreTocHeader(reader);
+                            var headerbackup = new FIoStoreTocHeader(readerbackup);
+
+                            if (header.Compare(headerbackup) && reader.Length == readerbackup.Length)
+                            {
+                                Log.Information($"{fileInfo.Name} IO header matches {item.Name} and will apply backup");
+                                reader.Dispose();
+                                readerbackup.Dispose();
+                                File.Move(fileInfo.FullName, item.FullName, true);
+                            }
+                            else
+                            {
+                                Log.Warning($"{fileInfo.Name} IO header does not match {item.Name} attempting to remove backup");
+                                reader.Dispose();
+                                readerbackup.Dispose();
+                                File.Delete(fileInfo.FullName);
+                            }
+                        }
                     }
 
-                    Log.Information("Finished reverting all cosmetics");
                     UEFN.Clear();
-                    SwapData.Delete();
                     SwapLogs.Clear();
                     SwapLogsDescription.Text = string.Format(Languages.Read(Languages.Type.View, "SettingsView", "SwapLogsDescription"), 0, 0, 0);
                 }
@@ -227,34 +252,6 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
         private void StartFortnite_Click(object sender, RoutedEventArgs e)
         {
-            Log.Information("Downloading Fortnite Launcher");
-
-            const string URL = "https://galaxyswapperv2.com/Downloads/Fortnite%20Launcher.exe";
-            string FortniteLauncherPath = $"{Config.Path}\\FortniteLauncher.exe";
-
-            try
-            {
-                if (File.Exists(FortniteLauncherPath))
-                    File.Delete(FortniteLauncherPath);
-
-                using (WebClient WBC = new WebClient())
-                {
-                    WBC.DownloadFile(URL, FortniteLauncherPath);
-                    WBC.Dispose();
-                }
-            }
-            catch (Exception Exception)
-            {
-                Log.Error(Exception, $"Failed to download Fortnite Launcher from {URL} to {FortniteLauncherPath}");
-            }
-
-            Log.Information("Starting custom Fortntie Launcher");
-            if (File.Exists(FortniteLauncherPath))
-            {
-                FortniteLauncherPath.UrlStart();
-                Log.Information($"Launched {FortniteLauncherPath}");
-            }
-
             Log.Information("Starting Fortnite");
             EpicGamesLauncher.Launch();
 
@@ -287,17 +284,18 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
         private void AutoCloseFortnite_Click(object sender, RoutedEventArgs e) => Settings.Edit(Settings.Type.CloseFortnite, AutoCloseFortnite.IsChecked);
         private void KickWarning_Click(object sender, RoutedEventArgs e) => Settings.Edit(Settings.Type.KickWarning, KickWarning.IsChecked);
-        private void CharacterGender_Click(object sender, RoutedEventArgs e)
-        {
-            Settings.Edit(Settings.Type.CharacterGender, CharacterGender.IsChecked);
-            if (Generate.Cache.ContainsKey(Generate.Type.Characters))
-                Generate.Cache[Generate.Type.Characters].Cosmetics.Values.Where(cosmetic => cosmetic.Options.Count != 0).ToList().ForEach(cosmetic => cosmetic.Options.Clear());
-        }
         private void BackPackGender_Click(object sender, RoutedEventArgs e)
         {
             Settings.Edit(Settings.Type.BackpackGender, BackPackGender.IsChecked);
             if (Generate.Cache.ContainsKey(Generate.Type.Backpacks))
                 Generate.Cache[Generate.Type.Backpacks]?.Cosmetics.Values.Where(cosmetic => cosmetic.Options.Count != 0).ToList().ForEach(cosmetic => cosmetic.Options.Clear());
+        }
+
+        private void Nsfw_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Edit(Settings.Type.HideNsfw, Nsfw.IsChecked);
+            Memory.Clear();
+            Generate.Cache.Clear();
         }
 
         private void RefreshCosmetics_Click(object sender, RoutedEventArgs e)

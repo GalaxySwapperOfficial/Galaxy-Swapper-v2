@@ -9,13 +9,9 @@ using System.Text;
 
 namespace Galaxy_Swapper_v2.Workspace.Properties
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public static class Plugins
     {
-        public static readonly string Path = $"{Config.Path}\\Plugins";
+        public static readonly string Path = $"{App.Config}\\Plugins";
         public static bool Add(string file)
         {
             string name = System.IO.Path.GetFileName(file);
@@ -29,7 +25,8 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
 
             if (Content.Encrypted())
             {
-                Message.Display("Error", $"Encrypted plugins can not be opened on the Github version!\nPlease download the swapper from:\nhttps://galaxyswapperv2.com/Guilded", System.Windows.MessageBoxButton.OK);
+                Log.Information($"Decrypting {name}");
+                Content = Content.Decompress();
             }
 
             if (!Content.ValidJson())
@@ -39,45 +36,36 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 return false;
             }
 
-            var Parse = JObject.Parse(Content);
+            var parse = JObject.Parse(Content);
 
-            if (Parse["Icon"].KeyIsNullOrEmpty())
+            if (parse["Icon"].KeyIsNullOrEmpty())
             {
-                Log.Error($"{name} does not contain Icon?");
-                Message.Display("Error", $"{name} does not contain Icon!", System.Windows.MessageBoxButton.OK);
-                return false;
-            }
-            if (Parse["Swapicon"].KeyIsNullOrEmpty())
-            {
-                Log.Error($"{name} does not contain Swapicon?");
-                Message.Display("Error", $"{name} does not contain Swapicon!", System.Windows.MessageBoxButton.OK);
+                Log.Error($"{name} does not contain 'Icon' value!");
+                Message.Display("Error", $"{name} does not contain 'Icon' value! This plugin will not be imported.", System.Windows.MessageBoxButton.OK);
                 return false;
             }
 
-            if (!Misc.ValidImage(Parse["Icon"].Value<string>()))
+            string icon = parse["Icon"].Value<string>();
+
+            if (!Misc.ValidImage(icon))
             {
-                Log.Error($"{name} Icon is a invalid url");
-                Message.Display("Error", $"{name} Icon is a invalid url!", System.Windows.MessageBoxButton.OK);
-                return false;
-            }
-            if (!Misc.ValidImage(Parse["Swapicon"].Value<string>()))
-            {
-                Log.Error($"{name} Swapicon is a invalid url");
-                Message.Display("Error", $"{name} Swapicon is a invalid url!", System.Windows.MessageBoxButton.OK);
-                return false;
-            }
-            if (!Parse["OverrideIcon"].KeyIsNullOrEmpty() && !Misc.ValidImage(Parse["OverrideIcon"].Value<string>()))
-            {
-                Log.Error($"{name} OverrideIcon is a invalid url");
-                Message.Display("Error", $"{name} OverrideIcon is a invalid url!", System.Windows.MessageBoxButton.OK);
+                Log.Error($"{name} has a invalid url for 'Icon'.\n{icon}");
+                Message.Display("Error", $"{name} has a invalid url for 'Icon'. This plugin will not be imported.", System.Windows.MessageBoxButton.OK);
                 return false;
             }
 
-            if (Parse["Downloadables"] != null)
+            if (!parse["FrontendIcon"].KeyIsNullOrEmpty() && !Misc.ValidImage(parse["FrontendIcon"].Value<string>()))
             {
-                foreach (var downloadable in Parse["Downloadables"])
+                Log.Error($"{name} has a invalid url for 'FrontendIcon'.\n{parse["FrontendIcon"].Value<string>()}");
+                Message.Display("Error", $"{name} has a invalid url for 'FrontendIcon'. This plugin will not be imported.", System.Windows.MessageBoxButton.OK);
+                return false;
+            }
+
+            if (parse["Downloadables"] != null)
+            {
+                foreach (var downloadable in parse["Downloadables"])
                 {
-                    int Index = (Parse["Downloadables"] as JArray).IndexOf(downloadable) + 1;
+                    int Index = (parse["Downloadables"] as JArray).IndexOf(downloadable) + 1;
                     string[] types = { "pak", "sig", "ucas", "utoc" };
                     foreach (string type in types)
                     {
@@ -97,46 +85,87 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 }
             }
 
-            foreach (var Asset in Parse["Assets"])
+            if (parse["Type"].KeyIsNullOrEmpty() || parse["Type"].Value<string>() == "default")
             {
-                int Index = (Parse["Assets"] as JArray).IndexOf(Asset) + 1;
-                if (Asset["AssetPath"].KeyIsNullOrEmpty())
+                Log.Information($"Reading {name} as type default.");
+                if (!ValidateDefault()) return false;
+            }
+            else
+            {
+                switch (parse["Type"].Value<string>())
                 {
-                    Log.Error($"{name} AssetPath does not exist in assets array {Index}");
-                    Message.Display("Error", $"{name} AssetPath does not exist in assets array {Index}", System.Windows.MessageBoxButton.OK);
-                    return false;
-                }
-                if (!Asset["AssetPathTo"].KeyIsNullOrEmpty() && Asset["AssetPathTo"].Value<string>().ToLower() == "/game/")
-                {
-                    Log.Error($"{name} AssetPathTo in assets array {Index} must be a valid asset.");
-                    Message.Display("Error", $"{name} AssetPathTo in assets array {Index} must be a valid asset.\nIf you are trying to invalid it set it as a empty characterpart.", System.Windows.MessageBoxButton.OK);
-                    return false;
-                }
-                if (Asset["Swaps"] != null)
-                {
-                    foreach (var Swap in Asset["Swaps"])
-                    {
-                        int SIndex = (Asset["Swaps"] as JArray).IndexOf(Swap) + 1;
-
-                        string[] Objects = { "search", "replace", "type" };
-                        foreach (string Object in Objects)
-                        {
-                            if (Swap[Object] == null)
-                            {
-                                Log.Error($"{name} {Object} does not exist in assets array {Index} swaps array {SIndex}");
-                                Message.Display("Error", $"{name} {Object} does not exist in assets array {Index} swaps array {SIndex}", System.Windows.MessageBoxButton.OK);
-                                return false;
-                            }
-                        }
-                    }
+                    case "UEFN_Character":
+                        Log.Information($"Reading {name} as type UEFN_Character.");
+                        if (!ValidateUEFN_Character()) return false;
+                        break;
                 }
             }
 
-            Log.Information($"Encrypting {name}");
+            Log.Information($"Compressing {name}");
             Content = Compression.Compress(Encoding.ASCII.GetBytes(Content));
 
             File.WriteAllText($"{Path}\\{new Random().Next(100000000, 999999999)}-{new Random().Next(100000000, 999999999)}.encrypted", Content);
             Log.Information($"Wrote {name} to {Path}");
+
+            bool ValidateDefault()
+            {
+                foreach (var Asset in parse["Assets"])
+                {
+                    int Index = (parse["Assets"] as JArray).IndexOf(Asset) + 1;
+                    if (Asset["AssetPath"].KeyIsNullOrEmpty())
+                    {
+                        Log.Error($"{name} AssetPath does not exist in assets array {Index}");
+                        Message.Display("Error", $"{name} AssetPath does not exist in assets array {Index}", System.Windows.MessageBoxButton.OK);
+                        return false;
+                    }
+
+                    if (!Asset["AssetPathTo"].KeyIsNullOrEmpty() && Asset["AssetPathTo"].Value<string>().ToLower() == "/game/")
+                    {
+                        Log.Error($"{name} AssetPathTo in assets array {Index} must be a valid asset.");
+                        Message.Display("Error", $"{name} AssetPathTo in assets array {Index} must be a valid asset.\nIf you are trying to invalid it set it as a empty characterpart.", System.Windows.MessageBoxButton.OK);
+                        return false;
+                    }
+
+                    if (Asset["Swaps"] != null)
+                    {
+                        foreach (var Swap in Asset["Swaps"])
+                        {
+                            int SIndex = (Asset["Swaps"] as JArray).IndexOf(Swap) + 1;
+
+                            string[] Objects = { "search", "replace", "type" };
+                            foreach (string Object in Objects)
+                            {
+                                if (Swap[Object] == null)
+                                {
+                                    Log.Error($"{name} {Object} does not exist in assets array {Index} swaps array {SIndex}");
+                                    Message.Display("Error", $"{name} {Object} does not exist in assets array {Index} swaps array {SIndex}", System.Windows.MessageBoxButton.OK);
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return true;
+            }
+
+            bool ValidateUEFN_Character()
+            {
+                if (parse["AssetPathTo"].KeyIsNullOrEmpty())
+                {
+                    Log.Error($"{name} does not contain 'AssetPathTo'! Please set it to a female body characterpart.");
+                    Message.Display("Error", $"{name} Does not contain 'AssetPathTo'! Please set it to a female body characterpart.", System.Windows.MessageBoxButton.OK);
+                    return false;
+                }
+
+                if (parse["Swaps"] == null)
+                {
+                    Log.Warning($"{name} does not contain a swaps array? Weird.");
+                }
+
+                return true;
+            }
+
             return true;
         }
 

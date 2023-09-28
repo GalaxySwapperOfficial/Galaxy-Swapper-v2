@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <_LastSelectedProfileId>E:\Projects\Galaxy Swapper v2\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
+    <_LastSelectedProfileId>D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
     <ApplicationDefinition Update="App.xaml">
@@ -42,13 +42,16 @@
     <Compile Update="Workspace\Usercontrols\DashboardView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Workspace\Usercontrols\FovView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="Workspace\Usercontrols\LoginView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Workspace\Usercontrols\MiscView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Workspace\Usercontrols\Overlays\DiscordView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Workspace\Usercontrols\Overlays\FovView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Workspace\Usercontrols\Overlays\LanguageSelectionView.xaml.cs">
@@ -116,13 +119,16 @@
     <Page Update="Workspace\Usercontrols\DashboardView.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Workspace\Usercontrols\FovView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
     <Page Update="Workspace\Usercontrols\LoginView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Workspace\Usercontrols\MiscView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Workspace\Usercontrols\Overlays\DiscordView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Workspace\Usercontrols\Overlays\FovView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Usercontrols\Overlays\LanguageSelectionView.xaml">

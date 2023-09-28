@@ -1,9 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using RestSharp;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Threading;
 using System.Windows;
 
 namespace Galaxy_Swapper_v2.Workspace.Utilities
@@ -15,12 +19,12 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
         public enum Type
         {
             Version,
-            DefaultSwaps,
             News,
             Cosmetics,
             Languages,
             Presence,
-            FOV
+            FOV,
+            UEFN
         }
 
         public static JToken Read(Type Type)
@@ -33,43 +37,43 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                 Message.DisplaySTA("Error", $"Failed to find {Type} in endpoint cache.", MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, close: true);
             }
 
-            if (File.Exists("E:\\Documents\\API\\Galaxy Swapper v2\\1.01\\Cosmetics.json")) //Local API for debugging
-                Parse["Cosmetics"] = JObject.Parse(File.ReadAllText("E:\\Documents\\API\\Galaxy Swapper v2\\1.01\\Cosmetics.json"));
+            if (File.Exists("D:\\Galaxy Swapper v2\\Backend\\API\\1.13\\Cosmetics.json")) //Local API for debugging
+                Parse["Cosmetics"] = JObject.Parse(File.ReadAllText("D:\\Galaxy Swapper v2\\Backend\\API\\1.13\\Cosmetics.json"));
+            if (File.Exists("D:\\Galaxy Swapper v2\\Backend\\API\\1.07\\UEFN.json")) //Local API for debugging
+                Parse["UEFN"] = JObject.Parse(File.ReadAllText("D:\\Galaxy Swapper v2\\Backend\\API\\1.07\\UEFN.json"));
 
             return Parse[Type.ToString()];
         }
 
         private static void Download()
         {
-            using (WebClient WC = new WebClient())
+            var stopwatch = new Stopwatch(); stopwatch.Start();
+
+            using (var client = new RestClient())
             {
-                WC.Headers.Add("version", Global.Version);
-                WC.Headers.Add("apiversion", Global.ApiVersion);
+                var request = new RestRequest(new Uri(Domain));
+                request.AddHeader("version", Global.Version);
+                request.AddHeader("apiversion", Global.ApiVersion);
 
-                try
+                Log.Information($"Sending request to {Domain}");
+
+                var response = client.Execute(request);
+
+                if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    string Response = WC.DownloadString(Domain);
-
-                    if (!Response.ValidJson())
-                    {
-                        Log.Fatal("Endpoint from webclient did not return in a valid json format");
-                        Message.DisplaySTA("Error", "Endpoint response did not return in a valid JSON format. Contact Wslt about this issue.", MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, close: true);
-                    }
-
-                    Parse = JObject.Parse(Response);
-
-                    if (Parse["status"].Value<int>() != 200)
-                    {
-                        Log.Fatal($"Endpoint did not return with code 200?\n{Parse["message"].Value<string>()}");
-                        Message.DisplaySTA("Error", Parse["message"].Value<string>(), MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, close: true);
-                    }
-
-                }
-                catch (Exception Exception)
-                {
-                    Log.Fatal(Exception, "Failed to download endpoint from webclient");
+                    Log.Fatal($"Failed to download response from endpoint! Expected: {HttpStatusCode.OK} Received: {response.StatusCode}");
                     Message.DisplaySTA("Error", "Webclient caught a exception while downloading response from Endpoint.", MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, close: true);
                 }
+
+                Parse = JsonConvert.DeserializeObject<JObject>(response.Content);
+
+                if (Parse["status"].Value<int>() != 200)
+                {
+                    Log.Fatal($"Endpoint did not return with code 200! Expected: 200 Received: {Parse["status"].Value<int>()}");
+                    Message.DisplaySTA("Error", Parse["message"].Value<string>(), MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, close: true);
+                }
+
+                Log.Information($"Finished GET request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
             }
         }
 

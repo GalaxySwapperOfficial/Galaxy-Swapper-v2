@@ -2,8 +2,10 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Galaxy_Swapper_v2"
-             Startup="Application_Startup"
-             ShutdownMode="OnExplicitShutdown"
+             ShutdownMode="OnMainWindowClose"
+             StartupUri="/Workspace/Views/MainView.xaml"
+             DispatcherUnhandledException="OnDispatcherUnhandledException"
+             Exit="App_Exit"
              >
     <Application.Resources>
         <Style x:Key="ScrollThumbs" TargetType="{x:Type Thumb}">

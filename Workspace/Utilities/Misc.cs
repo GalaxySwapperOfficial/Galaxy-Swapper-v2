@@ -1,12 +1,16 @@
-﻿using Newtonsoft.Json.Linq;
-using Serilog;
+﻿using CUE4Parse.UE4.Objects.Engine;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -96,7 +100,6 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                 Icon.BeginInit();
                 Icon.UriSource = new Uri(invalid, UriKind.RelativeOrAbsolute);
                 Icon.CacheOption = BitmapCacheOption.OnLoad;
-                Icon.DownloadFailed += IconDownloadFailed;
                 Icon.EndInit();
 
                 Image.Source = Icon;
@@ -105,16 +108,50 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             Image.Source = Icon;
         }
 
+        public static BitmapImage LoadImageToBitmap(string url)
+        {
+            var Icon = new BitmapImage();
+
+            Icon.BeginInit();
+            Icon.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
+            Icon.CacheOption = BitmapCacheOption.OnLoad;
+            Icon.EndInit();
+
+            return Icon;
+        }
+
+        public static string Hash(string filePath)
+        {
+            using SHA256 sHA = SHA256.Create();
+            using FileStream inputStream = File.OpenRead(filePath);
+            return BitConverter.ToString(sHA.ComputeHash(inputStream)).Replace("-", string.Empty);
+        }
+
+        public static TimeSpan GetElaspedAndStop(this Stopwatch stopwatch)
+        {
+            TimeSpan timespan = stopwatch.Elapsed;
+            stopwatch.Stop();
+            return timespan;
+        }
+
         public static bool ValidImage(string URL)
         {
-            using (WebClient WC = new WebClient())
+            using (HttpClient client = new HttpClient())
             {
                 try
                 {
-                    WC.DownloadString(URL);
-                    return true;
+                    HttpResponseMessage response = client.Send(new HttpRequestMessage(HttpMethod.Head, URL));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
-                catch
+                catch (HttpRequestException)
                 {
                     return false;
                 }
@@ -172,6 +209,44 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             return -1;
         }
 
+        public static long IndexOfSequence(Stream stream, byte[] pattern, long pos = 0)
+        {
+            long bufferSize = 4096;
+            byte[] buffer = new byte[bufferSize];
+            int patternLength = pattern.Length;
+            int matchIndex = 0;
+
+            stream.Seek(pos, SeekOrigin.Begin);
+
+            while (true)
+            {
+                int bytesRead = stream.Read(buffer, 0, buffer.Length);
+
+                if (bytesRead == 0)
+                    break;
+
+                for (int i = 0; i < bytesRead; i++)
+                {
+                    if (buffer[i] == pattern[matchIndex])
+                    {
+                        matchIndex++;
+
+                        if (matchIndex == patternLength)
+                        {
+                            return stream.Position - bytesRead + i + 1 - patternLength;
+                        }
+                    }
+                    else
+                    {
+                        matchIndex = 0;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+
         public static byte[] HexToByte(this string hexString)
         {
             hexString = hexString.Replace(" ", "");
@@ -183,8 +258,6 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             }
             return data;
         }
-
-        public static string Base64Decode(this string content) => System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(content));
 
         public static string ByteToHex(byte[] byteArray) => BitConverter.ToString(byteArray).Replace("-", " ");
 

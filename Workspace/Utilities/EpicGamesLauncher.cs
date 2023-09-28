@@ -2,47 +2,84 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Galaxy_Swapper_v2.Workspace.Utilities
 {
     public static class EpicGamesLauncher
     {
-        const string AppName = "Fortnite";
-        const string LaunchArg = "com.epicgames.launcher://apps/Fortnite?action=launch&silent=true";
-        const string VerifyArg = "com.epicgames.launcher://apps/Fortnite?action=verify&silent=false";
-        static readonly string[] Processes = { "EpicGamesLauncher", "FortniteLauncher", "FortniteClient-Win64-Shipping", "FortniteClient-Win64-Shipping_BE", "FortniteClient-Win64-Shipping_EAC", "FortniteClient-Win64-Shipping_EAC_EOS", "CrashReportClient" };
-        static readonly string UnrealEngineLauncher = $"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\\Epic\\UnrealEngineLauncher";
-        public static string InstallLocation(string InstallLocation = "")
+        private static readonly string ProgramData = $"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\\Epic";
+        private static readonly string SavedLogs = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\EpicGamesLauncher\\Saved\\Logs";
+        private static readonly string AppName = "Fortnite";
+        private const string LaunchArg = "com.epicgames.launcher://apps/Fortnite?action=launch&silent=true";
+        private const string NullLaunchArg = "com.epicgames.launcher://apps/GalaxySwapperv2?action=launch&silent=true";
+        private const string VerifyArg = "com.epicgames.launcher://apps/Fortnite?action=verify&silent=false";
+        private static readonly string[] Processes = { "EpicGamesLauncher", "FortniteLauncher", "FortniteClient-Win64-Shipping", "FortniteClient-Win64-Shipping_BE", "FortniteClient-Win64-Shipping_EAC", "FortniteClient-Win64-Shipping_EAC_EOS", "CrashReportClient" };
+        public static string Installation()
         {
-            TryInstallLocation(ref InstallLocation);
-            return InstallLocation;
+            TryInstallation(out string location);
+            return location;
         }
 
-        public static bool TryInstallLocation(ref string InstallLocation)
+        public static bool TryInstallation(out string location)
         {
-            if (!Directory.Exists(UnrealEngineLauncher))
-                return false;
+            location = string.Empty;
 
-            if (!File.Exists($"{UnrealEngineLauncher}\\LauncherInstalled.dat"))
-                return false;
+            if (!Directory.Exists(SavedLogs)) return false;
 
-            string Content = File.ReadAllText($"{UnrealEngineLauncher}\\LauncherInstalled.dat");
+            if (!File.Exists($"{SavedLogs}\\EpicGamesLauncher.log")) return false;
 
-            if (string.IsNullOrEmpty(Content) || !Content.ValidJson())
-                return false;
+            if (File.Exists($"{SavedLogs}\\EpicGamesLauncher.temp")) File.Delete($"{SavedLogs}\\EpicGamesLauncher.temp");
 
-            var Parse = JObject.Parse(Content);
+            File.Copy($"{SavedLogs}\\EpicGamesLauncher.log", $"{SavedLogs}\\EpicGamesLauncher.temp");
 
-            foreach (var Installation in Parse["InstallationList"])
+            foreach (string line in File.ReadAllLines($"{SavedLogs}\\EpicGamesLauncher.temp"))
             {
-                if (Installation["AppName"].Value<string>() == AppName)
+                Match match = Regex.Match(line, @"LogInit: Base Directory: (.*)");
+                if (match.Success)
                 {
-                    string InstallationPath = Installation["InstallLocation"].Value<string>();
+                    string win64 = $"{match.Groups[1].Value.Trim()}EpicGamesLauncher.exe";
+                    if (!File.Exists(win64)) continue;
 
-                    if (!Directory.Exists(InstallationPath) || !Directory.Exists($"{InstallationPath}\\FortniteGame\\Content\\Paks"))
-                        continue;
+                    location = win64;
+                    return true;
+                }
+            }
+            return false;
+        }
 
-                    InstallLocation = InstallationPath;
+        public static string FortniteInstallation()
+        {
+            TryFortniteInstallation(out string location);
+            return location;
+        }
+
+        public static bool TryFortniteInstallation(out string location)
+        {
+            location = string.Empty;
+
+            if (!Directory.Exists(ProgramData)) return false;
+
+            string launcherinstalled = $"{ProgramData}\\UnrealEngineLauncher\\LauncherInstalled.dat";
+
+            if (!File.Exists(launcherinstalled)) return false;
+
+            string content = File.ReadAllText(launcherinstalled);
+
+            if (string.IsNullOrEmpty(content) || !content.ValidJson()) return false;
+
+            var parse = JObject.Parse(content);
+
+            foreach (var installation in parse["InstallationList"])
+            {
+                if (installation["AppName"].Value<string>() == AppName)
+                {
+                    string installlocation = installation["InstallLocation"].Value<string>();
+
+                    if (!Directory.Exists(installlocation) || !Directory.Exists($"{installlocation}\\FortniteGame\\Content\\Paks")) continue;
+
+                    location = installlocation;
+
                     return true;
                 }
             }
@@ -51,7 +88,6 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
         }
 
         public static void Launch() => TryLaunch();
-
         public static bool TryLaunch()
         {
             try
@@ -65,45 +101,29 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             }
         }
 
-        public static void Close() => TryClose();
-
-        public static bool TryClose()
+        public static void Close(bool Fortnite = true) => TryClose(Fortnite: Fortnite);
+        public static bool TryClose(bool Fortnite = true)
         {
-            foreach (string Name in Processes)
+            try
             {
-                try
+                foreach (string name in Processes)
                 {
-                    Process[] process = Process.GetProcessesByName(Name);
+                    Process[] process = Process.GetProcessesByName(name);
                     if (process.Length == 0)
                         continue;
                     process[0].Kill();
                     process[0].WaitForExit();
                 }
-                catch
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
 
-        public static bool IsOpen()
-        {
-            foreach (string Name in Processes)
+                return true;
+            }
+            catch
             {
-                if (Name == "EpicGamesLauncher")
-                    continue;
-
-                Process[] process = Process.GetProcessesByName(Name);
-                if (process.Length != 0)
-                    return true;
+                return false;
             }
-
-            return false;
         }
 
         public static void Verify() => TryVerify();
-
         public static bool TryVerify()
         {
             try
@@ -115,6 +135,15 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             {
                 return false;
             }
+        }
+
+        public static bool IsOpen()
+        {
+            Process[] process = Process.GetProcessesByName("EpicGamesLauncher");
+            if (process.Length != 0)
+                return true;
+            else
+                return false;
         }
     }
 }

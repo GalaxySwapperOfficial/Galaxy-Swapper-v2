@@ -5,14 +5,13 @@ using System.Linq;
 using System.Text;
 using CUE4Parse.FileProvider.Objects;
 using CUE4Parse.FileProvider.Vfs;
-using CUE4Parse.UE4.Assets;
 using CUE4Parse.UE4.IO;
 using CUE4Parse.UE4.IO.Objects;
 using CUE4Parse.UE4.Pak;
 using CUE4Parse.UE4.Readers;
 using CUE4Parse.UE4.Versions;
 using CUE4Parse.Utils;
-using Galaxy_Swapper_v2.Workspace.Utilities;
+using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
 using Ionic.Zip;
 using static Galaxy_Swapper_v2.Workspace.Global;
 
@@ -46,8 +45,6 @@ namespace CUE4Parse.FileProvider
         {
             if (!_workingDirectory.Exists) throw new ArgumentException("Given directory must exist", nameof(_workingDirectory));
 
-            ObjectTypeRegistry.Start();
-
             var availableFiles = new List<Dictionary<string, GameFile>> {IterateFiles(_workingDirectory, _searchOption)};
 
             if (_extraDirectories is {Count: > 0})
@@ -59,8 +56,6 @@ namespace CUE4Parse.FileProvider
             {
                 _files.AddFiles(osFiles);
             }
-
-            Log.Information("VGhpcyB2ZXJzaW9uIGlzIG9wZW4gc291cmNlISBJZiB5b3UgaGF2ZSBiZWVuIHNlbnQgdGhpcyBmaWxlIGJlIGNhcmZ1bCBvZiBhbnkgY29kZSBtb2RpZmNhdGlvbiB0aGF0IGNvdWxkIGhhdmUgYmVlbiBkb25lLiBodHRwczovL2dhbGF4eXN3YXBwZXJ2Mi5jb20vR3VpbGRlZA==".Base64Decode());
         }
 
         public void Initialize(string pakchunk)
@@ -78,8 +73,6 @@ namespace CUE4Parse.FileProvider
             {
                 _files.AddFiles(osFiles);
             }
-
-            Log.Information("VGhpcyB2ZXJzaW9uIGlzIG9wZW4gc291cmNlISBJZiB5b3UgaGF2ZSBiZWVuIHNlbnQgdGhpcyBmaWxlIGJlIGNhcmZ1bCBvZiBhbnkgY29kZSBtb2RpZmNhdGlvbiB0aGF0IGNvdWxkIGhhdmUgYmVlbiBkb25lLiBodHRwczovL2dhbGF4eXN3YXBwZXJ2Mi5jb20vR3VpbGRlZA==".Base64Decode());
         }
 
         private void RegisterFile(string file, Stream[] stream = null!, Func<string, FArchive>? openContainerStreamFunc = null)
@@ -204,7 +197,6 @@ namespace CUE4Parse.FileProvider
             var osFiles = new Dictionary<string, GameFile>();
             if (!directory.Exists) return osFiles;
 
-            // Look for .uproject file to get the correct mount point
             var uproject = directory.GetFiles("*.uproject", SearchOption.TopDirectoryOnly).FirstOrDefault();
             string mountPoint;
             if (uproject != null)
@@ -223,7 +215,8 @@ namespace CUE4Parse.FileProvider
             foreach (var file in directory.EnumerateFiles("*.*", option))
             {
                 var ext = file.Extension.SubstringAfter('.');
-                if (!file.Exists || string.IsNullOrEmpty(ext)) continue;
+                if (!file.Exists || string.IsNullOrEmpty(ext))
+                    continue;
 
                 if (file.Name.Contains("ProSwapper") || file.Name.Contains("Saturn"))
                 {
@@ -246,24 +239,17 @@ namespace CUE4Parse.FileProvider
                 if (ext == "utoc")
                 {
                     newfileinfo = new FileInfo($"{directory.FullName}\\{System.IO.Path.GetFileNameWithoutExtension(file.Name)}.backup");
-
-                    if (newfileinfo.Exists)
+                    if (!newfileinfo.Exists)
                     {
-                        if (file.Length != newfileinfo.Length)
-                            DupeIO(directory, file, newfileinfo);
-                    }
-                    else
                         DupeIO(directory, file, newfileinfo);
+                    }
                 }
 
-                
-                // Only load containers if .uproject file is not found
                 if (uproject == null)
                 {
                     RegisterFile(newfileinfo);
                 }
 
-                // Register local file only if it has a known extension, we don't need every file
                 if (!GameFile.Ue4KnownExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase)) continue;
 
                 var osFile = new OsGameFile(_workingDirectory, newfileinfo, mountPoint, Versions);
@@ -311,13 +297,10 @@ namespace CUE4Parse.FileProvider
                 {
                     newfileinfo = new FileInfo($"{directory.FullName}\\{System.IO.Path.GetFileNameWithoutExtension(file.Name)}.backup");
 
-                    if (newfileinfo.Exists)
+                    if (!newfileinfo.Exists)
                     {
-                        if (file.Length != newfileinfo.Length)
-                            DupeIO(directory, file, newfileinfo);
-                    }
-                    else
                         DupeIO(directory, file, newfileinfo);
+                    }
                 }
 
 

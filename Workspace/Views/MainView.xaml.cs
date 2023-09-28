@@ -1,4 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Components;
+using Galaxy_Swapper_v2.Workspace.Swapping.Other;
+using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
 using Galaxy_Swapper_v2.Workspace.Usercontrols;
 using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
@@ -66,6 +68,10 @@ namespace Galaxy_Swapper_v2.Workspace.Views
                 case "Weapons":
                     NewTab = Memory.LoadWeapons(SearchBar.Searchbar);
                     SearchBar.Visibility = Visibility.Visible;
+                    break;
+                case "Misc":
+                    NewTab = Memory.MiscView;
+                    SearchBar.Visibility = Visibility.Hidden;
                     break;
                 case "Settings":
                     NewTab = Memory.SettingsView;

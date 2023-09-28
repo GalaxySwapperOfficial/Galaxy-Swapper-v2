@@ -7,10 +7,6 @@ using System.Text;
 
 namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public class Reader : BinaryReader
     {
         public long Length => base.BaseStream.Length;
@@ -28,7 +24,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
         }
 
         public Reader(string file)
-            : base(File.OpenRead(file))
+            : base(File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read))
         {
         }
 

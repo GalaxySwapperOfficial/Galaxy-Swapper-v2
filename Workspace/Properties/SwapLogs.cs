@@ -8,14 +8,10 @@ using System.Linq;
 
 namespace Galaxy_Swapper_v2.Workspace.Properties
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public static class SwapLogs
     {
         public static JArray Cache { get; set; } = default!;
-        public static readonly string Path = $"{Config.Path}\\SwapLogs.json";
+        public static readonly string Path = $"{App.Config}\\SwapLogs.json";
         public static void Initialize()
         {
             try
@@ -50,7 +46,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             }
         }
 
-        public static void Add(string Name, string Icon, string OverrideIcon, int AssetCount, List<string> UcasList, List<string> UtocList)
+        public static void Add(string Name, string Icon, string OverrideIcon, int AssetCount, List<string> UcasList, List<string> UtocList, bool UEFNFormat = false)
         {
             DateTime CurrentTime = DateTime.Now;
             var Object = JObject.FromObject(new
@@ -61,7 +57,8 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 AssetCount = AssetCount,
                 SwappedAt = CurrentTime.ToString("h:mm tt"),
                 Ucas = new JArray(UcasList),
-                Utoc = new JArray(UtocList)
+                Utoc = new JArray(UtocList),
+                UEFNFormat
             });
 
             Cache.Add(Object);
@@ -164,6 +161,21 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                     return true;
             }
 
+            return false;
+        }
+
+        public static bool IsSwappedUEFNSwapped(string Name, out string revertitem)
+        {
+            foreach (var Cosmetic in Cache)
+            {
+                if (Cosmetic["Name"].Value<string>() != Name && !Cosmetic["UEFNFormat"].KeyIsNullOrEmpty() && Cosmetic["UEFNFormat"].Value<bool>())
+                {
+                    revertitem = Cosmetic["Name"].Value<string>();
+                    return true;
+                }
+            }
+
+            revertitem = null;
             return false;
         }
 

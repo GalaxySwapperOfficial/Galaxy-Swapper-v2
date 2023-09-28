@@ -4,10 +4,6 @@ using Newtonsoft.Json.Linq;
 
 namespace Galaxy_Swapper_v2.Workspace.Generation.Types
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public static class Weapons
     {
         public static void Format(Cosmetic Cosmetic)
@@ -61,6 +57,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                     NewOption.Downloadables = Cosmetic.Downloadables;
 
                 NewOption.Nsfw = Cosmetic.Nsfw;
+                NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
 
                 Cosmetic.Options.Add(NewOption);
             }

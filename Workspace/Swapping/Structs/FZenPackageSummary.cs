@@ -4,10 +4,6 @@ using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 
 namespace Galaxy_Swapper_v2.Workspace.Swapping.Structs
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public struct FZenPackageSummary
     {
         public uint bHasVersioningInfo;

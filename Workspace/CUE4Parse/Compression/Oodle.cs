@@ -44,7 +44,7 @@ namespace CUE4Parse.Compression
             }
         }
 
-        [DllImport(DLLData.OODLE_5, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("oo2core_5_win64.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern unsafe long OodleLZ_Decompress(byte* buffer, long bufferSize, byte* output, long outputBufferSize, int a, int b, int c, long d, long e, long f, long g, long h, long i, int threadModule);
     }
 }

@@ -5,8 +5,7 @@ using System.Windows.Media;
 namespace Galaxy_Swapper_v2.Workspace.Components
 {
     /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
+    /// Interaction logic for CCloseControl.xaml
     /// </summary>
     public partial class CCloseControl : UserControl
     {

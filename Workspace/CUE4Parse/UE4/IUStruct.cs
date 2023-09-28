@@ -1,4 +1,4 @@
-namespace CUE4Parse.UE4
+﻿namespace CUE4Parse.UE4
 {
     public interface IUStruct
     {

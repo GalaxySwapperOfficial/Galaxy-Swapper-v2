@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -82,157 +81,45 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
         private void LoadWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            var Parse = Endpoint.Read(Endpoint.Type.Version);
+            var parse = Endpoint.Read(Endpoint.Type.Version);
 
-            Global.Discord = Parse["Discord"].Value<string>();
-            Global.Website = Parse["Website"].Value<string>();
-            Global.Download = Parse["Download"].Value<string>();
-            Global.Key = Parse["Key"].Value<string>();
+            Global.Discord = parse["Discord"].Value<string>();
+            Global.Website = parse["Website"].Value<string>();
+            Global.Download = parse["Download"].Value<string>();
+            Global.Key = parse["Key"].Value<string>();
 
-            Parse = Parse[Global.Version];
+            parse = parse[Global.Version];
+            
+            if (parse["Warning"]["Enabled"].Value<bool>())
+                Message.DisplaySTA(parse["Warning"]["Header"].Value<string>(), parse["Warning"]["Content"].Value<string>(), MessageBoxButton.OK);
 
-            if (Parse["Warning"]["Enabled"].Value<bool>())
-                Message.DisplaySTA(Parse["Warning"]["Header"].Value<string>(), Parse["Warning"]["Content"].Value<string>(), MessageBoxButton.OK);
+            if (parse["DownTime"]["Enabled"].Value<bool>())
+                Message.DisplaySTA(parse["DownTime"]["Header"].Value<string>(), parse["DownTime"]["Content"].Value<string>(), MessageBoxButton.OK, new List<string> { Global.Discord }, close: false);
 
-            if (Parse["DownTime"]["Enabled"].Value<bool>())
-                Message.DisplaySTA(Parse["DownTime"]["Header"].Value<string>(), Parse["DownTime"]["Content"].Value<string>(), MessageBoxButton.OK, new List<string> { Global.Discord }, close: true);
-
-            if (Parse["Update"]["Enabled"].Value<bool>())
+            if (parse["Update"]["Enabled"].Value<bool>())
             {
-                if (Parse["Update"]["Force"]["Enabled"].Value<bool>())
-                    Message.DisplaySTA(Parse["Update"]["Force"]["Header"].Value<string>(), Parse["Update"]["Force"]["Content"].Value<string>(), MessageBoxButton.OK, new List<string> { Global.Discord, Global.Download, Global.Website }, close: true);
-                else if (Message.DisplaySTA(Parse["Update"]["Header"].Value<string>(), Parse["Update"]["Content"].Value<string>(), MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
+                if (parse["Update"]["Force"]["Enabled"].Value<bool>())
+                {
+                    Message.DisplaySTA(parse["Update"]["Force"]["Header"].Value<string>(), parse["Update"]["Force"]["Content"].Value<string>(), MessageBoxButton.OK, new List<string> { Global.Discord, Global.Download, Global.Website });
+                    Environment.Exit(0);
+                }
+                else if (Message.DisplaySTA(parse["Update"]["Header"].Value<string>(), parse["Update"]["Content"].Value<string>(), MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
                 {
                     Global.Discord.UrlStart();
                     Global.Download.UrlStart();
                     Global.Website.UrlStart();
                     Environment.Exit(0);
-                }    
+                }
             }
 
             Presence.Initialize();
 
-            OverwriteOldData();
+            string installation = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
 
-            Message.DisplaySTA("WARNING", "VGhpcyB2ZXJzaW9uIGlzIG9wZW4gc291cmNlISBJZiB5b3UgcmVjZWl2ZWQgdGhpcyBmaWxlLCBiZSBjYXJlZnVsIG9mIGFueSBjb2RlIG1vZGlmaWNhdGlvbnMgdGhhdCBtYXkgaGF2ZSBiZWVuIG1hZGUh".Base64Decode(), MessageBoxButton.OK);
-
-            string Installation = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
-
-            if (string.IsNullOrEmpty(Installation))
-                return;
-            else if (!Directory.Exists(Installation))
+            if (!string.IsNullOrEmpty(installation) && !Directory.Exists(installation))
             {
                 Settings.Edit(Settings.Type.Installtion, string.Empty);
                 return;
-            }
-
-            bool Notify = false;
-
-            try
-            {
-                foreach (string PakChunk in Directory.GetFiles(Installation))
-                {
-                    if (PakChunk.ToLower().Contains("saturn") || PakChunk.ToLower().Contains("twilight") || PakChunk.ToLower().Contains("proswapper"))
-                    {
-                        if (!Notify)
-                        {
-                            if (Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Question"), Languages.Read(Languages.Type.Message, "UnknownBackup"), MessageBoxButton.YesNo) == MessageBoxResult.No)
-                                return;
-                            Notify = true;
-                        }
-
-                        File.Delete(PakChunk);
-                    }
-                }
-
-                if (Directory.Exists($"{Installation}\\Elytra Swapper"))
-                {
-                    if (!Notify && Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Question"), Languages.Read(Languages.Type.Message, "UnknownBackup"), MessageBoxButton.YesNo) == MessageBoxResult.No)
-                        return;
-
-                    Directory.Delete($"{Installation}\\Elytra Swapper", true);
-                }
-                if (Directory.Exists($"{Installation}\\Galaxy Swapper v2"))
-                {
-                    Directory.Delete($"{Installation}\\Galaxy Swapper v2", true);
-                }
-                if (Directory.Exists($"{Installation}\\Apple"))
-                {
-                    Directory.Delete($"{Installation}\\Apple", true);
-                }
-            }
-            catch
-            {
-                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "UnknownBackupError"), MessageBoxButton.OK, new List<string> { Global.Discord }, Languages.ReadSolutions(Languages.Type.Message, "UnknownBackupError"));
-            }
-        }
-
-        //This will be removed once Fortnite updates.
-        private void OverwriteOldData()
-        {
-            if (SwapData.Cache.Count == 0)
-                return;
-
-            Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.Message, "RemovedSwapData"), Global.Version), MessageBoxButton.OK);
-
-            EpicGamesLauncher.Close();
-
-            Log.Information("Starting to remove SwapData");
-            try
-            {
-                foreach (var Asset in SwapData.Cache)
-                {
-                    if (!Asset["CompressionBlock"].KeyIsNullOrEmpty() && !Asset["ChunkOffsetAndLengths"].KeyIsNullOrEmpty())
-                    {
-                        string iostore = Asset["ChunkOffsetAndLengths"]["Path"].Value<string>();
-
-                        if (!File.Exists(iostore))
-                        {
-                            Log.Warning($"Iostore no longer exist:\n{iostore}");
-                            continue;
-                        }
-
-                        using (BinaryReader iostorereader = new BinaryReader(File.Open(iostore, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite)))
-                        {
-                            iostorereader.BaseStream.Position = Asset["ChunkOffsetAndLengths"]["Offset"].Value<long>();
-
-                            byte[] buffer = iostorereader.ReadBytes(5);
-                            byte[] buffer2 = Compression.Decompress(Asset["ChunkOffsetAndLengths"]["Buffer"].Value<string>()).Take(5).ToArray();
-
-                            if (!buffer.SequenceEqual(buffer2))
-                            {
-                                Log.Warning($"{Asset["ObjectPath"].Value<string>()} is outdated. Skipping!");
-                                continue;
-                            }
-
-                            iostorereader.Close();
-                        }
-
-                        using (BinaryWriter iostorewriter = new BinaryWriter(File.Open(iostore, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite)))
-                        {
-                            iostorewriter.BaseStream.Position = Asset["ChunkOffsetAndLengths"]["Offset"].Value<long>();
-                            iostorewriter.Write(Compression.Decompress(Asset["ChunkOffsetAndLengths"]["Buffer"].Value<string>()));
-
-                            iostorewriter.BaseStream.Position = Asset["CompressionBlock"]["Offset"].Value<long>();
-                            iostorewriter.Write(Compression.Decompress(Asset["CompressionBlock"]["Buffer"].Value<string>()));
-
-                            iostorewriter.Close();
-                        }
-                    }
-                }
-
-                SwapData.Delete();
-                SwapLogs.Clear();
-            }
-            catch (Exception Exception)
-            {
-                Log.Error(Exception.Message);
-
-                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.Message, "RemovedSwapDataError"), Global.Version), MessageBoxButton.OK);
-                SwapData.Delete();
-                SwapLogs.Clear();
-                EpicGamesLauncher.Verify();
-                Environment.Exit(0);
             }
         }
 

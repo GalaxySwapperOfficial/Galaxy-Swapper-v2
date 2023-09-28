@@ -11,17 +11,17 @@ using System.Windows.Media.Animation;
 namespace Galaxy_Swapper_v2.Workspace.Components
 {
     /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
+    /// Interaction logic for CPluginControl.xaml
     /// </summary>
     public partial class CPluginControl : UserControl
     {
         private Storyboard Storyboard { get; set; } = default!;
         private PluginsView PluginsView { get; set; } = default!;
-        public CPluginControl(PluginsView pluginsview)
+        public CPluginControl(PluginsView pluginsview, string tooltip = "Remove")
         {
             InitializeComponent();
             PluginsView = pluginsview;
+            Remove.ToolTip = tooltip;
         }
 
         public static readonly DependencyProperty IconProperty = DependencyProperty.Register("Icon", typeof(ImageSource), typeof(CPluginControl));
@@ -47,6 +47,10 @@ namespace Galaxy_Swapper_v2.Workspace.Components
 
             Storyboard = Interface.SetElementAnimations(new Interface.BaseAnim { Element = Remove, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 0, To = 1, Duration = new TimeSpan(0, 0, 0, 0, 200) } });
             Storyboard.Begin();
+
+            Margin = new Thickness(5);
+            Height += 10;
+            Width += 10;
         }
 
         private void root_MouseLeave(object sender, MouseEventArgs e)
@@ -56,6 +60,10 @@ namespace Galaxy_Swapper_v2.Workspace.Components
 
             Storyboard = Interface.SetElementAnimations(new Interface.BaseAnim { Element = Remove, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 200) } });
             Storyboard.Begin();
+
+            Margin = new Thickness(10);
+            Height -= 10;
+            Width -= 10;
         }
 
         private void Remove_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

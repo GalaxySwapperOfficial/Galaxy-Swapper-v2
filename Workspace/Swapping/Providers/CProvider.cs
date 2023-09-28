@@ -2,10 +2,14 @@
 using CUE4Parse.UE4.Versions;
 using CUE4Parse.Utils;
 using Galaxy_Swapper_v2.Workspace.Generation.Formats;
+using Galaxy_Swapper_v2.Workspace.Properties;
+using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,133 +17,149 @@ using static Galaxy_Swapper_v2.Workspace.Global;
 
 namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public static class CProvider
     {
         private static DefaultFileProvider Provider { get; set; } = default!;
         public static List<StreamData> OpenedStreamers;
-        private static Task FortniteCheckingTask;
         public static Export Export { get; set; } = default!;
         public static byte[] ExportName { get; set; } = default!;
         public static bool SaveExport = false;
-        public static void Initialize(string Path)
+        private const string PaksPath = "\\FortniteGame\\Content\\Paks";
+        public static void Initialize()
         {
-            if (Provider != null)
+            if (Provider is not null)
             {
-                Log.Information("Provider was already loaded skipping.");
+                Log.Information("CProvider is already initialized");
                 return;
             }
+
+            string paks = Settings.Read(Settings.Type.Installtion).Value<string>();
+
+            if (paks is null || string.IsNullOrEmpty(paks) || !Directory.Exists(paks))
+            {
+                throw new CustomException(Languages.Read(Languages.Type.Message, "FortniteDirectoryEmpty"));
+            }
+
+            paks = string.Concat(paks, PaksPath);
+            OpenedStreamers = new();
+
+            PaksCheck.Validate(paks);
+            PaksCheck.Backup(paks);
+            AesProvider.Initialize();
             
-            try
-            {
-                OpenedStreamers = new List<StreamData>();
-                Provider = new DefaultFileProvider(Path, System.IO.SearchOption.TopDirectoryOnly, false, new VersionContainer(EGame.GAME_UE5_3));
-                Provider.Initialize();
-                Provider.SubmitKeys(FortniteApi.Keys);
+            Provider = new(paks, SearchOption.TopDirectoryOnly, isCaseInsensitive: false, new(EGame.GAME_UE5_3));
+            Provider.Initialize();
+            Provider.SubmitKeys(AesProvider.Keys);
 
-                Log.Information($"Loaded Provider with version: {Provider.Versions.Game} to path ({Path}) with {FortniteApi.Keys.Count()} AES keys.");
+            WaitForEpicGames(); //If Fortnite starts swapper will auto close to prevent read errors.
 
-                Log.Information("Starting FortniteCheckingTask");
-                StartChecking();
-            }
-            catch (Exception Exception)
-            {
-                Log.Error(Exception, "Failed to initialize Provider!");
-                throw;
-            }
+            Log.Information($"Loaded Provider with version: {Provider.Versions.Game} to path ({paks}) with {AesProvider.Keys.Count()} AES keys.");
         }
 
         public static void Add(string pakchunk)
         {
             Provider.Initialize(pakchunk);
-            Provider.SubmitKeys(FortniteApi.Keys);
+            Provider.SubmitKeys(AesProvider.Keys);
             Log.Information($"Added {pakchunk} to provider.");
         }
 
-        public static bool Save(string Path)
+        public static bool Save(string path)
         {
             SaveExport = true;
             Export = null;
-            ExportName = Encoding.ASCII.GetBytes(System.IO.Path.GetFileNameWithoutExtension(Path));
+            ExportName = Encoding.ASCII.GetBytes(System.IO.Path.GetFileNameWithoutExtension(path));
 
-            bool Result = Provider.TrySaveAsset(Path, out byte[] Data);
+            bool Result = Provider.TrySaveAsset(path, out byte[] Data);
 
             if (Result)
             {
                 Export.Buffer = Data;
-                Log.Information($"Exported {Path}");
+                Log.Information($"Exported {path}");
             }
             else
-                Log.Error($"Failed export {Path}");
+                Log.Error($"Failed export {path}");
 
             return Result;
         }
 
-        public static string FormatGamePath(string path) => CProvider.Provider.FixPath(path).SubstringBeforeLast('.');
-
-        public static string FormatUEFNGamePath(string path)
+        public static void Dispose()
         {
-            string pathtofind = path.ToLower();
-            string newpath = null;
+            if (Provider == null)
+                return;
 
-            foreach (string gamepath in Provider.Files.Keys)
+            Log.Information("Disposing Provider");
+
+            if (OpenedStreamers != null && OpenedStreamers.Count != 0)
             {
-                if (gamepath.SubstringBeforeLast('.').ToLower().EndsWith(pathtofind))
+                foreach (var stream in OpenedStreamers)
                 {
-                    newpath = gamepath;
-                    break;
+                    Log.Information($"Disposing {stream.Name} stream");
+                    stream.Stream.Close();
                 }
             }
 
-            if (newpath == null)
-                throw new CustomException($"Failed to find suitable UEFN game path for:\n{path}\nEnsure the custom plugin files are correct and the game path.");
+            Provider.Dispose();
+            Provider = null!;
+        }
 
-            if (newpath.StartsWith("FortniteGame/Plugins/GameFeatures/") || newpath.StartsWith("fortnitegame/plugins/gamefeatures/"))
-                newpath = newpath.Substring(34);
-            else if (newpath.StartsWith("/Game/") || newpath.StartsWith("/game/"))
-                newpath = newpath.Substring(6);
+        public static string FormatGamePath(string path) => Provider.FixPath(path).SubstringBeforeLast('.');
+
+        public static string FormatUEFNGamePath(string path)
+        {
+            const string game = "/game/";
+            const string plugin = "fortnitegame/plugins/gamefeatures/";
+            string search = path.ToLower();
+            string formatted = Provider.Files.Keys.FirstOrDefault(gamepath => gamepath.SubstringBeforeLast('.').ToLower().EndsWith(search))!;
+
+            if (string.IsNullOrEmpty(formatted))
+            {
+                Log.Error($"Could not find suitable UEFN game path: {path}");
+                throw new CustomException($"Failed to find suitable UEFN game path for:\n{path}\nEnsure the custom plugin path is correct and the game file contains the asset.");
+            }
+
+            if (formatted.ToLower().StartsWith(plugin))
+                formatted = formatted.Substring(plugin.Length);
+            else if (formatted.ToLower().StartsWith(game)) //It should never start with /Game/ but just in case.
+                formatted = formatted.Substring(game.Length);
             else
-                throw new CustomException($"Failed to find suitable UEFN game path for:\n{path}\nEnsure the custom plugin files are correct and the game path.");
+            {
+                Log.Error($"Failed to format UEFN game path:\n{path}\nDoes not start with {game} or {plugin}");
+                throw new CustomException($"Failed to format UEFN game path:\n{path}");
+            }
 
-            newpath = newpath.Split('/').First();
-            newpath = $"/{newpath}{path}";
+            formatted = string.Format("/{0}{1}", formatted.Split('/').First(), path);
+            Log.Information($"Created new UEFN game path: {formatted}");
 
-            Log.Information($"Created new UEFN game path: {newpath}");
-
-            return newpath;
+            return formatted;
         }
 
         public static void CloseStream(string path)
         {
-            if (CProvider.OpenedStreamers != null && CProvider.OpenedStreamers.Count != 0)
+            if (OpenedStreamers is not null && OpenedStreamers.Count != 0)
             {
-                foreach (var stream in CProvider.OpenedStreamers)
+                foreach (var stream in OpenedStreamers)
                 {
-                    if (stream.Path == path)
+                    if (stream.Path != path) continue;
+                    try
                     {
-                        try
-                        {
-                            stream.Stream.Close();
-                            Log.Information($"Closed {stream.Name} stream");
-                        }
-                        catch
-                        {
-                            Log.Error($"Failed to close {stream.Name} stream");
-                        }
+                        stream.Stream.Close();
+                        Log.Information($"Closed {stream.Name} stream");
+                    }
+                    catch
+                    {
+                        Log.Error($"Failed to close {stream.Name} stream");
                     }
                 }
             }
         }
 
-        private static void StartChecking()
+        private static void WaitForEpicGames()
         {
-            FortniteCheckingTask = Task.Run(async () =>
+            Task.Run(async () =>
             {
                 while (true)
                 {
+                    if (Provider is null) return;
                     if (EpicGamesLauncher.IsOpen())
                     {
                         Log.Warning("Detected Fortnite being opened! Closing swapper to prevent read errors");

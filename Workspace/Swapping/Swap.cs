@@ -2,7 +2,6 @@
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
 using Galaxy_Swapper_v2.Workspace.Swapping.Sterilization;
-using Galaxy_Swapper_v2.Workspace.Usercontrols;
 using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
@@ -14,10 +13,6 @@ using static Galaxy_Swapper_v2.Workspace.Global;
 
 namespace Galaxy_Swapper_v2.Workspace.Swapping
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public class Swap
     {
         private SwapView SwapView { get; set; } = default!;
@@ -34,6 +29,8 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
         {
             if (FovView == null)
                 SwapView.Output(Content, Type);
+            else
+                FovView.Output(Content, (FovView.Type)Type);
         }
 
         public bool Convert()

@@ -20,7 +20,6 @@ using CUE4Parse.UE4.Plugins;
 using CUE4Parse.UE4.Readers;
 using CUE4Parse.UE4.Versions;
 using CUE4Parse.Utils;
-using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -376,7 +375,6 @@ namespace CUE4Parse.FileProvider
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual bool TrySaveAsset(string path, out byte[] data)
         {
-            Log.Information("VGhpcyB2ZXJzaW9uIGlzIG9wZW4gc291cmNlISBJZiB5b3UgaGF2ZSBiZWVuIHNlbnQgdGhpcyBmaWxlIGJlIGNhcmZ1bCBvZiBhbnkgY29kZSBtb2RpZmNhdGlvbiB0aGF0IGNvdWxkIGhhdmUgYmVlbiBkb25lLiBodHRwczovL2dhbGF4eXN3YXBwZXJ2Mi5jb20vR3VpbGRlZA==".Base64Decode());
             if (!TryFindGameFile(path, out var file))
             {
                 data = default;

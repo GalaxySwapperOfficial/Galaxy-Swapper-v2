@@ -4,10 +4,6 @@ using System.Collections.Generic;
 
 namespace Galaxy_Swapper_v2.Workspace.Generation.Formats
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public class Option : ICloneable
     {
         public string Name;
@@ -17,6 +13,8 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Formats
         public string Message;
         public string OptionMessage;
         public bool Nsfw = false;
+        public bool UseMainUEFN = false;
+        public bool UEFNFormat = false;
         public JToken Parse;
         public List<Asset> Exports = new List<Asset>();
         public List<Downloadable> Downloadables = new List<Downloadable>();

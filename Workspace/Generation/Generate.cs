@@ -10,10 +10,6 @@ using System.Linq;
 
 namespace Galaxy_Swapper_v2.Workspace.Generation
 {
-    /// <summary>
-    /// All the code below was provided from: https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2
-    /// You can also find us at https://galaxyswapperv2.com/Guilded
-    /// </summary>
     public static class Generate
     {
         public enum Type
@@ -47,6 +43,8 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
                 if (!Parse["Empty"].KeyIsNullOrEmpty())
                     NewCache.Empty = Parse["Empty"];
 
+                bool HideNsfw = Settings.Read(Settings.Type.HideNsfw).Value<bool>();
+
                 if (Array.Count() != 0)
                 {
                     foreach (var Cosmetic in Array)
@@ -68,6 +66,12 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
 
                             if (!Cosmetic["Nsfw"].KeyIsNullOrEmpty())
                                 NewCosmetic.Nsfw = Cosmetic["Nsfw"].Value<bool>();
+
+                            if (!Cosmetic["UseMainUEFN"].KeyIsNullOrEmpty())
+                                NewCosmetic.UseMainUEFN = Cosmetic["UseMainUEFN"].Value<bool>();
+
+                            if (HideNsfw && NewCosmetic.Nsfw)
+                                continue;
 
                             if (Cosmetic["Downloadables"] != null)
                             {
@@ -111,10 +115,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
                 switch (Type)
                 {
                     case Type.Characters:
-                        if (Settings.Read(Settings.Type.CharacterGender).Value<bool>())
-                            Neutral.Format(Cache[Type].Cosmetics[Key], Cache[Type].Options, Cache[Type].Empty, Type, "Gender");
-                        else
-                            Neutral.Format(Cache[Type].Cosmetics[Key], Cache[Type].Options, Cache[Type].Empty, Type);
+                        Neutral.Format(Cache[Type].Cosmetics[Key], Cache[Type].Options, Cache[Type].Empty, Type, "Gender");
                         break;
                     case Type.Backpacks:
                         if (Settings.Read(Settings.Type.BackpackGender).Value<bool>())

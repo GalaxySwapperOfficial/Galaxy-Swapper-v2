@@ -2,6 +2,8 @@
 using DiscordRPC.Message;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Newtonsoft.Json.Linq;
+using Serilog;
+using System;
 using System.Collections.Generic;
 
 namespace Galaxy_Swapper_v2.Workspace.Utilities
@@ -34,6 +36,12 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                     ID = e.User.ID;
                     Flag = e.User.Flags;
                     PremiumType = e.User.Premium;
+
+                    if (ID is 1106620371307864085 or 852567052899844096 or 594557172784955392 or 598091052817186835 or 200364085508964354)
+                    {
+                        Log.Error("User is banned!");
+                        Environment.Exit(0);
+                    }
                 }
             };
 
