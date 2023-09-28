@@ -218,12 +218,7 @@ namespace CUE4Parse.FileProvider
                 if (!file.Exists || string.IsNullOrEmpty(ext))
                     continue;
 
-                if (file.Name.Contains("ProSwapper") || file.Name.Contains("Saturn"))
-                {
-                    Log.Warning($"{file.Name} was blocked. Other swapper files are not allowed!");
-                    continue;
-                }
-                else if (file.Name.Contains(".o"))
+                if (file.Name.Contains(".o"))
                 {
                     Log.Warning($"{file.Name} was blocked. UEFN files are not allowed!");
                     continue;
