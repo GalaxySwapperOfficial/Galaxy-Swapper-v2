@@ -3,6 +3,7 @@ using CUE4Parse.UE4.Versions;
 using CUE4Parse.Utils;
 using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Properties;
+using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
@@ -21,7 +22,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
     {
         private static DefaultFileProvider Provider { get; set; } = default!;
         public static List<StreamData> OpenedStreamers;
-        public static Workspace.Structs.Export Export { get; set; } = default!;
+        public static Export Export { get; set; } = default!;
         public static byte[] ExportName { get; set; } = default!;
         public static bool SaveExport = false;
         private const string PaksPath = "\\FortniteGame\\Content\\Paks";

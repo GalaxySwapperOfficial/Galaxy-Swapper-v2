@@ -1,5 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Properties;
+using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Swapping;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
@@ -199,7 +200,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                         else
                         {
                             Output(Languages.Read(Languages.Type.View, "SwapView", "Decompressing"), Type.Info);
-                            Asset.OverrideExport = new Structs.Export() { Buffer = Compression.Decompress(Asset.OverrideBuffer) };
+                            Asset.OverrideExport = new () { Buffer = Compression.Decompress(Asset.OverrideBuffer) };
                         }
                         Asset.OverrideObject = FormatObject(Asset.OverrideObject);
                     }

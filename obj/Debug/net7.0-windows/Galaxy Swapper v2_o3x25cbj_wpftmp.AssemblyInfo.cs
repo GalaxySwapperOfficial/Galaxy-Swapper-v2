@@ -11,7 +11,7 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("Wslt#9596")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("Wslt#0977")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright © Galaxy Swapper v2")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
