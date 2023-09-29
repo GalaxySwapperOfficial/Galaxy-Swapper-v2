@@ -13,6 +13,7 @@ using Galaxy_Swapper_v2.Workspace.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Formats.Asn1;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -118,7 +119,7 @@ namespace CUE4Parse.UE4.IO
             if (!(entry is FIoStoreEntry ioEntry) || entry.Vfs != this) throw new ArgumentException($"Wrong io store reader, required {entry.Vfs.Path}, this is {Path}");
             var Result = Read(ioEntry.Offset, ioEntry.Size);
 
-            if (CProvider.SaveExport)
+            if (CProvider.SaveExport && CProvider.Export is not null)
             {
                 CProvider.Export.ChunkOffsetLengths = TocResource.ChunkOffsetLengths[ioEntry.TocEntryIndex];
             }
@@ -276,9 +277,9 @@ namespace CUE4Parse.UE4.IO
                     }
                 }
 
-                if (CProvider.SaveExport && CProvider.Export == null && src.IndexOfSequence(CProvider.ExportName, 0) > 0)
+                if (CProvider.SaveExport && CProvider.Export is null && src.IndexOfSequence(CProvider.ExportName, 0) > 0)
                 {
-                    CProvider.Export = new Export() { Buffer = src, CompressedBuffer = compressedBuffer, CompressionBlock = compressionBlock, Ucas = System.IO.Path.GetFileNameWithoutExtension(reader.Name), Utoc = System.IO.Path.GetFileNameWithoutExtension(this.Name), Offset = partitionOffset, LastPartition = TocResource.Header.PartitionCount - 1 };
+                    CProvider.Export = new() { CompressionBlock = compressionBlock, Ucas = System.IO.Path.GetFileNameWithoutExtension(reader.Name), Utoc = System.IO.Path.GetFileNameWithoutExtension(this.Name), LastPartition = TocResource.Header.PartitionCount - 1 };
                 }
 
                 var sizeInBlock = (int) Math.Min(compressionBlockSize - offsetInBlock, remainingSize);

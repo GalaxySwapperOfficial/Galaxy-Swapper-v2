@@ -199,7 +199,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                         else
                         {
                             Output(Languages.Read(Languages.Type.View, "SwapView", "Decompressing"), Type.Info);
-                            Asset.OverrideExport = new Export() { Buffer = Compression.Decompress(Asset.OverrideBuffer) };
+                            Asset.OverrideExport = new Structs.Export() { Buffer = Compression.Decompress(Asset.OverrideBuffer) };
                         }
                         Asset.OverrideObject = FormatObject(Asset.OverrideObject);
                     }
