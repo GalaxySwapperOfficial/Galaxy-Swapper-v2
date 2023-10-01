@@ -60,23 +60,32 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
                 foreach (var Object in Asset.Swaps)
                 {
-                    if (Object["type"].Value<string>() != "string")
-                        continue;
-
-                    string ObjectPath = (Object["search"].Value<string>().Contains('.') ? Object["search"].Value<string>().Split('.').First() : Object["search"].Value<string>()).Replace("FortniteGame/Plugins/GameFeatures/BRCosmetics/Content/", "/BRCosmetics/");
-                    string ObjectName = Object["search"].Value<string>().Split('.')?.Last();
-                    string OverrideObjectPath = (Object["replace"].Value<string>().Contains('.') ? Object["replace"].Value<string>().Split('.').First() : Object["replace"].Value<string>()).Replace("FortniteGame/Plugins/GameFeatures/BRCosmetics/Content/", "/BRCosmetics/");
-                    string OverrideObjectName = Object["replace"].Value<string>().Split('.')?.Last();
-
-                    if (!string.IsNullOrEmpty(OverrideObjectPath) && !Object["UEFN"].KeyIsNullOrEmpty() && Object["UEFN"].Value<bool>())
+                    switch (Object["type"].Value<string>())
                     {
-                        OverrideObjectPath = CProvider.FormatUEFNGamePath(OverrideObjectPath);
+                        case "string":
+                            {
+                                string ObjectPath = (Object["search"].Value<string>().Contains('.') ? Object["search"].Value<string>().Split('.').First() : Object["search"].Value<string>()).Replace("FortniteGame/Plugins/GameFeatures/BRCosmetics/Content/", "/BRCosmetics/");
+                                string ObjectName = Object["search"].Value<string>().Split('.')?.Last();
+                                string OverrideObjectPath = (Object["replace"].Value<string>().Contains('.') ? Object["replace"].Value<string>().Split('.').First() : Object["replace"].Value<string>()).Replace("FortniteGame/Plugins/GameFeatures/BRCosmetics/Content/", "/BRCosmetics/");
+                                string OverrideObjectName = Object["replace"].Value<string>().Split('.')?.Last();
+
+                                if (!string.IsNullOrEmpty(OverrideObjectPath) && !Object["UEFN"].KeyIsNullOrEmpty() && Object["UEFN"].Value<bool>())
+                                {
+                                    OverrideObjectPath = CProvider.FormatUEFNGamePath(OverrideObjectPath);
+                                }
+
+                                Deserializer.ReplaceNameMap(ObjectPath, OverrideObjectPath);
+
+                                if (!string.IsNullOrEmpty(ObjectName) && !string.IsNullOrEmpty(OverrideObjectName))
+                                    Deserializer.ReplaceNameMap(ObjectName, OverrideObjectName);
+                            }
+                            break;
+                        case "tag":
+                            {
+                                Deserializer.ReplaceNameMap(Object["search"].Value<string>(), Object["replace"].Value<string>());
+                            }
+                            break;
                     }
-
-                    Deserializer.ReplaceNameMap(ObjectPath, OverrideObjectPath);
-
-                    if (!string.IsNullOrEmpty(ObjectName) && !string.IsNullOrEmpty(OverrideObjectName))
-                        Deserializer.ReplaceNameMap(ObjectName, OverrideObjectName);
                 }
             }
 
