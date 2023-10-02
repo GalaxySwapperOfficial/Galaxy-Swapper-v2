@@ -1,4 +1,4 @@
-﻿using Galaxy_Swapper_v2.Workspace.Components;
+﻿using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -9,50 +9,109 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Windows;
 
 namespace Galaxy_Swapper_v2.Workspace.Properties
 {
     public static class Account
     {
-        public static readonly string Path = $"{App.Config}\\Login.encrypted";
+        public static readonly string Path = $"{App.Config}\\Account.dat";
         public static bool Valid()
         {
             try
             {
                 if (!File.Exists(Path))
-                    return false;
-
-                string Content = File.ReadAllText(Path);
-
-                if (string.IsNullOrEmpty(Content))
-                    return false;
-
-                Content = Content.Decompress();
-
-                if (!Content.ValidJson())
-                    return false;
-
-                var Parse = JObject.Parse(Content);
-
-                if (Parse["Username"].Value<string>() != Environment.UserName)
-                    return false;
-
-                DateTime CurrentDate = DateTime.Now;
-
-                foreach (string Day in Parse["Days"])
                 {
-                    if (Day == CurrentDate.ToString("dd/MM/yyyy"))
-                        return true;
+                    return false;
                 }
 
-                Log.Warning("Key expired");
-                File.Delete(Path);
+                var reader = new Reader(File.ReadAllBytes(Path));
+
+                ulong usernameHash = reader.Read<ulong>();
+                int usernameLength = reader.Read<int>();
+                byte[] usernameBuffer = reader.ReadBytes(usernameLength);
+                string username = Encoding.ASCII.GetString(usernameBuffer);
+
+                if (username != Environment.UserName)
+                {
+                    Log.Warning("Account username was not as expected and will return invalid");
+                    return false;
+                }
+
+                ulong expectedUsernameHash = CityHash.Hash(Encoding.ASCII.GetBytes(Environment.UserName));
+                if (usernameHash != expectedUsernameHash)
+                {
+                    Log.Warning("Account username hash was not as expected and will return invalid");
+                    return false;
+                }
+
+                int daysAmount = reader.Read<int>();
+
+                DateTime dateTime = DateTime.Now;
+                for (int i = 0; i < daysAmount; i++)
+                {
+                    ulong dateHash = reader.Read<ulong>();
+                    int dateLength = reader.Read<int>();
+                    byte[] dateBuffer = reader.ReadBytes(dateLength);
+
+                    if (dateHash != CityHash.Hash(dateBuffer))
+                    {
+                        Log.Information("Account date hash was not as expected and will be skipped");
+                        continue;
+                    }
+
+                    if (Encoding.ASCII.GetString(dateBuffer) == dateTime.ToString("dd/MM/yyyy"))
+                    {
+                        Log.Information("Found a valid date in account data");
+                        return true;
+                    }
+                }
+
+                Log.Information("Could not find a valid date in account data");
                 return false;
             }
-            catch (Exception Exception)
+            catch (Exception e)
             {
-                Log.Error(Exception, "Error while validating key");
+                Log.Fatal("Application caught a unexpected error while checking account data");
+                Log.Fatal(e.ToString());
+                return false;
+            }
+        }
+
+        public static bool Create(int days)
+        {
+            try
+            {
+                if (File.Exists(Path))
+                    File.Delete(Path);
+
+                var writer = new Writer(new byte[60000]);
+                byte[] username = Encoding.ASCII.GetBytes(Environment.UserName);
+
+                writer.Write(CityHash.Hash(username));
+                writer.Write(username.Length);
+                writer.WriteBytes(username);
+
+                writer.Write(days);
+
+                DateTime dateTime = DateTime.Now;
+                for (int i = 0; i < days; i++)
+                {
+                    byte[] date = Encoding.ASCII.GetBytes(dateTime.AddDays(i).ToString("dd/MM/yyyy"));
+                    writer.Write(CityHash.Hash(date));
+                    writer.Write(date.Length);
+                    writer.WriteBytes(date);
+                }
+
+                File.WriteAllBytes(Path, writer.ToByteArray(writer.Position));
+                Log.Information($"Wrote to: {Path} with {days} days");
+                return true;
+            }
+            catch (Exception e)
+            {
+                Log.Fatal("Application caught a unexpected error while creating account data");
+                Log.Fatal(e.ToString());
                 return false;
             }
         }
@@ -98,42 +157,6 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                         Message.Display(Languages.Read(Languages.Type.Header, "Error"), parse["message"].Value<string>(), MessageBoxButton.OK, solutions: new () { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
                         return false;
                 }
-            }
-        }
-
-        private static bool Create(int Days)
-        {
-            try
-            {
-                if (File.Exists(Path))
-                    File.Delete(Path);
-
-                DateTime CurrentDate = DateTime.Now;
-
-                var Array = new JArray
-                {
-                    CurrentDate.ToString("dd/MM/yyyy")
-                };
-
-                for (int i = 1; i < Days; i++)
-                {
-                    Array.Add(CurrentDate.AddDays(i).ToString("dd/MM/yyyy"));
-                }
-
-                var Object = JObject.FromObject(new
-                {
-                    Username = Environment.UserName,
-                    Days = Array
-                });
-
-                string Content = Object.ToString(Newtonsoft.Json.Formatting.None).Compress();
-
-                File.WriteAllText(Path, Content);
-                return true;
-            }
-            catch
-            {
-                return false;
             }
         }
     }

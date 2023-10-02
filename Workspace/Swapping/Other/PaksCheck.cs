@@ -1,5 +1,6 @@
 ﻿using CUE4Parse.UE4.IO.Objects;
 using CUE4Parse.Utils;
+using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Serilog;
 using System.Diagnostics;
@@ -77,6 +78,9 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
                 Log.Information($"{fileInfo.Name} does not exist!");
                 Copy(directoryInfo, item, fileInfo.FullName);
             }
+
+            Log.Information("Checking for high resolution texture files");
+            UEFN.OpenSlots(path);
 
             stopwatch.Stop();
             Log.Information($"Finished backing up game files in {stopwatch.Elapsed.TotalSeconds} seconds!");

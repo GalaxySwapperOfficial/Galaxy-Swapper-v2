@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Galaxy_Swapper_v2.Workspace.Structs;
+using Newtonsoft.Json.Linq;
 using System;
 
 namespace Galaxy_Swapper_v2.Workspace.Generation.Formats

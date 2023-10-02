@@ -250,6 +250,11 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             }
         }
 
+        private void ResetUEFN_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private void StartFortnite_Click(object sender, RoutedEventArgs e)
         {
             Log.Information("Starting Fortnite");
