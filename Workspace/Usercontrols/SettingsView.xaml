@@ -19,6 +19,7 @@
                             <TextBlock x:Name="InstallationDescription" FontSize="10" FontWeight="SemiBold" Foreground="#454B56" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 32, 0, 0"/>
                             <Button x:Name="EditPath" Content="Edit Path" Margin="603,14,185,14" Click="EditPath_Click"/>
                             <Button x:Name="Verify" Content="Verify" Margin="769,14,19,14" Click="Verify_Click"/>
+                            <Button x:Name="ResetUEFN" Content="Reset UEFN" Margin="434,14,354,14" Click="ResetUEFN_Click"/>
                         </Grid>
                     </Border>
                     <Border Style="{StaticResource Settings}">

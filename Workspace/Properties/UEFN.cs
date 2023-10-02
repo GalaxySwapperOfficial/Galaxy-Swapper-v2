@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Windows;
 using static Galaxy_Swapper_v2.Workspace.Global;
 
@@ -41,6 +42,44 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             Cache = JObject.Parse(Content);
 
             Log.Information("Successfully initialized UEFN");
+        }
+
+        private static readonly byte[] UEFNMountPoint = Encoding.ASCII.GetBytes("/FortniteGame/Plugins/GameFeatures/");
+        public static void OpenSlots(string paks)
+        {
+            var Parse = Endpoint.Read(Endpoint.Type.UEFN);
+            foreach (string slot in Parse["Slots"])
+            {
+                string path = $"{paks}\\{slot}.pak";
+                if (File.Exists(path))
+                {
+                    Log.Information($"Slot {slot} is open checking if stream is as well");
+                    CProvider.CloseStream($"{paks}\\{slot}.pak");
+
+                    Log.Information("Checking if slot is a high resolution texture game file");
+                    using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
+                    {
+                        long position = Misc.IndexOfSequence(stream, UEFNMountPoint);
+
+                        stream.Close(); //Don't need it.
+
+                        if (position < 0)
+                        {
+                            Log.Information($"{slot} is not a UEFN game file and will be removed (Including ucas, utoc, pak, sig");
+
+                            Delete($"{paks}\\{slot}.ucas");
+                            Delete($"{paks}\\{slot}.utoc");
+                            Delete($"{paks}\\{slot}.pak");
+                            Delete($"{paks}\\{slot}.sig");
+                            Delete($"{paks}\\{slot}.backup");
+                        }
+                        else
+                        {
+                            Log.Information($"{slot} is a UEFN game file");
+                        }
+                    }
+                }
+            }
         }
 
         public static void DownloadMain(string paks)
@@ -205,12 +244,12 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
 
                 try
                 {
-                    Log.Information($"Deleting old uefn file: {path}");
+                    Log.Information($"Deleting {path}");
                     File.Delete(path);
                 }
                 catch (Exception Exception)
                 {
-                    Log.Error(Exception, $"Failed to delete old uefn file: {path}");
+                    Log.Error(Exception, $"Failed to delete {path}");
                     return false;
                 }
             }
