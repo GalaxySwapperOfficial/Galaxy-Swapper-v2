@@ -1,2 +1,0 @@
-D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\publish\win-x64\Galaxy Swapper v2.pdb
-D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\publish\win-x64\Galaxy Swapper v2.exe
