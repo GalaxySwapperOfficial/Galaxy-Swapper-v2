@@ -1,0 +1,82 @@
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\Galaxy Swapper v2.exe
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\Galaxy Swapper v2.deps.json
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\Galaxy Swapper v2.runtimeconfig.json
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\Galaxy Swapper v2.dll
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\Galaxy Swapper v2.pdb
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\DiscordRPC.dll
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\DotNetZip.dll
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\K4os.Compression.LZ4.dll
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\Newtonsoft.Json.dll
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\RestSharp.dll
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\Serilog.dll
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\Serilog.Sinks.Debug.dll
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\Serilog.Sinks.File.dll
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\bin\Release\net7.0-windows\WindowsAPICodePack.Shell.CommonFileDialogs.dll
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2.csproj.AssemblyReference.cache
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CCloseControl.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CMessageboxControl.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CMinimizeControl.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CNewsControl.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CPluginControl.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CSearchbarControl.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CSettingsControl.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CSwappedControl.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CTabControl.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\CosmeticsView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\DashboardView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\LoginView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\MiscView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\DiscordView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\FovView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\LanguageSelectionView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\NoOptionsView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\NotesView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\OptionsView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\SwappedView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\SwapView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\PluginsView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\SettingsView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\SplashView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Views\MainView.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\App.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2_Content.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\GeneratedInternalTypeHelper.g.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2_MarkupCompile.cache
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2_MarkupCompile.lref
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\App.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CCloseControl.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CMessageboxControl.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CMinimizeControl.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CNewsControl.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CPluginControl.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CSearchbarControl.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CSettingsControl.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CSwappedControl.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Components\CTabControl.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\CosmeticsView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\DashboardView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\LoginView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\MiscView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\DiscordView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\FovView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\LanguageSelectionView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\NoOptionsView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\NotesView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\OptionsView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\SwappedView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\Overlays\SwapView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\PluginsView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\SettingsView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Usercontrols\SplashView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Workspace\Views\MainView.baml
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2.g.resources
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2.GeneratedMSBuildEditorConfig.editorconfig
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2.AssemblyInfoInputs.cache
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2.AssemblyInfo.cs
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2.csproj.CoreCompileInputs.cache
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2.csproj.CopyComplete
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2.dll
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\refint\Galaxy Swapper v2.dll
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2.pdb
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\Galaxy Swapper v2.genruntimeconfig.cache
+D:\Galaxy Swapper v2\Source\Galaxy Swapper v2\obj\Release\net7.0-windows\ref\Galaxy Swapper v2.dll
