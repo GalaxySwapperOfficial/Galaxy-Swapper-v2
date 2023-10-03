@@ -5,6 +5,7 @@ using CUE4Parse.UE4.Objects.Core.Misc;
 using CUE4Parse.UE4.Readers;
 using CUE4Parse.Utils;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
+using Serilog;
 
 namespace CUE4Parse.UE4.IO.Objects
 {
@@ -61,8 +62,10 @@ namespace CUE4Parse.UE4.IO.Objects
         public FIoStoreTocHeader(FArchive Ar)
         {
             TocMagic = Ar.ReadBytes(16);
+
             if (!TOC_MAGIC.SequenceEqual(TocMagic))
-                throw new ParserException(Ar, "Invalid utoc magic");
+                throw new ParserException(Ar, $"Invalid utoc magic: {Ar.Name}");
+
             Version = Ar.Read<EIoStoreTocVersion>();
             _reserved0 = Ar.Read<byte>();
             _reserved1 = Ar.Read<ushort>();
@@ -93,7 +96,7 @@ namespace CUE4Parse.UE4.IO.Objects
             TocMagic = reader.ReadBytes(16);
 
             if (!TOC_MAGIC.SequenceEqual(TocMagic))
-                throw new Exception("Invalid utoc magic");
+                throw new Exception($"Invalid utoc magic: {reader.Name}");
 
             Version = reader.Read<EIoStoreTocVersion>();
             _reserved0 = reader.Read<byte>();

@@ -47,8 +47,10 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
 
             stopwatch.Start();
 
-            Log.Information("Starting IO backup task");
+            Log.Information("Checking for high resolution texture files");
+            UEFN.OpenSlots(path);
 
+            Log.Information("Starting IO backup task");
             foreach (FileInfo item in directoryInfo.EnumerateFiles("*.utoc*", SearchOption.TopDirectoryOnly))
             {
                 FileInfo fileInfo = new FileInfo(item.FullName.SubstringBeforeLast('.') + ".backup");
@@ -78,9 +80,6 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
                 Log.Information($"{fileInfo.Name} does not exist!");
                 Copy(directoryInfo, item, fileInfo.FullName);
             }
-
-            Log.Information("Checking for high resolution texture files");
-            UEFN.OpenSlots(path);
 
             stopwatch.Stop();
             Log.Information($"Finished backing up game files in {stopwatch.Elapsed.TotalSeconds} seconds!");
