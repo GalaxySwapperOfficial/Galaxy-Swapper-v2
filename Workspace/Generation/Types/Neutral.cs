@@ -52,8 +52,10 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                                 else
                                     NewOption.Icon = string.Format(Generate.Domain, NewOption.ID);
 
+                                if (!Override["UseMainUEFN"].KeyIsNullOrEmpty())
+                                    NewOption.UseMainUEFN = Override["UseMainUEFN"].Value<bool>();
+
                                 NewOption.Nsfw = Cosmetic.Nsfw;
-                                NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
 
                                 if (Override["Downloadables"] != null)
                                 {
@@ -103,7 +105,6 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                         UEFNFormat = true,
                         Parse = null // Not needed we will never use it
                     };
-
 
                     if (!option["Override"].KeyIsNullOrEmpty())
                         NewOption.Icon = option["Override"].Value<string>();
