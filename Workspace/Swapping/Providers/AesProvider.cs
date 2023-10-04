@@ -19,6 +19,12 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
         public static Dictionary<FGuid, FAesKey> Keys = new Dictionary<FGuid, FAesKey>();
         public static void Initialize()
         {
+            if (Keys.Count != 0)
+            {
+                Log.Warning("Keys were already initialized");
+                return;
+            }
+
             using (RestClient client = new())
             {
                 var request = new RestRequest(new Uri(Domain), Method.Get);
