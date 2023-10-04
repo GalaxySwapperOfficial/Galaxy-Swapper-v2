@@ -218,14 +218,8 @@ namespace CUE4Parse.FileProvider
                 if (!file.Exists || string.IsNullOrEmpty(ext))
                     continue;
 
-                if (file.Name.Contains(".o"))
+                if (file.Name.Contains(".o") || ext == "backup")
                 {
-                    Log.Warning($"{file.Name} was blocked. UEFN files are not allowed!");
-                    continue;
-                }
-                else if (ext == "backup")
-                {
-                    Log.Warning($"{file.Name} was blocked. Backup files aren't suppose to be loaded yet!");
                     continue;
                 }
 
@@ -297,7 +291,6 @@ namespace CUE4Parse.FileProvider
                         DupeIO(directory, file, newfileinfo);
                     }
                 }
-
 
                 // Only load containers if .uproject file is not found
                 if (uproject == null)
