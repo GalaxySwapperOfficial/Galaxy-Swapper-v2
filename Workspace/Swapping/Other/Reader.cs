@@ -10,7 +10,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
     public class Reader : BinaryReader
     {
         public long Length => base.BaseStream.Length;
-
+        public string Name { get; set; }
         public long Position
         {
             get
@@ -26,6 +26,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
         public Reader(string file)
             : base(File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read))
         {
+            Name = file;
         }
 
         public Reader(byte[] data)
