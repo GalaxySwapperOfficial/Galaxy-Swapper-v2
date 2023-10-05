@@ -1,5 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Components;
 using Galaxy_Swapper_v2.Workspace.Generation.Formats;
+using Galaxy_Swapper_v2.Workspace.Plugins;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
@@ -35,7 +36,11 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
                 foreach (string file in files)
                 {
-                    Plugins.Add(file);
+                    var fileInfo = new FileInfo(file);
+                    if (Validate.IsValid(file, out JObject parse))
+                    {
+                        Plugin.Import(fileInfo, parse);
+                    }
                 }
 
                 Refresh();
@@ -65,7 +70,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             if (Plugins_Items.Children.Count != 0)
                 Plugins_Items.Children.Clear();
 
-            foreach (string Plugin in Plugins.List())
+            foreach (string Plugin in Properties.Plugins.List())
             {
                 string Content = File.ReadAllText(Plugin);
                 if (Content.Length == 0)

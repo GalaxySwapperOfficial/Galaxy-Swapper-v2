@@ -1,6 +1,8 @@
 ﻿using Galaxy_Swapper_v2.Workspace;
+using Galaxy_Swapper_v2.Workspace.Plugins;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
 using System.Diagnostics;
@@ -51,6 +53,8 @@ namespace Galaxy_Swapper_v2
             SwapLogs.Initialize();
             UEFN.Initialize();
             Binaries.Initialize();
+
+            Plugin.Import(new FileInfo("C:\\Users\\Administrator\\Downloads\\TestPlugin.json"), JObject.Parse(File.ReadAllText("C:\\Users\\Administrator\\Downloads\\TestPlugin.json")));
 
             base.OnStartup(e);
         }
