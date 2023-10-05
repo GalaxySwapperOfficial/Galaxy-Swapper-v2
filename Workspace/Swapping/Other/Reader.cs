@@ -41,6 +41,13 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
             return array;
         }
 
+        public new string ReadStrings(int length)
+        {
+            byte[] array = new byte[length];
+            Read(array, 0, length);
+            return Encoding.ASCII.GetString(array);
+        }
+
         public T Read<T>()
         {
             if (typeof(T) == typeof(string) || typeof(T) == typeof(object))

@@ -1,5 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,15 +29,54 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             byte[] key = GenerateKey(16);
 
             writer.Write(CityHash.Hash(key));
-            writer.Write(key.Length);
+            writer.Write(key.Length); //Will always be 16 but If I do other formats it may change.
+            writer.WriteBytes(key);
 
+            //Plugin buffer
             byte[] encrypted = Encrypt(parse.ToString(Newtonsoft.Json.Formatting.None), key);
 
             writer.Write(CityHash.Hash(encrypted));
             writer.Write(encrypted.Length);
             writer.WriteBytes(encrypted);
 
-            File.WriteAllBytes($"{Path}\\{System.IO.Path.GetRandomFileName()}.plugin", writer.ToByteArray(writer.Position));
+            string output = $"{Path}\\{System.IO.Path.GetRandomFileName()}.plugin";
+            File.WriteAllBytes(output, writer.ToByteArray(writer.Position));
+
+            Log.Information($"Plugin wrote to: {output}");
+        }
+
+        public static bool Export(FileInfo fileInfo)
+        {
+            var reader = new Reader(File.ReadAllBytes(fileInfo.FullName));
+
+            reader.BaseStream.Position += sizeof(int); //encryption/compression format currently not used
+
+            int importpathlength = reader.Read<int>();
+            string importpath = reader.ReadStrings(importpathlength);
+
+            ulong keyhash = reader.Read<ulong>();
+            int keylength = reader.Read<int>();
+            byte[] key = reader.ReadBytes(keylength);
+
+            if (CityHash.Hash(key) != keyhash)
+            {
+                Log.Warning($"{fileInfo.Name} encryption key hash was not as expected plugin will be skipped");
+                return false;
+            }
+
+            ulong pluginhash = reader.Read<ulong>();
+            int pluginlength = reader.Read<int>();
+            byte[] pluginbuffer = reader.ReadBytes(pluginlength);
+
+            if (CityHash.Hash(pluginbuffer) != pluginhash)
+            {
+                Log.Warning($"{fileInfo.Name} buffer hash was not as expected plugin will be skipped");
+                return false;
+            }
+
+            Log.Information(Decrypt(pluginbuffer, key));
+
+            return true;
         }
 
         private static byte[] GenerateKey(int keyLengthInBytes)
@@ -73,11 +113,11 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             }
         }
 
-        private static string Decrypt(byte[] encryptedBytes, string key)
+        private static string Decrypt(byte[] encryptedBytes, byte[] key)
         {
             using (Aes aesAlg = Aes.Create())
             {
-                aesAlg.Key = Encoding.UTF8.GetBytes(key);
+                aesAlg.Key = key;
                 aesAlg.Mode = CipherMode.CBC;
                 aesAlg.Padding = PaddingMode.PKCS7;
 
