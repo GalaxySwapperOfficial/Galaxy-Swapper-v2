@@ -59,6 +59,9 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
 
         public static void Add(string pakchunk)
         {
+            if (Provider == null)
+                return;
+
             Provider.Initialize(pakchunk);
             Provider.SubmitKeys(AesProvider.Keys);
             Log.Information($"Added {pakchunk} to provider.");

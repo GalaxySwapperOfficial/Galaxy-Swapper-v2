@@ -121,6 +121,26 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 Settings.Edit(Settings.Type.Installtion, string.Empty);
                 return;
             }
+
+            //Remove next Fortnite update
+            if (!UEFN.Cache["Main"].KeyIsNullOrEmpty())
+            {
+                UEFN.Cache.Add("Downloadables", new JArray());
+
+                Log.Information($"{UEFN.Cache["Main"].Value<string>()}.ucas");
+
+                if (File.Exists($"{UEFN.Cache["Main"].Value<string>()}.ucas"))
+                {
+                    File.Delete($"{UEFN.Cache["Main"].Value<string>()}.ucas");
+                    UEFN.Cache["Main"] = null;
+                    UEFN.DownloadMain(installation);
+                }
+                else
+                {
+                    UEFN.Cache["Main"] = null;
+                    File.WriteAllText(UEFN.Path, UEFN.Cache.ToString());
+                }
+            }
         }
 
         private void Drag_Click(object sender, MouseButtonEventArgs e) => Memory.MainView.DragMove();
