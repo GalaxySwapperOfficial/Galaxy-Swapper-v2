@@ -1,6 +1,8 @@
 ﻿using CUE4Parse.UE4.Objects.Engine;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -11,9 +13,11 @@ using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using static Galaxy_Swapper_v2.Workspace.Global;
 
 namespace Galaxy_Swapper_v2.Workspace.Utilities
 {
@@ -187,6 +191,32 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             catch (IOException)
             {
                 return false;
+            }
+        }
+
+        public static void Download(string path, string url, string name = "file")
+        {
+            using (WebClient WC = new WebClient())
+            {
+                try
+                {
+                    Log.Information($"Downloading data from: {url}");
+
+                    WC.DownloadFile(url, path);
+                    WC.Dispose();
+                }
+                catch (IOException ioException)
+                {
+                    Message.DisplaySTA("Error", "Failed to download file. There is not enough space on the disk!", MessageBoxButton.OK, solutions: new List<string> { "Make room on the disk and try again." });
+                    Log.Error(ioException, $"Failed to download from: {url} disk ran out of space!");
+                    throw new CustomException("Failed to download custom UEFN game file! Ran out of space.");
+                }
+                catch (Exception Exception)
+                {
+                    Message.DisplaySTA("Error", "Webclient caught a exception while downloading file!", MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
+                    Log.Error(Exception, $"Failed to download from: {url}");
+                    throw new CustomException("Failed to download file!");
+                }
             }
         }
 

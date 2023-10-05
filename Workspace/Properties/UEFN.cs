@@ -6,6 +6,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Windows;
@@ -84,85 +85,103 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
 
         public static void DownloadMain(string paks)
         {
-            var Parse = Endpoint.Read(Endpoint.Type.UEFN);
+            var parse = Endpoint.Read(Endpoint.Type.UEFN);
 
-            if (!Parse["Enabled"].Value<bool>())
+            if (!parse["Enabled"].Value<bool>())
             {
-                Log.Warning("Main UEFN is disabled!");
-                return;
+                Log.Warning("UEFN Is disabled");
+                throw new Exception($"UEFN game files are currently disabled");
             }
 
-            if (Cache["Main"].KeyIsNullOrEmpty() || Cache["Version"].KeyIsNullOrEmpty())
-                Log.Information("UEFN cache key 'Main' and 'Version' is null.");
-            else if (Parse["Version"].Value<int>() != Cache["Version"].Value<int>())
+            if (!Cache["Version"].KeyIsNullOrEmpty() && parse["Version"].Value<int>() != Cache["Version"].Value<int>())
             {
-                Log.Information("Main UEFN game file is out of date.");
-                foreach (string extension in Extensions)
+                //Remove all main game files
+            }
+
+            var downloadables = new List<Downloadable>();
+            foreach (var downloadable in parse["Downloadables"])
+            {
+                if (downloadable["zip"].KeyIsNullOrEmpty())
                 {
-                    Delete($"{Cache["Main"].Value<string>()}{extension}");
+                    downloadables.Add(new() { Ucas = downloadable["ucas"].Value<string>(), Utoc = downloadable["utoc"].Value<string>(), Pak = downloadable["pak"].Value<string>(), Sig = downloadable["sig"].Value<string>() });
                 }
-                Delete($"{Cache["Main"].Value<string>()}.backup"); //Might exist!
-            }
-            else if (!File.Exists($"{Cache["Main"].Value<string>()}.ucas") || !File.Exists($"{Cache["Main"].Value<string>()}.utoc") || !File.Exists($"{Cache["Main"].Value<string>()}.pak") || !File.Exists($"{Cache["Main"].Value<string>()}.sig"))
-                Log.Warning("Main UEFN game file is cached but does not exist?");
-            else
-            {
-                Log.Information($"Main UEFN pakchunk is already downloaded.");
-                return;
+                else
+                {
+                    downloadables.Add(new() { Zip = downloadable["zip"].Value<string>() });
+                }
             }
 
-            if (!FindSlot(paks, out string slot))
+            Download(new DirectoryInfo(paks), downloadables, out List<string> usedslots);
+        }
+
+        private static void Download(DirectoryInfo paks, List<Downloadable> downloadables, out List<string> usedslots)
+        {
+            var temp = new DirectoryInfo($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Temp\\GalaxyDownloadables");
+            usedslots = new List<string>();
+
+            if (temp.Exists)
+            {
+                Directory.Delete(temp.FullName, true);
+            }
+
+            Directory.CreateDirectory(temp.FullName);
+
+            Log.Information($"Created temp folder for downloading at: {temp.FullName}");
+
+            var openSlots = FindOpenSlots(paks.FullName);
+
+            if (downloadables.Count > openSlots.Count)
             {
                 Log.Error($"Failed to find open slot for main UEFN game file.");
                 throw new CustomException($"Failed to find a open slot for main UEFN game file!\nPlease revert a revert a item you have swapped to make space for this.");
             }
 
-            Delete($"{paks}\\{slot}.backup"); //Just in case there is a left over .backup
+            Log.Information($"Found a total of {openSlots.Count} slots open and only need: {downloadables.Count}");
 
-            Download($"{paks}\\{slot}.ucas", Parse["Main"]["ucas"].Value<string>());
-            Download($"{paks}\\{slot}.utoc", Parse["Main"]["utoc"].Value<string>());
-            Download($"{paks}\\{slot}.pak", Parse["Main"]["pak"].Value<string>());
-            Download($"{paks}\\{slot}.sig", Parse["Main"]["sig"].Value<string>());
-            Download($"{paks}\\{slot}.backup", Parse["Main"]["utoc"].Value<string>());
+            foreach (var downloadable in downloadables)
+            {
+                if (!string.IsNullOrEmpty(downloadable.Zip))
+                {
+                    //zip
+                }
+                else
+                {
+                    Misc.Download($"{temp}\\{openSlots.First()}.ucas", downloadable.Ucas);
+                    Misc.Download($"{temp}\\{openSlots.First()}.utoc", downloadable.Utoc);
+                    Misc.Download($"{temp}\\{openSlots.First()}.pak", downloadable.Pak);
+                    Misc.Download($"{temp}\\ {openSlots.First()}.sig", downloadable.Sig);
+                    Misc.Download($"{temp}\\{openSlots.First()}.backup", downloadable.Utoc);
 
-            CProvider.Add(slot);
+                    Log.Information($"Downloaded UEFN game files to: {temp}\\{openSlots.First()}");
+                }
 
-            Cache["Main"] = $"{paks}\\{slot}";
-            Cache["Version"] = Parse["Version"].Value<int>();
+                usedslots.Add(openSlots.First());
+                openSlots.Remove(openSlots.First());
+            }
 
-            File.WriteAllText(Path, Cache.ToString());
-            Log.Information($"Wrote UEFN cache to {Path}");
+            long requriedSize = 0;
+            foreach (var downloaded in temp.GetFiles())
+            {
+                requriedSize += downloaded.Length;
+            }
+
+            var driveInfo = new DriveInfo(paks.Root.Name);
+            if (requriedSize > driveInfo.TotalFreeSpace)
+            {
+                Log.Error($"Drive: {driveInfo.Name} does not have enough space for UEFN game files! Required: {requriedSize} Has: {driveInfo.TotalFreeSpace}");
+                throw new CustomException($"Drive: {driveInfo.Name} does not have enough space for UEFN game files!\nRequired: {requriedSize}\nHas: {driveInfo.TotalFreeSpace}\nPlease make room on the {driveInfo.Name} drive for this process to continue.");
+            }
+
+            foreach (var pak in temp.GetFiles())
+            {
+                File.Move(pak.FullName, $"{paks.FullName}\\{pak.Name}", true);
+                Log.Information($"Moved: {pak.FullName} To: {paks.FullName}");
+            }
         }
 
         public static void Add(string paks, string name, Downloadable downloadable)
         {
-            Remove(name);
 
-            if (!FindSlot(paks, out string slot))
-            {
-                Log.Error($"Failed to find open slot for UEFN game file.");
-                throw new CustomException($"Failed to find a open slot for UEFN game file!\nPlease revert a revert a item you have swapped to make space for this.");
-            }
-
-            Delete($"{paks}\\{slot}.backup"); //Just in case there is a left over .backup
-
-            Download($"{paks}\\{slot}.ucas", downloadable.Ucas);
-            Download($"{paks}\\{slot}.utoc", downloadable.Utoc);
-            Download($"{paks}\\{slot}.pak", downloadable.Pak);
-            Download($"{paks}\\{slot}.sig", downloadable.Sig);
-            Download($"{paks}\\{slot}.backup", downloadable.Utoc);
-
-            CProvider.Add(slot);
-
-            var newobject = JObject.FromObject(new
-            {
-                Name = name,
-                Pakchunk = $"{paks}\\{slot}"
-            });
-
-            (Cache["Externals"] as JArray).Add(newobject);
-            File.WriteAllText(Path, Cache.ToString());
-            Log.Information($"Wrote UEFN cache to {Path}");
         }
 
         public static void Remove(string name)
@@ -217,23 +236,21 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             File.WriteAllText(Path, Cache.ToString());
         }
 
-        private static bool FindSlot(string paks, out string available)
+        private static List<string> FindOpenSlots(string paks)
         {
-            available = null;
+            var available = new List<string>();
+            var parse = Endpoint.Read(Endpoint.Type.UEFN);
 
-            var Parse = Endpoint.Read(Endpoint.Type.UEFN);
-            foreach (string slot in Parse["Slots"])
+            foreach (string slot in parse["Slots"])
             {
                 if (!File.Exists($"{paks}\\{slot}.ucas") || !File.Exists($"{paks}\\{slot}.utoc") || !File.Exists($"{paks}\\{slot}.pak") || !File.Exists($"{paks}\\{slot}.sig"))
                 {
                     Log.Information($"Found open slot: {slot}");
-                    available = slot;
-                    return true;
+                    available.Add(slot);
                 }
             }
 
-            Log.Error("Failed to find open slot!");
-            return false;
+            return available;
         }
 
         private static bool Delete(string path)
@@ -254,34 +271,6 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 }
             }
             return true;
-        }
-
-        private static void Download(string path, string url)
-        {
-            using (WebClient WC = new WebClient())
-            {
-                try
-                {
-                    Delete(path);
-
-                    WC.DownloadFile(url, path);
-                    WC.Dispose();
-
-                    Log.Information($"Downloaded data from {url} to {path}");
-                }
-                catch (IOException ioException)
-                {
-                    Message.DisplaySTA("Error", "Failed to download UEFN game file. There is not enough space on the disk!", MessageBoxButton.OK, solutions: new List<string> { "Make room on the disk and try again." });
-                    Log.Error(ioException, $"Failed to download from: {url} disk ran out of space!");
-                    throw new CustomException("Failed to download custom UEFN game file! Ran out of space.");
-                }
-                catch (Exception Exception)
-                {
-                    Message.DisplaySTA("Error", "Webclient caught a exception while downloading custom UEFN game file!", MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
-                    Log.Error(Exception, $"Failed to download from: {url}");
-                    throw new CustomException("Failed to download custom UEFN game file!");
-                }
-            }
         }
 
         private static void Reset()

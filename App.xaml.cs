@@ -53,6 +53,8 @@ namespace Galaxy_Swapper_v2
             UEFN.Initialize();
             Binaries.Initialize();
 
+            UEFN.DownloadMain("C:\\Program Files\\Epic Games\\Fortnite\\FortniteGame\\Content\\Paks");
+
             base.OnStartup(e);
         }
 

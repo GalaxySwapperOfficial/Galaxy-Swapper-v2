@@ -6,5 +6,6 @@
         public string Sig;
         public string Ucas;
         public string Utoc;
+        public string Zip;
     }
 }
