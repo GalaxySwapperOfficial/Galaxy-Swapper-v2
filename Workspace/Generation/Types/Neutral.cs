@@ -1,4 +1,5 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
+using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -56,6 +57,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                                     NewOption.UseMainUEFN = Override["UseMainUEFN"].Value<bool>();
 
                                 NewOption.Nsfw = Cosmetic.Nsfw;
+                                NewOption.Socials = Cosmetic.Socials;
 
                                 if (Override["Downloadables"] != null)
                                 {
@@ -121,6 +123,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
 
                     NewOption.Nsfw = Cosmetic.Nsfw;
                     NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
+                    NewOption.Socials = Cosmetic.Socials;
 
                     foreach (var Asset in option["Assets"])
                     {
@@ -250,6 +253,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                 NewOption.OverrideIcon = Cosmetic.Icon;
                 NewOption.Nsfw = Cosmetic.Nsfw;
                 NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
+                NewOption.Socials = Cosmetic.Socials;
 
                 Cosmetic.Options.Add(NewOption);
             }

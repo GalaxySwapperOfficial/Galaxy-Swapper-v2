@@ -1,6 +1,7 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Generation.Types;
 using Galaxy_Swapper_v2.Workspace.Properties;
+using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -79,6 +80,32 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
                                 {
                                     if (!downloadable["pak"].KeyIsNullOrEmpty() && !downloadable["sig"].KeyIsNullOrEmpty() && !downloadable["ucas"].KeyIsNullOrEmpty() && !downloadable["utoc"].KeyIsNullOrEmpty())
                                         NewCosmetic.Downloadables.Add(new Downloadable() { Pak = downloadable["pak"].Value<string>(), Sig = downloadable["sig"].Value<string>(), Ucas = downloadable["ucas"].Value<string>(), Utoc = downloadable["utoc"].Value<string>() });
+                                }
+                            }
+
+                            if (Cosmetic["Socials"] is not null)
+                            {
+                                var sparse = Endpoint.Read(Endpoint.Type.Socials);
+                                foreach (var social in Cosmetic["Socials"])
+                                {
+                                    string type = social["type"].Value<string>().ToUpper();
+
+                                    if (sparse[type] is null)
+                                        continue;
+
+                                    var newsocial = new Social() { Icon = sparse[type]["Icon"].Value<string>() };
+
+                                    if (!social["header"].KeyIsNullOrEmpty())
+                                    {
+                                        newsocial.Header = social["header"].Value<string>();
+                                    }
+
+                                    if (!social["url"].KeyIsNullOrEmpty())
+                                    {
+                                        newsocial.URL = social["url"].Value<string>();
+                                    }
+
+                                    NewCosmetic.Socials.Add(newsocial);
                                 }
                             }
 

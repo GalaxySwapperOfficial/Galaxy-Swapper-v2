@@ -56,6 +56,8 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                                 if (!Override["UseMainUEFN"].KeyIsNullOrEmpty())
                                     NewOption.UseMainUEFN = Override["UseMainUEFN"].Value<bool>();
 
+                                NewOption.Socials = Cosmetic.Socials;
+
                                 if (Override["Downloadables"] != null)
                                 {
                                     foreach (var downloadable in Override["Downloadables"])
@@ -176,6 +178,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                 NewOption.OverrideIcon = Cosmetic.Icon;
                 NewOption.Nsfw = Cosmetic.Nsfw;
                 NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
+                NewOption.Socials = Cosmetic.Socials;
 
                 Cosmetic.Options.Add(NewOption);
             }
