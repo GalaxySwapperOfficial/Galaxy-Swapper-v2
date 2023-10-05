@@ -86,6 +86,21 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
                 }
             }
 
+            if (parse["Socials"] is not null)
+            {
+                foreach (var social in parse["Socials"])
+                {
+                    int index = (parse["Socials"] as JArray).IndexOf(social) + 1;
+
+                    if (social["type"].KeyIsNullOrEmpty())
+                    {
+                        Log.Error($"{fileInfo.Name} 'Socials' array {index} 'type' is null or empty");
+                        Message.Display("Error", $"{fileInfo.Name} 'Socials' array {index} 'type' is null or empty", MessageBoxButton.OK);
+                        return false;
+                    }
+                }
+            }
+
             if (parse["Type"].KeyIsNullOrEmpty())
             {
                 return None(ref fileInfo, ref parse);
