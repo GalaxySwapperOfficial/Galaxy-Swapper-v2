@@ -171,7 +171,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
                 CustomEpicGamesLauncher.Revert();
                 SwapLogs.Clear();
-                UEFN.Clear();
+                UEFN.Clear(Installtion);
 
                 Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), Languages.Read(Languages.Type.Message, "Verify"), MessageBoxButton.OK);
                 EpicGamesLauncher.Verify();
@@ -237,7 +237,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                         }
                     }
 
-                    UEFN.Clear();
+                    UEFN.Clear(paks);
                     SwapLogs.Clear();
                     SwapLogsDescription.Text = string.Format(Languages.Read(Languages.Type.View, "SettingsView", "SwapLogsDescription"), 0, 0, 0);
                 }

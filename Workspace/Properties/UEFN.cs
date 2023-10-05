@@ -18,7 +18,6 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
     {
         public static JObject Cache { get; set; } = default!;
         public static readonly string Path = $"{App.Config}\\UEFN.json";
-        public static readonly string[] Extensions = { ".ucas", ".utoc", ".pak", ".sig" };
         public static void Initialize()
         {
             if (Cache != null)
@@ -93,9 +92,51 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 throw new Exception($"UEFN game files are currently disabled");
             }
 
-            if (!Cache["Version"].KeyIsNullOrEmpty() && parse["Version"].Value<int>() != Cache["Version"].Value<int>())
+            if (Cache["Version"].KeyIsNullOrEmpty())
             {
-                //Remove all main game files
+                Log.Information("Main UEFN version was set as null");
+            }
+            else if (parse["Version"].Value<int>() != Cache["Version"].Value<int>())
+            {
+                Log.Information("Main UEFN files are outdated and will be removed");
+                DeleteMainUEFN();
+            }
+            else
+            {
+                if (((JArray)Cache["Downloadables"]).Count != ((JArray)parse["Downloadables"]).Count)
+                {
+                    Log.Information("Main UEFN files amount does not match the api. UEFN game files will be deleted");
+                    DeleteMainUEFN();
+                }
+                else
+                {
+                    bool valid = true;
+
+                    foreach (string downloadable in Cache["Downloadables"])
+                    {
+                        if (!File.Exists($"{paks}\\{downloadable}.ucas") || !File.Exists($"{paks}\\{downloadable}.utoc") || !File.Exists($"{paks}\\{downloadable}.pak") || !File.Exists($"{paks}\\{downloadable}.sig"))
+                        {
+                            Log.Information($"Cached main UEFN file is missing. UEFN ame files will be deleted");
+                            DeleteMainUEFN();
+                            valid = false;
+                            break;
+                        }
+                    }
+
+                    if (valid) return;
+                }
+            }
+
+            void DeleteMainUEFN()
+            {
+                foreach (string downloadable in Cache["Downloadables"])
+                {
+                    Delete($"{paks}\\{downloadable}.ucas");
+                    Delete($"{paks}\\{downloadable}.utoc");
+                    Delete($"{paks}\\{downloadable}.pak");
+                    Delete($"{paks}\\{downloadable}.sig");
+                    Delete($"{paks}\\{downloadable}.backup");
+                }
             }
 
             var downloadables = new List<Downloadable>();
@@ -111,6 +152,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 }
             }
 
+            Log.Information($"Downloading {downloadables.Count} main UEFN game files");
             Download(new DirectoryInfo(paks), downloadables, out List<string> usedslots);
 
             Cache["Version"] = parse["Version"].Value<int>();
@@ -118,6 +160,31 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
 
             File.WriteAllText(Path, Cache.ToString());
             Log.Information($"Wrote UEFN cache to {Path}");
+
+            foreach (string slot in usedslots)
+            {
+                CProvider.Add(slot); //Should be last
+            }
+        }
+
+        public static void Add(string paks, string name, Downloadable downloadable)
+        {
+            Remove(name);
+
+            Log.Information($"Downloading 1 UEFN game file");
+            Download(new DirectoryInfo(paks), new () { downloadable }, out List<string> usedslots);
+
+            var newobject = JObject.FromObject(new
+            {
+                Name = name,
+                Pakchunk = $"{paks}\\{usedslots.First()}"
+            });
+
+            (Cache["Externals"] as JArray).Add(newobject);
+            File.WriteAllText(Path, Cache.ToString());
+            Log.Information($"Wrote UEFN cache to {Path}");
+
+            CProvider.Add(usedslots.First()); //Should be last
         }
 
         private static void Download(DirectoryInfo paks, List<Downloadable> downloadables, out List<string> usedslots)
@@ -185,29 +252,24 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             }
         }
 
-        public static void Add(string paks, string name, Downloadable downloadable)
-        {
-
-        }
-
         public static void Remove(string name)
         {
-            if (Cache["Externals"] == null)
+            if (Cache["Externals"] is null)
                 return;
 
             var Externals = new JArray();
-            foreach (var external in Cache["Externals"])
+            foreach (var slot in Cache["Externals"])
             {
-                if (external["Name"].Value<string>() == name)
+                if (slot["Name"].Value<string>() == name)
                 {
-                    foreach (string extension in Extensions)
-                    {
-                        Delete($"{external["Pakchunk"].Value<string>()}{extension}");
-                    }
-                    Delete($"{external["Pakchunk"].Value<string>()}.backup");//Might exist!
+                    Delete($"{slot["Pakchunk"].Value<string>()}.ucas");
+                    Delete($"{slot["Pakchunk"].Value<string>()}.utoc");
+                    Delete($"{slot["Pakchunk"].Value<string>()}.pak");
+                    Delete($"{slot["Pakchunk"].Value<string>()}.sig");
+                    Delete($"{slot["Pakchunk"].Value<string>()}.backup");
                 }
                 else
-                    Externals.Add(external);
+                    Externals.Add(slot);
             }
 
             Cache["Externals"] = Externals;
@@ -215,27 +277,30 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             Log.Information($"Wrote UEFN cache to {Path}");
         }
 
-        public static void Clear()
+        public static void Clear(string paks)
         {
-            foreach (var external in Cache["Externals"])
+            Log.Information("Removing main UEFN game files");
+
+            if (!Cache["Downloadables"].KeyIsNullOrEmpty())
             {
-                Log.Warning($"{external["Pakchunk"].Value<string>()}");
-                foreach (string extension in Extensions)
+                foreach (string slot in Cache["Downloadables"])
                 {
-                    Log.Warning($"{external["Pakchunk"].Value<string>()}{extension}");
-                    Delete($"{external["Pakchunk"].Value<string>()}{extension}");
+                    Delete($"{paks}\\{slot}.ucas");
+                    Delete($"{paks}\\{slot}.utoc");
+                    Delete($"{paks}\\{slot}.pak");
+                    Delete($"{paks}\\{slot}.sig");
+                    Delete($"{paks}\\{slot}.backup");
                 }
-                Delete($"{external["Pakchunk"].Value<string>()}.backup");//Might exist!
             }
 
-            if (!Cache["Main"].KeyIsNullOrEmpty())
+            Log.Information("Removing externals");
+            foreach (var slot in Cache["Externals"])
             {
-                foreach (string extension in Extensions)
-                {
-                    Log.Warning($"{Cache["Main"].Value<string>()}{extension}");
-                    Delete($"{Cache["Main"].Value<string>()}{extension}");
-                }
-                Delete($"{Cache["Main"].Value<string>()}.backup");//Might exist!
+                Delete($"{slot["Pakchunk"].Value<string>()}.ucas");
+                Delete($"{slot["Pakchunk"].Value<string>()}.utoc");
+                Delete($"{slot["Pakchunk"].Value<string>()}.pak");
+                Delete($"{slot["Pakchunk"].Value<string>()}.sig");
+                Delete($"{slot["Pakchunk"].Value<string>()}.backup");
             }
 
             Reset();
@@ -273,7 +338,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 catch (Exception Exception)
                 {
                     Log.Error(Exception, $"Failed to delete {path}");
-                    return false;
+                    throw new CustomException($"Failed to delete {path}");
                 }
             }
             return true;
@@ -283,7 +348,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
         {
             Cache = JObject.FromObject(new
             {
-                Downloadables = JValue.CreateNull(),
+                Downloadables = new JArray(),
                 Version = JValue.CreateNull(),
                 Externals = new JArray()
             });
