@@ -1,4 +1,6 @@
-﻿using Galaxy_Swapper_v2.Workspace.Utilities;
+﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
+using Galaxy_Swapper_v2.Workspace.Swapping;
+using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
@@ -7,6 +9,7 @@ using System.Drawing;
 using System.Formats.Asn1;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -39,7 +42,7 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             if (parse["Icon"].KeyIsNullOrEmpty())
             {
                 Log.Error($"{fileInfo.Name} does not contain 'Icon' value");
-                Message.Display("Error", $"{fileInfo.Name} does not contain 'Icon' value!", System.Windows.MessageBoxButton.OK);
+                Message.Display("Error", $"{fileInfo.Name} does not contain 'Icon' value!", MessageBoxButton.OK);
                 return false;
             }
 
@@ -95,26 +98,97 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
 
             if (parse["Type"].KeyIsNullOrEmpty())
             {
-                return None();
+                return None(ref fileInfo, ref parse);
             }
 
             switch (parse["Type"].Value<string>())
             {
                 case "UEFN_Character":
-                    return UEFN_Character();
+                    return UEFN_Character(ref fileInfo, ref parse);
                 default:
-                    return None();
+                    return None(ref fileInfo, ref parse);
             }
         }
 
         #region PluginTypes
-        public static bool None()
+        public static bool None(ref FileInfo fileInfo, ref JObject parse)
         {
+            if (parse["Swapicon"].KeyIsNullOrEmpty())
+            {
+                Log.Error($"{fileInfo.Name} does not contain 'Swapicon' value");
+                Message.Display("Error", $"{fileInfo.Name} does not contain 'Swapicon' value!", MessageBoxButton.OK);
+                return false;
+            }
+
+            if (!Misc.ValidImage(parse["Swapicon"].Value<string>()))
+            {
+                Log.Error($"{fileInfo.Name} 'Swapicon' url is invalid");
+                Message.Display("Error", $"{fileInfo.Name} 'Swapicon' url is invalid", MessageBoxButton.OK);
+                return false;
+            }
+
+            foreach (var asset in parse["Assets"])
+            {
+                int index = (parse["Assets"] as JArray).IndexOf(asset) + 1;
+
+                if (asset["AssetPath"].KeyIsNullOrEmpty())
+                {
+                    Log.Error($"{fileInfo.Name} assets array {index} does not contain 'AssetPath' value");
+                    Message.Display("Error", $"{fileInfo.Name} assets array {index} does not contain 'AssetPath' value", MessageBoxButton.OK);
+                    return false;
+                }
+
+                if (asset["Swaps"] is not null)
+                {
+                    foreach (var swap in asset["Swaps"])
+                    {
+                        int sindex = (asset["Swaps"] as JArray).IndexOf(swap) + 1;
+                        string[] objects = { "search", "replace", "type" };
+
+                        foreach (string obj in objects)
+                        {
+                            if (swap[obj].KeyIsNullOrEmpty())
+                            {
+                                Log.Error($"{fileInfo.Name} assets array {index} swaps array {sindex} does not contain '{obj}' value");
+                                Message.Display("Error", $"{fileInfo.Name} assets array {index} swaps array {sindex} does not contain '{obj}' value", MessageBoxButton.OK);
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
             return true;
         }
 
-        public static bool UEFN_Character()
+        public static bool UEFN_Character(ref FileInfo fileInfo, ref JObject parse)
         {
+            if (parse["AssetPathTo"].KeyIsNullOrEmpty())
+            {
+                Log.Error($"{fileInfo.Name} does not contain 'AssetPathTo' value");
+                Message.Display("Error", $"{fileInfo.Name} does not contain 'AssetPathTo' value", MessageBoxButton.OK);
+                return false;
+            }
+
+            if (parse["Swaps"] is not null)
+            {
+                foreach (var swap in parse["Swaps"])
+                {
+                    int sindex = (parse["Swaps"] as JArray).IndexOf(swap) + 1;
+                    string[] objects = { "search", "replace", "type" };
+
+                    foreach (string obj in objects)
+                    {
+                        if (swap[obj].KeyIsNullOrEmpty())
+                        {
+                            Log.Error($"{fileInfo.Name} 'Swaps' array {sindex} does not contain '{obj}' value");
+                            Message.Display("Error", $"{fileInfo.Name} 'Swaps' array {sindex} does not contain '{obj}' value", MessageBoxButton.OK);
+                            return false;
+                        }
+                    }
+                }
+            }
+
             return true;
         }
         #endregion

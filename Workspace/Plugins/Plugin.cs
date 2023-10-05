@@ -114,7 +114,7 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
         {
             var list = new List<PluginData>();
 
-            foreach (var plugin in new DirectoryInfo(Path).GetFiles())
+            foreach (var plugin in new DirectoryInfo(Path).GetFiles("*.*", SearchOption.AllDirectories))
             {
                 PluginData plugindata = null!;
 
