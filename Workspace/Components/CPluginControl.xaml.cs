@@ -28,6 +28,9 @@ namespace Galaxy_Swapper_v2.Workspace.Components
             PluginData = plugindata;
             Remove.ToolTip = removetip;
             Import.ToolTip = reimporttip;
+
+            if (!File.Exists(plugindata.Import))
+                Import.Visibility = Visibility.Hidden;
         }
 
         public static readonly DependencyProperty IconProperty = DependencyProperty.Register("Icon", typeof(ImageSource), typeof(CPluginControl));
