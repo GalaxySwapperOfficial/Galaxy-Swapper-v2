@@ -1,5 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
+using Serilog;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -67,6 +68,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
         private void ActivateKey_Click(object sender, RoutedEventArgs e)
         {
+            Password.Password = Password.Password.Trim();
             if (Password.Password == "000000-000000-000000" || string.IsNullOrEmpty(Password.Password))
             {
                 Message.Display(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "LoginEmpty"), MessageBoxButton.OK);
