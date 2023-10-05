@@ -1,5 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
+using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
@@ -81,9 +82,16 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             }
 
             string decrypted = Decrypt(pluginbuffer, key);
+
+            if (!decrypted.ValidJson())
+            {
+                Log.Warning($"{fileInfo.Name} is not in a valid json format and will be skipped");
+                return null!;
+            }
+
             var parse = JObject.Parse(decrypted);
 
-            return new() { Import = importpath, Content = decrypted, Parse = parse };
+            return new() { Import = importpath, Path = fileInfo.FullName, Content = decrypted, Parse = parse };
         }
 
         public static List<PluginData> GetPlugins()

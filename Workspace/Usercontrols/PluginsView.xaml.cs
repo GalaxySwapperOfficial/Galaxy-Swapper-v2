@@ -1,7 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Components;
 using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Plugins;
-using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Galaxy_Swapper_v2.Workspace.Views;
@@ -11,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -37,7 +35,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 foreach (string file in files)
                 {
                     var fileInfo = new FileInfo(file);
-                    if (Validate.IsValid(file, out JObject parse))
+                    if (Validate.IsValid(fileInfo, out JObject parse))
                     {
                         Plugin.Import(fileInfo, parse);
                     }
@@ -70,26 +68,10 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             if (Plugins_Items.Children.Count != 0)
                 Plugins_Items.Children.Clear();
 
-            foreach (string Plugin in Properties.Plugins.List())
+            foreach (var plugindata in Plugin.GetPlugins())
             {
-                string Content = File.ReadAllText(Plugin);
-                if (Content.Length == 0)
-                {
-                    Log.Warning($"{Plugin} content length is 0? skipping");
-                    continue;
-                }
-
-                Content = Encoding.ASCII.GetString(Compression.Decompress(Content));
-
-                if (!Content.ValidJson())
-                {
-                    Log.Warning($"{Plugin} content is not in a valid json format? skipping");
-                    continue;
-                }
-
-                var Parse = JObject.Parse(Content);
-                var NewCosmetic = CreateCosmetic(Parse["Name"].Value<string>(), Plugin, Parse);
-                Plugins_Items.Children.Add(NewCosmetic);
+                var newcosmetic = CreateCosmetic(plugindata.Parse["Name"].Value<string>(), plugindata.Path, plugindata.Parse);
+                Plugins_Items.Children.Add(newcosmetic);
             }
 
             if (Plugins_Items.Children.Count == 0)
