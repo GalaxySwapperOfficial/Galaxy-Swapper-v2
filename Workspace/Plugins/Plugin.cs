@@ -1,24 +1,30 @@
-﻿using Galaxy_Swapper_v2.Workspace.Swapping.Other;
+﻿using Galaxy_Swapper_v2.Workspace.Structs;
+using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Galaxy_Swapper_v2.Workspace.Plugins
 {
     public static class Plugin
     {
         public static readonly string Path = $"{App.Config}\\Plugins";
+        public enum Type
+        {
+            None = 0,
+            Aes = 1,
+            Base64 = 2,
+            GZip = 3
+        }
         public static void Import(FileInfo fileInfo, JObject parse)
         {
             var writer = new Writer(new byte[fileInfo.Length + 60000]);
 
-            writer.Write(1); //1 = encrypted in case I want to add other formats later on
+            writer.Write(Type.Aes); //1 = encrypted in case I want to add other formats later on
 
             //Import directory
             byte[] importpath = Encoding.ASCII.GetBytes(fileInfo.FullName);
@@ -45,7 +51,7 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             Log.Information($"Plugin wrote to: {output}");
         }
 
-        public static bool Export(FileInfo fileInfo)
+        public static PluginData Export(FileInfo fileInfo)
         {
             var reader = new Reader(File.ReadAllBytes(fileInfo.FullName));
 
@@ -61,7 +67,7 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             if (CityHash.Hash(key) != keyhash)
             {
                 Log.Warning($"{fileInfo.Name} encryption key hash was not as expected plugin will be skipped");
-                return false;
+                return null!;
             }
 
             ulong pluginhash = reader.Read<ulong>();
@@ -71,12 +77,28 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             if (CityHash.Hash(pluginbuffer) != pluginhash)
             {
                 Log.Warning($"{fileInfo.Name} buffer hash was not as expected plugin will be skipped");
-                return false;
+                return null!;
             }
 
-            Log.Information(Decrypt(pluginbuffer, key));
+            string decrypted = Decrypt(pluginbuffer, key);
+            var parse = JObject.Parse(decrypted);
 
-            return true;
+            return new() { Import = importpath, Content = decrypted, Parse = parse };
+        }
+
+        public static List<PluginData> GetPlugins()
+        {
+            var list = new List<PluginData>();
+
+            foreach (var plugin in new DirectoryInfo(Path).GetFiles())
+            {
+                var plugindata = Export(plugin);
+
+                if (plugindata is not null)
+                    list.Add(plugindata);
+            }
+
+            return list;
         }
 
         private static byte[] GenerateKey(int keyLengthInBytes)
