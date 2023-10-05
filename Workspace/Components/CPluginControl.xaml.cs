@@ -75,8 +75,14 @@ namespace Galaxy_Swapper_v2.Workspace.Components
             PluginsView.Refresh();
         }
 
+        private bool IsReImporting = false;
         private void ReImport_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (IsReImporting) return;
+
+            IsReImporting = true;
+            Import.IsEnabled = false;
+
             if (PluginData.Import is not null && File.Exists(PluginData.Import))
             {
                 var fileInfo = new FileInfo(PluginData.Import);
@@ -86,6 +92,8 @@ namespace Galaxy_Swapper_v2.Workspace.Components
                 }
                 else
                 {
+                    IsReImporting = false;
+                    Import.IsEnabled = true;
                     return;
                 }
             }
