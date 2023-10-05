@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Serilog;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -56,7 +57,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
 
         public static bool TryFortniteInstallation(out string location)
         {
-            location = string.Empty;
+            location = null!;
 
             if (!Directory.Exists(ProgramData)) return false;
 
@@ -79,12 +80,13 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                     if (!Directory.Exists(installlocation) || !Directory.Exists($"{installlocation}\\FortniteGame\\Content\\Paks")) continue;
 
                     location = installlocation;
-
-                    return true;
                 }
             }
 
-            return false;
+            if (location is null)
+                return false;
+            else
+                return true;
         }
 
         public static void Launch() => TryLaunch();
