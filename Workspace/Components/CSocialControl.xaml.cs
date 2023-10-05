@@ -36,8 +36,11 @@ namespace Galaxy_Swapper_v2.Workspace.Components
 
         private void root_Click(object sender, MouseButtonEventArgs e)
         {
-            if (string.IsNullOrEmpty(Social.URL)) return;
-            if (Message.Display(Languages.Read(Languages.Type.Header, "Warning"), string.Format(Languages.Read(Languages.Type.Message, "OpenUrl"), Social.URL), MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
+            if (string.IsNullOrEmpty(Social.URL))
+            {
+                Message.Display(Languages.Read(Languages.Type.Header, "Info"), Social.Header, MessageBoxButton.OK);
+            }
+            else if (Message.Display(Languages.Read(Languages.Type.Header, "Warning"), string.Format(Languages.Read(Languages.Type.Message, "OpenUrl"), Social.URL), MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
             {
                 Social.URL.UrlStart();
             }

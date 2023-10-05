@@ -24,7 +24,7 @@
             <Button x:Name="Convert" Content="Convert" VerticalAlignment="Top" HorizontalAlignment="Left" Width="150" Height="33" Margin="283,220,0,0" Foreground="#D3D3D6" Click="Worker_Click"/>
             <Button x:Name="Revert" Content="Revert" VerticalAlignment="Top" HorizontalAlignment="Left" Width="150" Height="33" Margin="15,220,0,0" Foreground="#D3D3D6" Click="Worker_Click"/>
 
-            <StackPanel x:Name="Socials" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,30" Orientation="Horizontal"/>
+            <StackPanel x:Name="Socials" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,30" Height="30" Orientation="Horizontal"/>
 
             <TextBlock Name="DisplayName" Text="placeholder" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="14" FontWeight="SemiBold" Foreground="#D3D3D6" IsEnabled="False" Margin="0,0,0,5" />
             <TextBlock Name="LOG" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="14" FontWeight="SemiBold" Foreground="#D3D3D6" IsEnabled="False" Margin="0,0,0,5" Opacity="0" />

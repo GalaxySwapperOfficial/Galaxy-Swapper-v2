@@ -152,7 +152,6 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                             newsocial.Header = social["header"].Value<string>();
                         }
 
-                        //Scan urls here
                         if (!social["url"].KeyIsNullOrEmpty())
                         {
                             newsocial.URL = social["url"].Value<string>();
