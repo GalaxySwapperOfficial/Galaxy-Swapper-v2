@@ -14,5 +14,6 @@
     <Grid>
         <Image x:Name="Cosmetic" Source="{Binding Icon, ElementName=root}" Stretch="UniformToFill"/>
         <Image x:Name="Remove" Stretch="UniformToFill" Source="/Workspace/Assets/Remove.png" Width="13" Height="13" VerticalAlignment="Top" HorizontalAlignment="Right" Opacity="0" Margin="0, 0, -4, 0" MouseLeftButtonDown="Remove_MouseLeftButtonDown"/>
+        <Image x:Name="Import" Stretch="UniformToFill" Source="/Workspace/Assets/ReImport.png" Width="13" Height="13" VerticalAlignment="Top" HorizontalAlignment="Right" Opacity="0" Margin="0, 22, -4, 0" MouseLeftButtonDown="ReImport_MouseLeftButtonDown"/>
     </Grid>
 </UserControl>

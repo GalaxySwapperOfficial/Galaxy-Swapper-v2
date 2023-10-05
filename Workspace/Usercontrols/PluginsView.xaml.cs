@@ -1,6 +1,7 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Components;
 using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Plugins;
+using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Galaxy_Swapper_v2.Workspace.Views;
@@ -70,8 +71,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
             foreach (var plugindata in Plugin.GetPlugins())
             {
-                var newcosmetic = CreateCosmetic(plugindata.Parse["Name"].Value<string>(), plugindata.Path, plugindata.Parse);
-                Plugins_Items.Children.Add(newcosmetic);
+                Plugins_Items.Children.Add(CreateCosmetic(plugindata));
             }
 
             if (Plugins_Items.Children.Count == 0)
@@ -88,14 +88,15 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             Log.Information($"Loaded plugins in {Stopwatch.Elapsed.TotalSeconds} seconds, With {Plugins_Items.Children.Count} items!");
         }
 
-        private CPluginControl CreateCosmetic(string name, string path, JToken parse)
+        private CPluginControl CreateCosmetic(PluginData plugindata)
         {
-            var newcomsetic = new CPluginControl(this, Languages.Read(Languages.Type.View, "PluginsView", "Remove")) { Height = 85, Width = 85, Margin = new Thickness(10), Cursor = Cursors.Hand, ToolTip = name, PluginPath = path };
-
+            var parse = plugindata.Parse;
             string icon = null!;
             string frontendicon = null!;
             string swapicon = null!;
-
+            string name = parse["Name"].Value<string>();
+            var newcomsetic = new CPluginControl(this, plugindata, Languages.Read(Languages.Type.View, "PluginsView", "Remove")) { Height = 85, Width = 85, Margin = new Thickness(10), Cursor = Cursors.Hand, ToolTip = name };
+            
             if (!parse["FrontendIcon"].KeyIsNullOrEmpty())
                 frontendicon = parse["FrontendIcon"].Value<string>();
             if (!parse["Icon"].KeyIsNullOrEmpty())
@@ -113,7 +114,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             }
             else
             {
-                throw new Exception($"'FrontendIcon' and Icon was invalid! Failed to load image from plugin file:\n{path}");
+                throw new Exception($"'FrontendIcon' and Icon was invalid! Failed to load image from plugin file:\n{plugindata.Path}");
             }
 
             newcomsetic.Cosmetic.MouseLeftButtonDown += delegate

@@ -1,5 +1,8 @@
-﻿using Galaxy_Swapper_v2.Workspace.Usercontrols;
+﻿using Galaxy_Swapper_v2.Workspace.Plugins;
+using Galaxy_Swapper_v2.Workspace.Structs;
+using Galaxy_Swapper_v2.Workspace.Usercontrols;
 using Galaxy_Swapper_v2.Workspace.Utilities;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Windows;
@@ -17,11 +20,14 @@ namespace Galaxy_Swapper_v2.Workspace.Components
     {
         private Storyboard Storyboard { get; set; } = default!;
         private PluginsView PluginsView { get; set; } = default!;
-        public CPluginControl(PluginsView pluginsview, string tooltip = "Remove")
+        private PluginData PluginData { get; set; } = default!;
+        public CPluginControl(PluginsView pluginsview, PluginData plugindata, string removetip = "Remove", string reimporttip = "Reimport")
         {
             InitializeComponent();
             PluginsView = pluginsview;
-            Remove.ToolTip = tooltip;
+            PluginData = plugindata;
+            Remove.ToolTip = removetip;
+            Import.ToolTip = reimporttip;
         }
 
         public static readonly DependencyProperty IconProperty = DependencyProperty.Register("Icon", typeof(ImageSource), typeof(CPluginControl));
@@ -32,20 +38,12 @@ namespace Galaxy_Swapper_v2.Workspace.Components
             set { SetValue(IconProperty, value); }
         }
 
-        public static readonly DependencyProperty PluginPathProperty = DependencyProperty.Register("PluginPath", typeof(string), typeof(CPluginControl));
-
-        public string PluginPath
-        {
-            get { return (string)GetValue(PluginPathProperty); }
-            set { SetValue(PluginPathProperty, value); }
-        }
-
         private void root_MouseEnter(object sender, MouseEventArgs e)
         {
             if (Storyboard != null)
                 Storyboard.Stop();
 
-            Storyboard = Interface.SetElementAnimations(new Interface.BaseAnim { Element = Remove, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 0, To = 1, Duration = new TimeSpan(0, 0, 0, 0, 200) } });
+            Storyboard = Interface.SetElementAnimations(new Interface.BaseAnim { Element = Remove, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 0, To = 1, Duration = new TimeSpan(0, 0, 0, 0, 200) } }, new Interface.BaseAnim { Element = Import, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 0, To = 1, Duration = new TimeSpan(0, 0, 0, 0, 200) } });
             Storyboard.Begin();
 
             Margin = new Thickness(5);
@@ -58,7 +56,7 @@ namespace Galaxy_Swapper_v2.Workspace.Components
             if (Storyboard != null)
                 Storyboard.Stop();
 
-            Storyboard = Interface.SetElementAnimations(new Interface.BaseAnim { Element = Remove, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 200) } });
+            Storyboard = Interface.SetElementAnimations(new Interface.BaseAnim { Element = Remove, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 200) } }, new Interface.BaseAnim { Element = Import, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 200) } });
             Storyboard.Begin();
 
             Margin = new Thickness(10);
@@ -68,8 +66,30 @@ namespace Galaxy_Swapper_v2.Workspace.Components
 
         private void Remove_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (File.Exists(PluginPath))
-                File.Delete(PluginPath);
+            if (File.Exists(PluginData.Path))
+                File.Delete(PluginData.Path);
+
+            PluginsView.Refresh();
+        }
+
+        private void ReImport_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (PluginData.Import is not null && File.Exists(PluginData.Import))
+            {
+                var fileInfo = new FileInfo(PluginData.Import);
+                if (Validate.IsValid(fileInfo, out JObject parse))
+                {
+                    Plugin.Import(fileInfo, parse);
+                }
+                else
+                {
+                    return;
+                }
+            }
+            if (File.Exists(PluginData.Path))
+            {
+                File.Delete(PluginData.Path);
+            }
 
             PluginsView.Refresh();
         }

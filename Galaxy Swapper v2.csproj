@@ -47,6 +47,7 @@
     <None Remove="Workspace\Assets\Pickaxes_Clicked.png" />
     <None Remove="Workspace\Assets\Plugins.png" />
     <None Remove="Workspace\Assets\Plugins_Clicked.png" />
+    <None Remove="Workspace\Assets\ReImport.png" />
     <None Remove="Workspace\Assets\Remove.png" />
     <None Remove="Workspace\Assets\Searchbar.png" />
     <None Remove="Workspace\Assets\Searching.png" />
@@ -99,6 +100,7 @@
     <Resource Include="Workspace\Assets\Pickaxes_Clicked.png" />
     <Resource Include="Workspace\Assets\Plugins.png" />
     <Resource Include="Workspace\Assets\Plugins_Clicked.png" />
+    <Resource Include="Workspace\Assets\ReImport.png" />
     <Resource Include="Workspace\Assets\Remove.png" />
     <Resource Include="Workspace\Assets\Searchbar.png" />
     <Resource Include="Workspace\Assets\Searching.png" />
