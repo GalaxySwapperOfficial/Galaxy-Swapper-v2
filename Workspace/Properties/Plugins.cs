@@ -66,19 +66,32 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 foreach (var downloadable in parse["Downloadables"])
                 {
                     int Index = (parse["Downloadables"] as JArray).IndexOf(downloadable) + 1;
-                    string[] types = { "pak", "sig", "ucas", "utoc" };
-                    foreach (string type in types)
+
+                    if (downloadable["zip"].KeyIsNullOrEmpty())
                     {
-                        if (downloadable[type].KeyIsNullOrEmpty())
+                        string[] types = { "pak", "sig", "ucas", "utoc" };
+                        foreach (string type in types)
                         {
-                            Log.Error($"Downloadables array {Index} does not contain {type}");
-                            Message.Display("Error", $"Downloadables array {Index} does not contain {type}!", System.Windows.MessageBoxButton.OK);
-                            return false;
+                            if (downloadable[type].KeyIsNullOrEmpty())
+                            {
+                                Log.Error($"Downloadables array {Index} does not contain {type}");
+                                Message.Display("Error", $"Downloadables array {Index} does not contain {type}!", System.Windows.MessageBoxButton.OK);
+                                return false;
+                            }
+                            if (!Misc.ValidImage(downloadable[type].Value<string>()))
+                            {
+                                Log.Error($"Downloadables array {Index} {type} does not contain a valid URL");
+                                Message.Display("Error", $"Downloadables array {Index} {type} does not contain a valid URL!", System.Windows.MessageBoxButton.OK);
+                                return false;
+                            }
                         }
-                        if (!Misc.ValidImage(downloadable[type].Value<string>()))
+                    }
+                    else
+                    {
+                        if (!Misc.ValidImage(downloadable["zip"].Value<string>()))
                         {
-                            Log.Error($"Downloadables array {Index} {type} does not contain a valid URL");
-                            Message.Display("Error", $"Downloadables array {Index} {type} does not contain a valid URL!", System.Windows.MessageBoxButton.OK);
+                            Log.Error($"Downloadables array {Index} zip does not contain a valid URL");
+                            Message.Display("Error", $"Downloadables array {Index} zip does not contain a valid URL!", System.Windows.MessageBoxButton.OK);
                             return false;
                         }
                     }

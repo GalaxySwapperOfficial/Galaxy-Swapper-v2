@@ -8,9 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
 using System.Text;
-using System.Windows;
 using static Galaxy_Swapper_v2.Workspace.Global;
 
 namespace Galaxy_Swapper_v2.Workspace.Properties
@@ -313,6 +311,16 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             {
                 File.Move(pak.FullName, $"{paks.FullName}\\{pak.Name}", true);
                 Log.Information($"Moved: {pak.FullName} To: {paks.FullName}");
+            }
+
+            try
+            {
+                Directory.Delete(temp.FullName, true);
+                Log.Information($"Removed temp folder to keep the pc nice and clean: {temp.FullName}");
+            }
+            catch
+            {
+
             }
         }
 

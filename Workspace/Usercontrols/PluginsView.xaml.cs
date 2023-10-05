@@ -138,7 +138,11 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 {
                     foreach (var downloadable in parse["Downloadables"])
                     {
-                        if (!downloadable["pak"].KeyIsNullOrEmpty() && !downloadable["sig"].KeyIsNullOrEmpty() && !downloadable["ucas"].KeyIsNullOrEmpty() && !downloadable["utoc"].KeyIsNullOrEmpty())
+                        if (!downloadable["zip"].KeyIsNullOrEmpty())
+                        {
+                            newoption.Downloadables.Add(new() { Zip = downloadable["zip"].Value<string>() });
+                        }
+                        else if (!downloadable["pak"].KeyIsNullOrEmpty() && !downloadable["sig"].KeyIsNullOrEmpty() && !downloadable["ucas"].KeyIsNullOrEmpty() && !downloadable["utoc"].KeyIsNullOrEmpty())
                             newoption.Downloadables.Add(new Downloadable() { Pak = downloadable["pak"].Value<string>(), Sig = downloadable["sig"].Value<string>(), Ucas = downloadable["ucas"].Value<string>(), Utoc = downloadable["utoc"].Value<string>() });
                     }
                 }
