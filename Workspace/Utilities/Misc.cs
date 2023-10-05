@@ -196,28 +196,32 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
 
         public static void Download(string path, string url, string name = "file")
         {
+            var stopwatch = new Stopwatch(); stopwatch.Start();
+
             using (WebClient WC = new WebClient())
             {
+                Log.Information($"Downloading data from: {url} to: {url}");
+
                 try
                 {
-                    Log.Information($"Downloading data from: {url}");
-
                     WC.DownloadFile(url, path);
                     WC.Dispose();
                 }
                 catch (IOException ioException)
                 {
-                    Message.DisplaySTA("Error", "Failed to download file. There is not enough space on the disk!", MessageBoxButton.OK, solutions: new List<string> { "Make room on the disk and try again." });
-                    Log.Error(ioException, $"Failed to download from: {url} disk ran out of space!");
-                    throw new CustomException("Failed to download custom UEFN game file! Ran out of space.");
+                    var driveInfo = new DriveInfo(path);
+                    Log.Error(ioException, $"Failed to download {name} drive: {driveInfo.Name} has ran out of space");
+                    throw new CustomException($"Failed to download {name}! Drive {driveInfo.Name} has ran out of space!\nMake room in {driveInfo.Name} and try again.");
                 }
                 catch (Exception Exception)
                 {
-                    Message.DisplaySTA("Error", "Webclient caught a exception while downloading file!", MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
-                    Log.Error(Exception, $"Failed to download from: {url}");
-                    throw new CustomException("Failed to download file!");
+                    Log.Error(Exception, $"Failed to download {name}");
+                    Message.DisplaySTA("Error", $"Webclient caught a exception while downloading {name}!", MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
+                    throw new CustomException($"Webclient caught a exception while downloading {name}!");
                 }
             }
+
+            Log.Information($"Downloaded {name} to: {path} in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")}");
         }
 
         public static int IndexOfSequence(this byte[] buffer, byte[] pattern, int Star)
