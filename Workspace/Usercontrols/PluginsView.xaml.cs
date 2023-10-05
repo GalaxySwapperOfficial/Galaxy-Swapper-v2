@@ -35,7 +35,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 foreach (string file in files)
                 {
                     var fileInfo = new FileInfo(file);
-                    if (Validate.IsValid(fileInfo, out JObject parse))
+                    if (fileInfo.Exists && Validate.IsValid(fileInfo, out JObject parse))
                     {
                         Plugin.Import(fileInfo, parse);
                     }
