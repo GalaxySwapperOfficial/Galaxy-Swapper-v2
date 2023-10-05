@@ -94,13 +94,39 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             return new() { Import = importpath, Path = fileInfo.FullName, Content = decrypted, Parse = parse };
         }
 
+        public static PluginData ExportOld(FileInfo fileInfo)
+        {
+            string content = File.ReadAllText(fileInfo.FullName);
+
+            content = Encoding.ASCII.GetString(Compression.Decompress(content));
+
+            if (!content.ValidJson())
+            {
+                Log.Warning($"{fileInfo.Name} is not in a valid json format and will be skipped");
+                return null!;
+            }
+
+            var parse = JObject.Parse(content);
+            return new() { Import = null!, Path = fileInfo.FullName, Content = content, Parse = parse };
+        }
+
         public static List<PluginData> GetPlugins()
         {
             var list = new List<PluginData>();
 
             foreach (var plugin in new DirectoryInfo(Path).GetFiles())
             {
-                var plugindata = Export(plugin);
+                PluginData plugindata = null!;
+
+                switch (plugin.Extension)
+                {
+                    case ".encrypted":
+                        plugindata = ExportOld(plugin);
+                        break;
+                    case ".plugin":
+                        plugindata = Export(plugin);
+                        break;
+                }
 
                 if (plugindata is not null)
                     list.Add(plugindata);
