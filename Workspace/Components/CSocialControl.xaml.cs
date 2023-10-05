@@ -22,7 +22,7 @@ namespace Galaxy_Swapper_v2.Workspace.Components
 
         private void root_MouseEnter(object sender, MouseEventArgs e)
         {
-            Margin = new Thickness(2, 0, 2, 0);
+            Margin = new Thickness(2.5, 0, 2.5, 0);
             Height += 5;
             Width += 5;
         }
