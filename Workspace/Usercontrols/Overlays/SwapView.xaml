@@ -21,11 +21,13 @@
             <Border Margin="283,58,15,0" Width="150" Height="150" VerticalAlignment="Top" Background="#0B0F16" CornerRadius="10" BorderThickness="1" BorderBrush="#050608">
                 <Image Name="OverrideIcon" VerticalAlignment="Bottom" Height="145" Width="150" Stretch="Fill" IsEnabled="False" />
             </Border>
-            <Button x:Name="Convert" Content="Convert" VerticalAlignment="Top" HorizontalAlignment="Left" Width="150" Height="33" Margin="283,223,0,0" Foreground="#D3D3D6" Click="Worker_Click"/>
-            <Button x:Name="Revert" Content="Revert" VerticalAlignment="Top" HorizontalAlignment="Left" Width="150" Height="33" Margin="15,223,0,0" Foreground="#D3D3D6" Click="Worker_Click"/>
+            <Button x:Name="Convert" Content="Convert" VerticalAlignment="Top" HorizontalAlignment="Left" Width="150" Height="33" Margin="283,220,0,0" Foreground="#D3D3D6" Click="Worker_Click"/>
+            <Button x:Name="Revert" Content="Revert" VerticalAlignment="Top" HorizontalAlignment="Left" Width="150" Height="33" Margin="15,220,0,0" Foreground="#D3D3D6" Click="Worker_Click"/>
 
-            <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,30" HorizontalAlignment="Center">
-                <Image Source="/Workspace/Assets/Remove.png" Width="25" Height="25"/>
+            <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,30" Orientation="Horizontal">
+                <Image Source="https://cdn.discordapp.com/attachments/1122580592370921494/1159415460715057213/icons8-discord-25_1.png" Width="25" Height="25" Margin="5, 0, 5, 0"/>
+                <Image Source="https://cdn.discordapp.com/attachments/1122580592370921494/1159415460715057213/icons8-discord-25_1.png" Width="25" Height="25" Margin="5, 0, 5, 0"/>
+                <Image Source="https://cdn.discordapp.com/attachments/1122580592370921494/1159415460715057213/icons8-discord-25_1.png" Width="25" Height="25" Margin="5, 0, 5, 0"/>
             </StackPanel>
 
             <TextBlock Name="DisplayName" Text="placeholder" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="14" FontWeight="SemiBold" Foreground="#D3D3D6" IsEnabled="False" Margin="0,0,0,5" />

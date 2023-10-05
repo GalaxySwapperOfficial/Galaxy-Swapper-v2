@@ -135,6 +135,32 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                     }
                 }
 
+                if (parse["Socials"] != null)
+                {
+                    var sparse = Endpoint.Read(Endpoint.Type.Socials);
+                    foreach (var social in parse["Socials"])
+                    {
+                        string type = social["type"].Value<string>().ToUpper();
+
+                        if (sparse[type] is null)
+                            continue;
+
+                        var newsocial = new Social();
+
+                        if (!social["header"].KeyIsNullOrEmpty())
+                        {
+                            newsocial.Header = social["header"].Value<string>();
+                        }
+
+                        if (!social["url"].KeyIsNullOrEmpty())
+                        {
+                            newsocial.URL = social["url"].Value<string>();
+                        }
+
+                        newoption.Socials.Add(newsocial);
+                    }
+                }
+
                 if (!parse["Nsfw"].KeyIsNullOrEmpty())
                     newoption.Nsfw = parse["Nsfw"].Value<bool>();
 

@@ -23,7 +23,8 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             Languages,
             Presence,
             FOV,
-            UEFN
+            UEFN,
+            Socials
         }
 
         public static JToken Read(Type Type)

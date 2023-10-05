@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Galaxy_Swapper_v2.Workspace.Structs;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
@@ -18,6 +19,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Formats
         public JToken Parse;
         public List<Asset> Exports = new List<Asset>();
         public List<Downloadable> Downloadables = new List<Downloadable>();
+        public List<Social> Socials = new List<Social>();
         public object Clone()
         {
             return this.MemberwiseClone();
