@@ -209,6 +209,16 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             }
 
             Log.Information($"Found a total of {openSlots.Count} slots open and only need: {downloadables.Count}");
+            Log.Information($"Ensuring slots {downloadables.Count} are not taken");
+
+            foreach (string slot in openSlots.Take(downloadables.Count))
+            {
+                Delete($"{paks.FullName}\\{slot}.ucas");
+                Delete($"{paks.FullName}\\{slot}.utoc");
+                Delete($"{paks.FullName}\\{slot}.pak");
+                Delete($"{paks.FullName}\\{slot}.sig");
+                Delete($"{paks.FullName}\\{slot}.backup");
+            }
 
             foreach (var downloadable in downloadables)
             {

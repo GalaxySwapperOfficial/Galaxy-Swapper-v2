@@ -1,10 +1,8 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
-using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace Galaxy_Swapper_v2.Workspace.Generation.Types
 {
