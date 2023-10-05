@@ -6,6 +6,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -152,7 +153,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 }
             }
 
-            Log.Information($"Downloading {downloadables.Count} main UEFN game files");
+            Log.Information($"Downloading {downloadables.Count} downloadables");
             Download(new DirectoryInfo(paks), downloadables, out List<string> usedslots);
 
             Cache["Version"] = parse["Version"].Value<int>();
@@ -171,7 +172,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
         {
             Remove(name);
 
-            Log.Information($"Downloading 1 UEFN game file");
+            Log.Information($"Downloading 1 downloadable");
             Download(new DirectoryInfo(paks), new () { downloadable }, out List<string> usedslots);
 
             var newobject = JObject.FromObject(new
@@ -215,15 +216,78 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             {
                 if (!string.IsNullOrEmpty(downloadable.Zip))
                 {
-                    //zip
+                    string zippedpath = $"{temp}\\Zipped ({openSlots.First()})";
+
+                    Log.Information($"Creating temp zip directory at: {zippedpath}");
+                    Directory.CreateDirectory(zippedpath);
+
+                    var gamefiles = new FileInfo($"{zippedpath}\\GameFiles.zip");
+
+                    Misc.Download(gamefiles.FullName, downloadable.Zip, name: "UEFN zipped game file");
+
+                    if (!gamefiles.Exists)
+                    {
+                        throw new CustomException($"{gamefiles.FullName} does not exist? How?");
+                    }
+
+                    var tempdriveInfo = new DriveInfo(gamefiles.FullName);
+
+                    if (gamefiles.Length > tempdriveInfo.TotalFreeSpace) //Best way I can think of to check this
+                    {
+                        Log.Error($"Drive: {tempdriveInfo.Name} does not have enough space for UEFN game files! Required: {gamefiles.Length} Has: {tempdriveInfo.TotalFreeSpace}");
+                        throw new CustomException($"Drive: {tempdriveInfo.Name} does not have enough space for UEFN game files!\nRequired: {gamefiles.Length}\nHas: {tempdriveInfo.TotalFreeSpace}\nPlease make room on the {tempdriveInfo.Name} drive for this process to continue.");
+                    }
+
+                    Log.Information("Extracting GameFiles.zip");
+                    ZipFile.ExtractToDirectory(gamefiles.FullName, zippedpath);
+
+                    string ucas = Misc.FindFileByExtension(zippedpath, ".ucas");
+                    if (ucas is null)
+                    {
+                        throw new CustomException("Zipped UEFN game files does not contain a .ucas file!");
+                    }
+
+                    File.Move(ucas, $"{temp}\\{openSlots.First()}.ucas");
+                    Log.Information($"Moved: {ucas} to: {temp}\\{openSlots.First()}.ucas");
+
+                    string utoc = Misc.FindFileByExtension(zippedpath, ".utoc");
+                    if (utoc is null)
+                    {
+                        throw new CustomException("Zipped UEFN game files does not contain a .utoc file!");
+                    }
+
+                    File.Copy(utoc, $"{temp}\\{openSlots.First()}.backup");
+                    File.Move(utoc, $"{temp}\\{openSlots.First()}.utoc");
+                    Log.Information($"Moved: {utoc} to: {temp}\\{openSlots.First()}.utoc");
+
+                    string pak = Misc.FindFileByExtension(zippedpath, ".pak");
+                    if (pak is null)
+                    {
+                        throw new CustomException("Zipped UEFN game files does not contain a .pak file!");
+                    }
+
+                    File.Move(pak, $"{temp}\\{openSlots.First()}.pak");
+                    Log.Information($"Moved: {pak} to: {temp}\\{openSlots.First()}.pak");
+
+                    string sig = Misc.FindFileByExtension(zippedpath, ".sig");
+                    if (sig is null)
+                    {
+                        throw new CustomException("Zipped UEFN game files does not contain a .sig file!");
+                    }
+
+                    File.Move(sig, $"{temp}\\{openSlots.First()}.sig");
+                    Log.Information($"Moved: {sig} to: {temp}\\{openSlots.First()}.sig");
+
+                    Log.Information("Removing temp zip directory");
+                    Directory.Delete(zippedpath, true);
                 }
                 else
                 {
-                    Misc.Download($"{temp}\\{openSlots.First()}.ucas", downloadable.Ucas);
-                    Misc.Download($"{temp}\\{openSlots.First()}.utoc", downloadable.Utoc);
-                    Misc.Download($"{temp}\\{openSlots.First()}.pak", downloadable.Pak);
-                    Misc.Download($"{temp}\\{openSlots.First()}.sig", downloadable.Sig);
-                    Misc.Download($"{temp}\\{openSlots.First()}.backup", downloadable.Utoc);
+                    Misc.Download($"{temp}\\{openSlots.First()}.ucas", downloadable.Ucas, name: "UEFN game file (Ucas)");
+                    Misc.Download($"{temp}\\{openSlots.First()}.utoc", downloadable.Utoc, name: "UEFN game file (Utoc)");
+                    Misc.Download($"{temp}\\{openSlots.First()}.pak", downloadable.Pak, name: "UEFN game file (Pak)");
+                    Misc.Download($"{temp}\\{openSlots.First()}.sig", downloadable.Sig, name: "UEFN game file (Sig)");
+                    Misc.Download($"{temp}\\{openSlots.First()}.backup", downloadable.Utoc, name: "UEFN game file (Utoc)");
 
                     Log.Information($"Downloaded UEFN game files to: {temp}\\{openSlots.First()}");
                 }

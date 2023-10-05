@@ -293,6 +293,16 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             return data;
         }
 
+        public static string FindFileByExtension(string path, string exten)
+        {
+            string[] foundFiles = Directory.GetFiles(path, $"*{exten}", SearchOption.AllDirectories);
+
+            if (foundFiles.Length == 0) 
+                return null!;
+            else
+                return foundFiles[0];
+        }
+
         public static string ByteToHex(byte[] byteArray) => BitConverter.ToString(byteArray).Replace("-", " ");
 
         public static long FileLength(this string path) => new FileInfo(path).Length;
