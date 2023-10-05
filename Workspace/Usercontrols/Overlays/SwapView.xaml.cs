@@ -1,6 +1,5 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Properties;
-using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Swapping;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
@@ -13,8 +12,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -33,7 +30,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
         {
             InitializeComponent();
             Option = option;
-            CosmeticName.Text = Option.Name;
+            DisplayName.Text = Option.Name;
         }
 
         private void Close_Click(object sender, MouseButtonEventArgs e) => Memory.MainView.RemoveOverlay();
@@ -49,7 +46,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             }
 
             Icon.LoadImage(Option.Icon);
-            IconOverride.LoadImage(Option.OverrideIcon);
+            OverrideIcon.LoadImage(Option.OverrideIcon);
 
             Convert.Content = Languages.Read(Languages.Type.View, "SwapView", "Convert");
             Revert.Content = Languages.Read(Languages.Type.View, "SwapView", "Revert");
@@ -152,7 +149,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             else
                 Worker.DoWork += Worker_Revert;
 
-            var StoryBoard = Interface.SetElementAnimations(new Interface.BaseAnim { Element = CosmeticName, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 100) } }, new Interface.BaseAnim { Element = LOG, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 0, To = 1, Duration = new TimeSpan(0, 0, 0, 0, 100), BeginTime = new TimeSpan(0, 0, 0, 0, 100) } });
+            var StoryBoard = Interface.SetElementAnimations(new Interface.BaseAnim { Element = DisplayName, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 100) } }, new Interface.BaseAnim { Element = LOG, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 0, To = 1, Duration = new TimeSpan(0, 0, 0, 0, 100), BeginTime = new TimeSpan(0, 0, 0, 0, 100) } });
             StoryBoard.Completed += delegate
             {
                 Worker.RunWorkerAsync();
@@ -160,7 +157,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             StoryBoard.Begin();
         }
 
-        private void Worker_Completed(object sender, RunWorkerCompletedEventArgs e) => Interface.SetElementAnimations(new Interface.BaseAnim { Element = CosmeticName, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 0, To = 1, Duration = new TimeSpan(0, 0, 0, 0, 100), BeginTime = new TimeSpan(0, 0, 0, 0, 100) } }, new Interface.BaseAnim { Element = LOG, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 100) } }).Begin();
+        private void Worker_Completed(object sender, RunWorkerCompletedEventArgs e) => Interface.SetElementAnimations(new Interface.BaseAnim { Element = DisplayName, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 0, To = 1, Duration = new TimeSpan(0, 0, 0, 0, 100), BeginTime = new TimeSpan(0, 0, 0, 0, 100) } }, new Interface.BaseAnim { Element = LOG, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 100) } }).Begin();
 
         private void Worker_Convert(object sender, DoWorkEventArgs e)
         {

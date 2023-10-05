@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays"
              xmlns:components="clr-namespace:Galaxy_Swapper_v2.Workspace.Components"
              mc:Ignorable="d" 
-             Height="300" 
+             Height="320" 
              Width="450"
              Loaded="SwapView_Loaded"
              >
@@ -15,18 +15,23 @@
             <DropShadowEffect ShadowDepth="0" Opacity="0.3" BlurRadius="10"/>
         </Border.Effect>
         <Grid>
-            <Border Margin="15,58,283,90" Background="#0B0F16" CornerRadius="10" BorderThickness="1" BorderBrush="#050608">
-                <Image x:Name="Icon" VerticalAlignment="Bottom" Height="145" Width="150" IsEnabled="False"/>
+            <Border Margin="15,58,283,0" Width="150" Height="150" VerticalAlignment="Top" Background="#0B0F16" CornerRadius="10" BorderThickness="1" BorderBrush="#050608">
+                <Image Name="Icon" VerticalAlignment="Bottom" Height="145" Width="150" Stretch="Fill" IsEnabled="False" />
             </Border>
-            <Border Margin="283,58,15,90" Background="#0B0F16" CornerRadius="10" BorderThickness="1" BorderBrush="#050608">
-                <Image x:Name="IconOverride" VerticalAlignment="Bottom" Height="145" Width="150" IsEnabled="False"/>
+            <Border Margin="283,58,15,0" Width="150" Height="150" VerticalAlignment="Top" Background="#0B0F16" CornerRadius="10" BorderThickness="1" BorderBrush="#050608">
+                <Image Name="OverrideIcon" VerticalAlignment="Bottom" Height="145" Width="150" Stretch="Fill" IsEnabled="False" />
             </Border>
-            <TextBlock x:Name="CosmeticName" Text="Renegade Raider" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="14" FontWeight="SemiBold" Foreground="#D3D3D6" IsEnabled="False" Margin="0,273,0,0"/>
-            <TextBlock x:Name="LOG" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="14" FontWeight="SemiBold" Foreground="#D3D3D6" IsEnabled="False" Margin="0,273,0,0" Opacity="0"/>
-            <Button x:Name="Convert" Content="Convert" Margin="283,223,15,42" Foreground="#D3D3D6" Click="Worker_Click"/>
-            <Button x:Name="Revert" Content="Revert" Margin="15,223,283,42" Foreground="#D3D3D6" Click="Worker_Click"/>
-            <TextBlock x:Name="Converted" Text="OFF" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="14" FontWeight="SemiBold" Foreground="#454B56" IsEnabled="False" Margin="0,189,0,0"/>
-            <Image Source="/WorkSpace/Assets/Arrow.png" IsEnabled="False" Margin="174,83,174,115"/>
+            <Button x:Name="Convert" Content="Convert" VerticalAlignment="Top" HorizontalAlignment="Left" Width="150" Height="33" Margin="283,223,0,0" Foreground="#D3D3D6" Click="Worker_Click"/>
+            <Button x:Name="Revert" Content="Revert" VerticalAlignment="Top" HorizontalAlignment="Left" Width="150" Height="33" Margin="15,223,0,0" Foreground="#D3D3D6" Click="Worker_Click"/>
+
+            <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,30" HorizontalAlignment="Center">
+                <Image Source="/Workspace/Assets/Remove.png" Width="25" Height="25"/>
+            </StackPanel>
+
+            <TextBlock Name="DisplayName" Text="placeholder" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="14" FontWeight="SemiBold" Foreground="#D3D3D6" IsEnabled="False" Margin="0,0,0,5" />
+            <TextBlock Name="LOG" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="14" FontWeight="SemiBold" Foreground="#D3D3D6" IsEnabled="False" Margin="0,0,0,5" Opacity="0" />
+            <TextBlock Name="Converted" Text="OFF" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="14" FontWeight="SemiBold" Foreground="#454B56" IsEnabled="False" Margin="0,189,0,0" />
+            <Image Source="/WorkSpace/Assets/Arrow.png" Width="100" Height="100" IsEnabled="False" VerticalAlignment="Top" Margin="0,83,0,0" />
             <components:CCloseControl x:Name="CloseButton" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5, 5, 5, 5" MouseLeftButtonDown="Close_Click"/>
         </Grid>
     </Border>

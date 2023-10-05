@@ -131,26 +131,37 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
                 EpicGamesLauncher.Close();
 
-                UEFN.Cache.Add("Downloadables", new JArray());
-
-                if (File.Exists($"{UEFN.Cache["Main"].Value<string>()}.ucas"))
+                try
                 {
-                    UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.ucas");
-                    UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.utoc");
-                    UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.pak");
-                    UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.sig");
-                    UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.backup");
+                    UEFN.Cache.Add("Downloadables", new JArray());
 
-                    UEFN.Cache["Main"] = null;
-                    UEFN.DownloadMain(installation);
+                    if (File.Exists($"{UEFN.Cache["Main"].Value<string>()}.ucas"))
+                    {
+                        UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.ucas");
+                        UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.utoc");
+                        UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.pak");
+                        UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.sig");
+                        UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.backup");
+
+                        UEFN.Cache["Main"] = null;
+                        UEFN.DownloadMain(installation);
+                    }
+                    else
+                    {
+                        UEFN.Cache["Main"] = null;
+                        File.WriteAllText(UEFN.Path, UEFN.Cache.ToString());
+                    }
+
+                    Log.Information("Successfully removed old UEFN data");
                 }
-                else
+                catch (Exception exception)
                 {
+                    Log.Error(exception, $"Failed to remove old UEFN data");
                     UEFN.Cache["Main"] = null;
                     File.WriteAllText(UEFN.Path, UEFN.Cache.ToString());
-                }
 
-                Log.Information("Successfully removed old UEFN data");
+                    Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), "Failed to update the UEFN format! It is recommended to go to the 'Settings' tab in the swapper and click 'Verify' to resolve this issue.", MessageBoxButton.OK);
+                }
             }
         }
 
