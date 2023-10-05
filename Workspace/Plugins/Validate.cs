@@ -1,17 +1,7 @@
-﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
-using Galaxy_Swapper_v2.Workspace.Swapping;
-using Galaxy_Swapper_v2.Workspace.Utilities;
+﻿using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Formats.Asn1;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Galaxy_Swapper_v2.Workspace.Plugins
