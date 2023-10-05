@@ -30,6 +30,9 @@
     <Compile Update="Workspace\Components\CSettingsControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Workspace\Components\CSocialControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Workspace\Components\CSwappedControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -105,6 +108,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Components\CSettingsControl.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Workspace\Components\CSocialControl.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Components\CSwappedControl.xaml">

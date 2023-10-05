@@ -1,4 +1,5 @@
-﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
+﻿using Galaxy_Swapper_v2.Workspace.Components;
+using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Swapping;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
@@ -50,6 +51,11 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
             Convert.Content = Languages.Read(Languages.Type.View, "SwapView", "Convert");
             Revert.Content = Languages.Read(Languages.Type.View, "SwapView", "Revert");
+
+            foreach (var social in Option.Socials)
+            {
+                Socials.Children.Add(new CSocialControl(social) { Margin = new Thickness(5, 0, 5, 0) });
+            }
 
             if (Option.UEFNFormat && SwapLogs.IsSwappedUEFNSwapped(Option.Name, out string revertitem))
             {

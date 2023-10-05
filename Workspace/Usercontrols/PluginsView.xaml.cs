@@ -145,13 +145,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                         if (sparse[type] is null)
                             continue;
 
-                        var newsocial = new Social();
+                        var newsocial = new Social() { Icon = sparse[type]["Icon"].Value<string>() };
 
                         if (!social["header"].KeyIsNullOrEmpty())
                         {
                             newsocial.Header = social["header"].Value<string>();
                         }
 
+                        //Scan urls here
                         if (!social["url"].KeyIsNullOrEmpty())
                         {
                             newsocial.URL = social["url"].Value<string>();
