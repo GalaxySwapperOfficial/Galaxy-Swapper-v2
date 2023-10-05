@@ -200,7 +200,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
 
             using (WebClient WC = new WebClient())
             {
-                Log.Information($"Downloading data from: {url} to: {url}");
+                Log.Information($"Downloading data from: {url} to: {path}");
 
                 try
                 {

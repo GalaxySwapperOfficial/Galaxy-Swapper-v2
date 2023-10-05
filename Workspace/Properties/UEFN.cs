@@ -112,6 +112,12 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             }
 
             Download(new DirectoryInfo(paks), downloadables, out List<string> usedslots);
+
+            Cache["Version"] = parse["Version"].Value<int>();
+            Cache["Downloadables"] = new JArray(usedslots);
+
+            File.WriteAllText(Path, Cache.ToString());
+            Log.Information($"Wrote UEFN cache to {Path}");
         }
 
         private static void Download(DirectoryInfo paks, List<Downloadable> downloadables, out List<string> usedslots)
@@ -149,7 +155,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                     Misc.Download($"{temp}\\{openSlots.First()}.ucas", downloadable.Ucas);
                     Misc.Download($"{temp}\\{openSlots.First()}.utoc", downloadable.Utoc);
                     Misc.Download($"{temp}\\{openSlots.First()}.pak", downloadable.Pak);
-                    Misc.Download($"{temp}\\ {openSlots.First()}.sig", downloadable.Sig);
+                    Misc.Download($"{temp}\\{openSlots.First()}.sig", downloadable.Sig);
                     Misc.Download($"{temp}\\{openSlots.First()}.backup", downloadable.Utoc);
 
                     Log.Information($"Downloaded UEFN game files to: {temp}\\{openSlots.First()}");
@@ -277,7 +283,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
         {
             Cache = JObject.FromObject(new
             {
-                Main = JValue.CreateNull(),
+                Downloadables = JValue.CreateNull(),
                 Version = JValue.CreateNull(),
                 Externals = new JArray()
             });
