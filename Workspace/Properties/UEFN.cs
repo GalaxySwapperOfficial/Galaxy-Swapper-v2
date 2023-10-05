@@ -396,7 +396,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             return available;
         }
 
-        private static bool Delete(string path)
+        public static bool Delete(string path)
         {
             if (File.Exists(path))
             {

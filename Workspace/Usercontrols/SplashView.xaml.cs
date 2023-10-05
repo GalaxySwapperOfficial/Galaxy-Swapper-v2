@@ -125,13 +125,22 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             //Remove next Fortnite update
             if (!UEFN.Cache["Main"].KeyIsNullOrEmpty())
             {
-                UEFN.Cache.Add("Downloadables", new JArray());
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), "The UEFN format has changed since v1.22. Please click 'OK' to begin the updating process.", MessageBoxButton.OK);
 
-                Log.Information($"{UEFN.Cache["Main"].Value<string>()}.ucas");
+                Log.Information("Attempting to remove old UEFN data from v1.22");
+
+                EpicGamesLauncher.Close();
+
+                UEFN.Cache.Add("Downloadables", new JArray());
 
                 if (File.Exists($"{UEFN.Cache["Main"].Value<string>()}.ucas"))
                 {
-                    File.Delete($"{UEFN.Cache["Main"].Value<string>()}.ucas");
+                    UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.ucas");
+                    UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.utoc");
+                    UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.pak");
+                    UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.sig");
+                    UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.backup");
+
                     UEFN.Cache["Main"] = null;
                     UEFN.DownloadMain(installation);
                 }
@@ -140,6 +149,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                     UEFN.Cache["Main"] = null;
                     File.WriteAllText(UEFN.Path, UEFN.Cache.ToString());
                 }
+
+                Log.Information("Successfully removed old UEFN data");
             }
         }
 
