@@ -95,7 +95,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             string frontendicon = null!;
             string swapicon = null!;
             string name = parse["Name"].Value<string>();
-            var newcomsetic = new CPluginControl(this, plugindata, Languages.Read(Languages.Type.View, "PluginsView", "Remove")) { Height = 85, Width = 85, Margin = new Thickness(10), Cursor = Cursors.Hand, ToolTip = name };
+            var newcomsetic = new CPluginControl(this, plugindata, Languages.Read(Languages.Type.View, "PluginsView", "Remove"), Languages.Read(Languages.Type.View, "PluginsView", "Reimport")) { Height = 85, Width = 85, Margin = new Thickness(10), Cursor = Cursors.Hand, ToolTip = name };
             
             if (!parse["FrontendIcon"].KeyIsNullOrEmpty())
                 frontendicon = parse["FrontendIcon"].Value<string>();
