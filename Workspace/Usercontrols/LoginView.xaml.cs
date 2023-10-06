@@ -1,6 +1,5 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
-using Serilog;
 using System;
 using System.Windows;
 using System.Windows.Controls;
