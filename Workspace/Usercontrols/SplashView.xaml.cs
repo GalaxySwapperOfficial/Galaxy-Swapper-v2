@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -133,7 +134,10 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
                 try
                 {
-                    UEFN.Cache.Add("Downloadables", new JArray());
+                    if (UEFN.Cache["Downloadables"] is null)
+                    {
+                        UEFN.Cache.Add("Downloadables", new JArray());
+                    }
 
                     if (File.Exists($"{UEFN.Cache["Main"].Value<string>()}.ucas"))
                     {
