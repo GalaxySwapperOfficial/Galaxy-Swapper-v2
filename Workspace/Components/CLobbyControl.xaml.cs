@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using Galaxy_Swapper_v2.Workspace.Structs;
+using Galaxy_Swapper_v2.Workspace.Utilities;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -9,9 +11,13 @@ namespace Galaxy_Swapper_v2.Workspace.Components
     /// </summary>
     public partial class CLobbyControl : UserControl
     {
-        public CLobbyControl()
+        public LobbyData LobbyData { get; set; }
+        public CLobbyControl(LobbyData lobbydata)
         {
             InitializeComponent();
+            LobbyData = lobbydata;
+            Logo.LoadImage(lobbydata.Preview);
+            Logo.ToolTip = lobbydata.Name;
         }
 
         private void root_MouseEnter(object sender, MouseEventArgs e)
@@ -26,11 +32,6 @@ namespace Galaxy_Swapper_v2.Workspace.Components
             Margin = new Thickness(10);
             Height -= 10;
             Width -= 10;
-        }
-
-        private void root_Click(object sender, MouseButtonEventArgs e)
-        {
-
         }
     }
 }

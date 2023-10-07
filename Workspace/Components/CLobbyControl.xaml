@@ -11,10 +11,9 @@
              Height="100"
              MouseEnter="root_MouseEnter"
              MouseLeave="root_MouseLeave"
-             MouseLeftButtonDown="root_Click"
              Cursor="Hand"
              >
     <Grid>
-        <Image x:Name="Logo" Stretch="Fill" Source="https://i.imgur.com/PrJwa2H.jpeg"/>
+        <Image x:Name="Logo" Stretch="Fill"/>
     </Grid>
 </UserControl>
