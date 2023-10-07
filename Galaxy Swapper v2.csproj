@@ -37,6 +37,7 @@
     <None Remove="Workspace\Assets\Embed.png" />
     <None Remove="Workspace\Assets\Gliders.png" />
     <None Remove="Workspace\Assets\Gliders_Clicked.png" />
+    <None Remove="Workspace\Assets\Hide.png" />
     <None Remove="Workspace\Assets\LoginPage.png" />
     <None Remove="Workspace\Assets\Logo.png" />
     <None Remove="Workspace\Assets\Minimize.png" />
@@ -53,6 +54,7 @@
     <None Remove="Workspace\Assets\Searching.png" />
     <None Remove="Workspace\Assets\Settings.png" />
     <None Remove="Workspace\Assets\Settings_Clicked.png" />
+    <None Remove="Workspace\Assets\Show.png" />
     <None Remove="Workspace\Assets\Wave.png" />
     <None Remove="Workspace\Assets\Weapons.png" />
     <None Remove="Workspace\Assets\Weapons_Clicked.png" />
@@ -90,6 +92,7 @@
     <Resource Include="Workspace\Assets\Embed.png" />
     <Resource Include="Workspace\Assets\Gliders.png" />
     <Resource Include="Workspace\Assets\Gliders_Clicked.png" />
+    <Resource Include="Workspace\Assets\Hide.png" />
     <Resource Include="Workspace\Assets\LoginPage.png" />
     <Resource Include="Workspace\Assets\Logo.png" />
     <Resource Include="Workspace\Assets\Minimize.png" />
@@ -106,6 +109,7 @@
     <Resource Include="Workspace\Assets\Searching.png" />
     <Resource Include="Workspace\Assets\Settings.png" />
     <Resource Include="Workspace\Assets\Settings_Clicked.png" />
+    <Resource Include="Workspace\Assets\Show.png" />
     <Resource Include="Workspace\Assets\Wave.png" />
     <Resource Include="Workspace\Assets\Weapons.png" />
     <Resource Include="Workspace\Assets\Weapons_Clicked.png" />
