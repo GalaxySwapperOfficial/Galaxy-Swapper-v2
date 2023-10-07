@@ -15,6 +15,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
         public static PluginsView PluginsView = PluginsView ?? new PluginsView();
         public static MiscView MiscView = MiscView ?? new MiscView();
         public static FovView FovView = FovView ?? new FovView();
+        public static LobbyView LobbyView = LobbyView ?? new LobbyView();
 
         private static CosmeticsView Characters = Characters ?? new CosmeticsView(Generation.Generate.Type.Characters);
         public static CosmeticsView LoadCharacters(TextBox SearchBar)

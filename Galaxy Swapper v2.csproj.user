@@ -60,6 +60,9 @@
     <Compile Update="Workspace\Usercontrols\Overlays\LanguageSelectionView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Workspace\Usercontrols\Overlays\LobbyView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Workspace\Usercontrols\Overlays\NoOptionsView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -138,6 +141,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Usercontrols\Overlays\LanguageSelectionView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Workspace\Usercontrols\Overlays\LobbyView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Usercontrols\Overlays\NoOptionsView.xaml">
