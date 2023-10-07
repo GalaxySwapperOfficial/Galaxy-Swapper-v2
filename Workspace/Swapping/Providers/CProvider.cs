@@ -137,13 +137,13 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
             return formatted;
         }
 
-        public static void CloseStream(string path)
+        public static void CloseStream(string name)
         {
             if (OpenedStreamers is not null && OpenedStreamers.Count != 0)
             {
                 foreach (var stream in OpenedStreamers)
                 {
-                    if (stream.Path != path) continue;
+                    if (stream.Name != name) continue;
                     try
                     {
                         stream.Stream.Close();

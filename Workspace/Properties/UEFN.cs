@@ -171,7 +171,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             Remove(name);
 
             Log.Information($"Downloading 1 downloadable");
-            Download(new DirectoryInfo(paks), new () { downloadable }, out List<string> usedslots);
+            Download(new DirectoryInfo(paks), new() { downloadable }, out List<string> usedslots);
 
             var newobject = JObject.FromObject(new
             {
@@ -408,19 +408,20 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
 
         public static bool Delete(string path)
         {
-            if (File.Exists(path))
+            var fileInfo = new FileInfo(path);
+            if (fileInfo.Exists)
             {
-                CProvider.CloseStream(path);
+                CProvider.CloseStream(System.IO.Path.GetFileNameWithoutExtension(fileInfo.Name));
 
                 try
                 {
-                    Log.Information($"Deleting {path}");
-                    File.Delete(path);
+                    Log.Information($"Deleting {fileInfo.FullName}");
+                    File.Delete(fileInfo.FullName);
                 }
                 catch (Exception Exception)
                 {
-                    Log.Error(Exception, $"Failed to delete {path}");
-                    throw new CustomException($"Failed to delete {path}");
+                    Log.Error(Exception, $"Failed to delete {fileInfo.FullName}");
+                    throw new CustomException($"Failed to delete {fileInfo.FullName}");
                 }
             }
             return true;
