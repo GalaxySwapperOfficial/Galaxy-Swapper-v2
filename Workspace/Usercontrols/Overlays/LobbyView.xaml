@@ -14,7 +14,32 @@
             <DropShadowEffect ShadowDepth="0" Opacity="0.3" BlurRadius="10"/>
         </Border.Effect>
         <Grid>
-            <components:CCloseControl x:Name="CloseButton" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5, 5, 5, 5"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0, 40, 0, 0">
+                <WrapPanel Name="Options_Items">
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                    <components:CLobbyControl Margin="10"/>
+                </WrapPanel>
+            </ScrollViewer>
+            <components:CCloseControl x:Name="CloseButton" HorizontalAlignment="Right" VerticalAlignment="Top" MouseLeftButtonDown="Close_Click" Margin="5, 5, 5, 5"/>
         </Grid>
     </Border>
 </UserControl>

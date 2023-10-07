@@ -12,6 +12,9 @@
     <Compile Update="Workspace\Components\CCloseControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Workspace\Components\CLobbyControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Workspace\Components\CMessageboxControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -93,6 +96,9 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Workspace\Components\CCloseControl.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Workspace\Components\CLobbyControl.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Components\CMessageboxControl.xaml">

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Galaxy_Swapper_v2.Workspace.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,5 +25,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
         {
             InitializeComponent();
         }
+
+        private void Close_Click(object sender, MouseButtonEventArgs e) => Memory.MainView.RemoveOverlay();
     }
 }
