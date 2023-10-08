@@ -1,8 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Properties;
 using Newtonsoft.Json.Linq;
-using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Galaxy_Swapper_v2.Workspace.Utilities

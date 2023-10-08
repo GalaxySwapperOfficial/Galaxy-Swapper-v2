@@ -5,15 +5,9 @@ using System.Windows.Controls;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 {
-    /// <summary>
-    /// Interaction logic for MiscView.xaml
-    /// </summary>
     public partial class MiscView : UserControl
     {
-        public MiscView()
-        {
-            InitializeComponent();
-        }
+        public MiscView() => InitializeComponent();
 
         private void MiscView_Loaded(object sender, RoutedEventArgs e)
         {
@@ -32,7 +26,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             {
                 LobbyBorder.Visibility = Visibility.Visible;
                 LobbyIcon.LoadImage(lobby["Icon"].Value<string>());
-                LobbyTextblock.Text = "TBD";
+                LobbyTextblock.Text = Languages.Read(Languages.Type.View, "LobbyView", "Frontend");
             }
         }
 
