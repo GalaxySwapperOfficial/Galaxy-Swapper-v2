@@ -45,9 +45,25 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             return Path[selected].KeyIsNullOrEmpty() ? Path["EN"].Value<string>() : Path[selected].Value<string>();
         }
 
-        public static string[] ReadSolutions(Type Type, params string[] Keys)
+        public static string[] ReadSolutions(Type type, params string[] keys)
         {
-            return null;
+            if (Parse is not null)
+            {
+                Parse = Endpoint.Read(Endpoint.Type.Languages);
+            }
+
+            JToken jToken = keys.Aggregate(
+                type switch
+                {
+                    Type.View => Parse["Views"],
+                    Type.Header => Parse["Headers"],
+                    Type.Message => Parse["Messages"],
+                    _ => throw new Exception($"Failed to find {type}"),
+                },
+                (current, key) => current[key])["Solutions"];
+
+            string language = Settings.Read(Settings.Type.Language).Value<string>();
+            return jToken[language].KeyIsNullOrEmpty() ? ((JArray)jToken["EN"]).ToObject<string[]>() : ((JArray)jToken[language]).ToObject<string[]>();
         }
     }
 }
