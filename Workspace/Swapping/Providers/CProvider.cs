@@ -1,15 +1,11 @@
-﻿using CUE4Parse.FileProvider;
-using CUE4Parse.UE4.Versions;
+﻿using CUE4Parse.UE4.Versions;
 using CUE4Parse.Utils;
-using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
-using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,100 +16,88 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
 {
     public static class CProvider
     {
-        private static DefaultFileProvider Provider { get; set; } = default!;
-        public static List<StreamData> OpenedStreamers;
-        public static Export Export { get; set; } = default!;
-        public static byte[] ExportName { get; set; } = default!;
-        public static bool SaveExport = false;
-        private const string PaksPath = "\\FortniteGame\\Content\\Paks";
-        public static void Initialize()
-        {
-            if (Provider is not null)
-            {
-                Log.Information("CProvider is already initialized");
-                return;
-            }
+        public static ProviderData DefaultProvider = null!;
+        public static ProviderData UEFNProvider = null!;
+        public static Export Export = null!;
+        public static byte[] ExportName = null!;
+        public const string Paks = "\\FortniteGame\\Content\\Paks";
 
-            string paks = Settings.Read(Settings.Type.Installtion).Value<string>();
+        public static void InitDefault()
+        {
+            if (DefaultProvider is not null)
+                return;
+
+            string paks = $"{Settings.Read(Settings.Type.Installtion)}{Paks}";
 
             if (paks is null || string.IsNullOrEmpty(paks) || !Directory.Exists(paks))
             {
                 throw new CustomException(Languages.Read(Languages.Type.Message, "FortniteDirectoryEmpty"));
             }
 
-            paks = string.Concat(paks, PaksPath);
-            OpenedStreamers = new();
-
             PaksCheck.Validate(paks);
             PaksCheck.Backup(paks);
             AesProvider.Initialize();
-            
-            Provider = new(paks, SearchOption.TopDirectoryOnly, isCaseInsensitive: false, new(EGame.GAME_UE5_3));
-            Provider.Initialize();
-            Provider.SubmitKeys(AesProvider.Keys);
 
-            WaitForEpicGames(); //If Fortnite starts swapper will auto close to prevent read errors.
+            DefaultProvider = new ();
+            DefaultProvider.SaveStreams = true;
+            DefaultProvider.FileProvider = new(paks, SearchOption.TopDirectoryOnly, isCaseInsensitive: false, new(EGame.GAME_UE5_3));
+            DefaultProvider.FileProvider.Initialize();
+            DefaultProvider.FileProvider.SubmitKeys(AesProvider.Keys);
+            DefaultProvider.SaveStreams = false;
 
-            Log.Information($"Loaded Provider with version: {Provider.Versions.Game} to path ({paks}) with {AesProvider.Keys.Count()} AES keys.");
+            WaitForEpicGames();
+            Log.Information($"Loaded Provider with version: {DefaultProvider.FileProvider.Versions.Game} to path ({paks}) with {AesProvider.Keys.Count()} AES keys.");
         }
 
-        public static void Add(string pakchunk)
+        public static void InitUEFN()
         {
-            if (Provider == null)
+            if (UEFNProvider is not null)
                 return;
 
-            Provider.Initialize(pakchunk);
-            Provider.SubmitKeys(AesProvider.Keys);
-            Log.Information($"Added {pakchunk} to provider.");
+            string paks = $"{Settings.Read(Settings.Type.Installtion)}{Paks}";
+
+            if (paks is null || string.IsNullOrEmpty(paks) || !Directory.Exists(paks))
+            {
+                throw new CustomException(Languages.Read(Languages.Type.Message, "FortniteDirectoryEmpty"));
+            }
+
+            AesProvider.Initialize();
+
+            UEFNProvider = new();
+            UEFNProvider.SaveStreams = true;
+            UEFNProvider.FileProvider = new(paks, SearchOption.TopDirectoryOnly, isCaseInsensitive: false, new(EGame.GAME_UE5_3));
+            UEFNProvider.FileProvider.Initialize(true);
+            UEFNProvider.FileProvider.SubmitKeys(AesProvider.Keys);
+            UEFNProvider.SaveStreams = false;
+
+            Log.Information($"Loaded UEFN Provider with version: {UEFNProvider.FileProvider.Versions.Game} to path ({paks}) with {AesProvider.Keys.Count()} AES keys.");
         }
 
         public static bool Save(string path)
         {
-            SaveExport = true;
-            Export = null;
+            DefaultProvider.Save = true;
+            Export = null!;
             ExportName = Encoding.ASCII.GetBytes(System.IO.Path.GetFileNameWithoutExtension(path));
 
-            bool Result = Provider.TrySaveAsset(path, out byte[] Data);
+            bool result = DefaultProvider.FileProvider.TrySaveAsset(path, out byte[] buffer);
 
-            if (Result)
+            if (result)
             {
-                Export.Buffer = Data;
-                Log.Information($"Exported {path}");
-            }
-            else
-                Log.Error($"Failed export {path}");
-
-            return Result;
-        }
-
-        public static void Dispose()
-        {
-            if (Provider == null)
-                return;
-
-            Log.Information("Disposing Provider");
-
-            if (OpenedStreamers != null && OpenedStreamers.Count != 0)
-            {
-                foreach (var stream in OpenedStreamers)
-                {
-                    Log.Information($"Disposing {stream.Name} stream");
-                    stream.Stream.Close();
-                }
+                Export.Buffer = buffer;
+                Log.Information($"Exported: {path}");
+                return true;
             }
 
-            Provider.Dispose();
-            Provider = null!;
+            Log.Information($"Failed to export: {path}");
+            return false;
         }
-
-        public static string FormatGamePath(string path) => Provider.FixPath(path).SubstringBeforeLast('.');
 
         public static string FormatUEFNGamePath(string path)
         {
             const string game = "/game/";
             const string plugin = "fortnitegame/plugins/gamefeatures/";
             string search = path.ToLower();
-            string formatted = Provider.Files.Keys.FirstOrDefault(gamepath => gamepath.SubstringBeforeLast('.').ToLower().EndsWith(search))!;
+            string formatted = UEFNProvider.FileProvider.Files.Keys.FirstOrDefault(gamepath => gamepath.SubstringBeforeLast('.').ToLower().EndsWith(search))!;
 
             if (string.IsNullOrEmpty(formatted))
             {
@@ -137,33 +121,13 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
             return formatted;
         }
 
-        public static void CloseStream(string name)
-        {
-            if (OpenedStreamers is not null && OpenedStreamers.Count != 0)
-            {
-                foreach (var stream in OpenedStreamers)
-                {
-                    if (stream.Name != name) continue;
-                    try
-                    {
-                        stream.Stream.Close();
-                        Log.Information($"Closed {stream.Name} stream");
-                    }
-                    catch
-                    {
-                        Log.Error($"Failed to close {stream.Name} stream");
-                    }
-                }
-            }
-        }
-
         private static void WaitForEpicGames()
         {
             Task.Run(async () =>
             {
                 while (true)
                 {
-                    if (Provider is null) return;
+                    if (DefaultProvider is null) return;
                     if (EpicGamesLauncher.IsOpen())
                     {
                         Log.Warning("Detected Fortnite being opened! Closing swapper to prevent read errors");

@@ -172,10 +172,11 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 var Stopwatch = new Stopwatch();
                 Stopwatch.Start();
 
-                string paks = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
+                string paks = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}{CProvider.Paks}";
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                CProvider.Initialize();
+                CProvider.InitDefault();
+                CProvider.InitUEFN();
 
                 List<string> Ucas = new List<string>();
                 List<string> Utocs = new List<string>();
@@ -284,7 +285,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 Stopwatch.Start();
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                CProvider.Initialize();
+                CProvider.InitDefault();
 
                 foreach (var Asset in Option.Exports)
                 {

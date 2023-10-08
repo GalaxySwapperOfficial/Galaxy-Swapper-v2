@@ -12,6 +12,7 @@ using CUE4Parse.UE4.Readers;
 using CUE4Parse.UE4.Versions;
 using CUE4Parse.Utils;
 using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
+using Galaxy_Swapper_v2.Workspace.Utilities;
 using Ionic.Zip;
 using static Galaxy_Swapper_v2.Workspace.Global;
 
@@ -41,15 +42,15 @@ namespace CUE4Parse.FileProvider
             _searchOption = searchOption;
         }
 
-        public void Initialize()
+        public void Initialize(bool UEFN = false)
         {
             if (!_workingDirectory.Exists) throw new ArgumentException("Given directory must exist", nameof(_workingDirectory));
 
-            var availableFiles = new List<Dictionary<string, GameFile>> {IterateFiles(_workingDirectory, _searchOption)};
+            var availableFiles = new List<Dictionary<string, GameFile>> {IterateFiles(_workingDirectory, _searchOption, UEFN)};
 
             if (_extraDirectories is {Count: > 0})
             {
-                availableFiles.AddRange(_extraDirectories.Select(directory => IterateFiles(directory, _searchOption)));
+                availableFiles.AddRange(_extraDirectories.Select(directory => IterateFiles(directory, _searchOption, UEFN)));
             }
 
             foreach (var osFiles in availableFiles)
@@ -66,7 +67,7 @@ namespace CUE4Parse.FileProvider
 
             if (_extraDirectories is { Count: > 0 })
             {
-                availableFiles.AddRange(_extraDirectories.Select(directory => IterateFiles(directory, _searchOption)));
+                availableFiles.AddRange(_extraDirectories.Select(directory => IterateFiles(directory, pakchunk, _searchOption)));
             }
 
             foreach (var osFiles in availableFiles)
@@ -192,7 +193,7 @@ namespace CUE4Parse.FileProvider
             }
         }
 
-        private Dictionary<string, GameFile> IterateFiles(DirectoryInfo directory, SearchOption option)
+        private Dictionary<string, GameFile> IterateFiles(DirectoryInfo directory, SearchOption option, bool UEFN)
         {
             var osFiles = new Dictionary<string, GameFile>();
             if (!directory.Exists) return osFiles;
@@ -212,40 +213,70 @@ namespace CUE4Parse.FileProvider
             // In .uproject mode, we must recursively look for files
             option = uproject != null ? SearchOption.AllDirectories : option;
 
-            foreach (var file in directory.EnumerateFiles("*.*", option))
+            var parse = Endpoint.Read(Endpoint.Type.UEFN);
+            string[] pakstomount = parse["Slots"].ToObject<string[]>();
+
+            if (UEFN)
             {
-                var ext = file.Extension.SubstringAfter('.');
-                if (!file.Exists || string.IsNullOrEmpty(ext))
-                    continue;
-
-                if (file.Name.Contains(".o") || ext == "backup")
+                foreach (var file in directory.EnumerateFiles("*.*", option))
                 {
-                    continue;
-                }
+                    var ext = file.Extension.SubstringAfter('.');
+                    if (!file.Exists || string.IsNullOrEmpty(ext)) continue;
 
-                var newfileinfo = new FileInfo(file.FullName);
+                    if (!pakstomount.Contains(file.Name.SubstringBefore('.')))
+                        continue;
 
-                if (ext == "utoc")
-                {
-                    newfileinfo = new FileInfo($"{directory.FullName}\\{System.IO.Path.GetFileNameWithoutExtension(file.Name)}.backup");
-                    if (!newfileinfo.Exists)
+                    if (uproject == null)
                     {
-                        DupeIO(directory, file, newfileinfo);
+                        RegisterFile(file);
                     }
-                }
 
-                if (uproject == null)
+                    if (!GameFile.Ue4KnownExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase)) continue;
+
+                    var osFile = new OsGameFile(_workingDirectory, file, mountPoint, Versions);
+                    if (IsCaseInsensitive)
+                        osFiles[osFile.Path.ToLowerInvariant()] = osFile;
+                    else
+                        osFiles[osFile.Path] = osFile;
+                }
+            }
+            else
+            {
+                foreach (var file in directory.EnumerateFiles("*.*", option))
                 {
-                    RegisterFile(newfileinfo);
+                    var ext = file.Extension.SubstringAfter('.');
+                    if (!file.Exists || string.IsNullOrEmpty(ext))
+                        continue;
+
+                    if (file.Name.Contains(".o") || ext == "backup" || pakstomount.Contains(file.Name.SubstringBefore('.')))
+                    {
+                        continue;
+                    }
+
+                    var newfileinfo = new FileInfo(file.FullName);
+
+                    if (ext == "utoc")
+                    {
+                        newfileinfo = new FileInfo($"{directory.FullName}\\{System.IO.Path.GetFileNameWithoutExtension(file.Name)}.backup");
+                        if (!newfileinfo.Exists)
+                        {
+                            DupeIO(directory, file, newfileinfo);
+                        }
+                    }
+
+                    if (uproject == null)
+                    {
+                        RegisterFile(newfileinfo);
+                    }
+
+                    if (!GameFile.Ue4KnownExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase)) continue;
+
+                    var osFile = new OsGameFile(_workingDirectory, newfileinfo, mountPoint, Versions);
+                    if (IsCaseInsensitive)
+                        osFiles[osFile.Path.ToLowerInvariant()] = osFile;
+                    else
+                        osFiles[osFile.Path] = osFile;
                 }
-
-                if (!GameFile.Ue4KnownExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase)) continue;
-
-                var osFile = new OsGameFile(_workingDirectory, newfileinfo, mountPoint, Versions);
-                if (IsCaseInsensitive)
-                    osFiles[osFile.Path.ToLowerInvariant()] = osFile;
-                else
-                    osFiles[osFile.Path] = osFile;
             }
 
             return osFiles;

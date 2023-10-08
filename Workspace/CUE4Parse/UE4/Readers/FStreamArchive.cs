@@ -14,7 +14,15 @@ namespace CUE4Parse.UE4.Readers
         {
             _baseStream = baseStream;
             Name = name;
-            CProvider.OpenedStreamers.Add(new Galaxy_Swapper_v2.Workspace.Generation.Formats.StreamData() { Name = System.IO.Path.GetFileNameWithoutExtension(name), Path = name, Stream = baseStream });
+
+            if (CProvider.DefaultProvider is not null && CProvider.DefaultProvider.SaveStreams)
+            {
+                CProvider.DefaultProvider.OpenedStreamers.Add(new() { Name = System.IO.Path.GetFileNameWithoutExtension(name), Path = name, Stream = baseStream });
+            }
+            else if (CProvider.UEFNProvider is not null && CProvider.UEFNProvider.SaveStreams)
+            {
+                CProvider.UEFNProvider.OpenedStreamers.Add(new() { Name = System.IO.Path.GetFileNameWithoutExtension(name), Path = name, Stream = baseStream });
+            }
         }
 
         public override void Close() => _baseStream.Close();

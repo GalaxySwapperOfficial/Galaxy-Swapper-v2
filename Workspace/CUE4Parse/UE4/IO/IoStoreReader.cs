@@ -119,7 +119,7 @@ namespace CUE4Parse.UE4.IO
             if (!(entry is FIoStoreEntry ioEntry) || entry.Vfs != this) throw new ArgumentException($"Wrong io store reader, required {entry.Vfs.Path}, this is {Path}");
             var Result = Read(ioEntry.Offset, ioEntry.Size);
 
-            if (CProvider.SaveExport && CProvider.Export is not null)
+            if (CProvider.DefaultProvider.Save && CProvider.Export is not null)
             {
                 CProvider.Export.ChunkOffsetLengths = TocResource.ChunkOffsetLengths[ioEntry.TocEntryIndex];
             }
@@ -277,7 +277,7 @@ namespace CUE4Parse.UE4.IO
                     }
                 }
 
-                if (CProvider.SaveExport && CProvider.Export is null && src.IndexOfSequence(CProvider.ExportName, 0) > 0)
+                if (CProvider.DefaultProvider.Save && CProvider.Export is null && src.IndexOfSequence(CProvider.ExportName, 0) > 0)
                 {
                     CProvider.Export = new() { CompressionBlock = compressionBlock, Ucas = System.IO.Path.GetFileNameWithoutExtension(reader.Name), Utoc = System.IO.Path.GetFileNameWithoutExtension(this.Name), LastPartition = TocResource.Header.PartitionCount - 1 };
                 }

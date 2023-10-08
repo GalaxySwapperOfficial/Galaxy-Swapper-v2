@@ -184,7 +184,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 Stopwatch.Start();
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                CProvider.Initialize();
+                CProvider.InitDefault();
 
                 List<string> Ucas = new List<string>();
                 List<string> Utocs = new List<string>();
@@ -264,7 +264,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 Stopwatch.Start();
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                CProvider.Initialize();
+                CProvider.InitDefault();
 
                 var Parse = Endpoint.Read(Endpoint.Type.FOV);
 

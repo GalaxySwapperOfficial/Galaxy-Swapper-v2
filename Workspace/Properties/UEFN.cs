@@ -52,9 +52,6 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 string path = $"{paks}\\{slot}.pak";
                 if (File.Exists(path))
                 {
-                    Log.Information($"Slot {slot} is open checking if stream is as well");
-                    CProvider.CloseStream($"{paks}\\{slot}.pak");
-
                     Log.Information("Checking if slot is a high resolution texture game file");
                     using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite))
                     {
@@ -91,6 +88,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 throw new Exception($"UEFN game files are currently disabled");
             }
 
+            //So many things can go wrong so this nightmare of if checks will exist.
             if (Cache["Version"].KeyIsNullOrEmpty())
             {
                 Log.Information("Main UEFN version was set as null");
@@ -98,46 +96,25 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             else if (parse["Version"].Value<int>() != Cache["Version"].Value<int>())
             {
                 Log.Information("Main UEFN files are outdated and will be removed");
-                DeleteMainUEFN();
+            }
+            else if (((JArray)Cache["Downloadables"]).Count != ((JArray)parse["Downloadables"]).Count)
+            {
+                Log.Information("Main UEFN files amount does not match the API. UEFN game files will be deleted");
+            }
+            else if (!Cache["Downloadables"].All(downloadable => File.Exists($"{paks}\\{downloadable}.ucas") && File.Exists($"{paks}\\{downloadable}.utoc") && File.Exists($"{paks}\\{downloadable}.pak") && File.Exists($"{paks}\\{downloadable}.sig")))
+            {
+                Log.Information("Cached main UEFN files are missing. UEFN game files will be deleted");
             }
             else
             {
-                if (((JArray)Cache["Downloadables"]).Count != ((JArray)parse["Downloadables"]).Count)
-                {
-                    Log.Information("Main UEFN files amount does not match the api. UEFN game files will be deleted");
-                    DeleteMainUEFN();
-                }
-                else
-                {
-                    bool valid = true;
-
-                    foreach (string downloadable in Cache["Downloadables"])
-                    {
-                        if (!File.Exists($"{paks}\\{downloadable}.ucas") || !File.Exists($"{paks}\\{downloadable}.utoc") || !File.Exists($"{paks}\\{downloadable}.pak") || !File.Exists($"{paks}\\{downloadable}.sig"))
-                        {
-                            Log.Information($"Cached main UEFN file is missing. UEFN ame files will be deleted");
-                            DeleteMainUEFN();
-                            valid = false;
-                            break;
-                        }
-                    }
-
-                    if (valid) return;
-                }
+                Log.Information("Cached main UEFN files are up to date!");
+                return;
             }
 
-            void DeleteMainUEFN()
-            {
-                foreach (string downloadable in Cache["Downloadables"])
-                {
-                    Delete($"{paks}\\{downloadable}.ucas");
-                    Delete($"{paks}\\{downloadable}.utoc");
-                    Delete($"{paks}\\{downloadable}.pak");
-                    Delete($"{paks}\\{downloadable}.sig");
-                    Delete($"{paks}\\{downloadable}.backup");
-                }
-            }
+            //Dispose UEFN file provider so files aren't in use.
+            Dispose();
 
+            //Sort our uefn files to a struct
             var downloadables = new List<Downloadable>();
             foreach (var downloadable in parse["Downloadables"])
             {
@@ -160,14 +137,13 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             File.WriteAllText(Path, Cache.ToString());
             Log.Information($"Wrote UEFN cache to {Path}");
 
-            foreach (string slot in usedslots)
-            {
-                CProvider.Add(slot); //Should be last
-            }
+            CProvider.InitUEFN();
         }
 
         public static void Add(string paks, string name, Downloadable downloadable)
         {
+            //Dispose UEFN file provider so files aren't in use.
+            Dispose();
             Remove(name);
 
             Log.Information($"Downloading 1 downloadable");
@@ -183,13 +159,13 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             File.WriteAllText(Path, Cache.ToString());
             Log.Information($"Wrote UEFN cache to {Path}");
 
-            CProvider.Add(usedslots.First()); //Should be last
+            CProvider.InitUEFN();
         }
 
         private static void Download(DirectoryInfo paks, List<Downloadable> downloadables, out List<string> usedslots)
         {
             var temp = new DirectoryInfo($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Temp\\GalaxyDownloadables");
-            usedslots = new List<string>();
+            usedslots = new ();
 
             if (temp.Exists)
             {
@@ -197,7 +173,6 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             }
 
             Directory.CreateDirectory(temp.FullName);
-
             Log.Information($"Created temp folder for downloading at: {temp.FullName}");
 
             var openSlots = FindOpenSlots(paks.FullName);
@@ -209,8 +184,8 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             }
 
             Log.Information($"Found a total of {openSlots.Count} slots open and only need: {downloadables.Count}");
-            Log.Information($"Ensuring slots {downloadables.Count} are not taken");
 
+            Log.Information($"Ensuring slots {downloadables.Count} are not taken");
             foreach (string slot in openSlots.Take(downloadables.Count))
             {
                 Delete($"{paks.FullName}\\{slot}.ucas");
@@ -226,8 +201,8 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 {
                     string zippedpath = $"{temp}\\Zipped ({openSlots.First()})";
 
-                    Log.Information($"Creating temp zip directory at: {zippedpath}");
                     Directory.CreateDirectory(zippedpath);
+                    Log.Information($"Created temp zip directory at: {zippedpath}");
 
                     var gamefiles = new FileInfo($"{zippedpath}\\GameFiles.zip");
 
@@ -323,15 +298,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 Log.Information($"Moved: {pak.FullName} To: {paks.FullName}");
             }
 
-            try
-            {
-                Directory.Delete(temp.FullName, true);
-                Log.Information($"Removed temp folder to keep the pc nice and clean: {temp.FullName}");
-            }
-            catch
-            {
-
-            }
+            Directory.Delete(temp.FullName, true);
         }
 
         public static void Remove(string name)
@@ -389,6 +356,17 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             File.WriteAllText(Path, Cache.ToString());
         }
 
+        private static void Reset()
+        {
+            Cache = JObject.FromObject(new
+            {
+                Downloadables = new JArray(),
+                Version = JValue.CreateNull(),
+                Externals = new JArray()
+            });
+        }
+
+        #region Utils
         private static List<string> FindOpenSlots(string paks)
         {
             var available = new List<string>();
@@ -411,8 +389,6 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             var fileInfo = new FileInfo(path);
             if (fileInfo.Exists)
             {
-                CProvider.CloseStream(System.IO.Path.GetFileNameWithoutExtension(fileInfo.Name));
-
                 try
                 {
                     Log.Information($"Deleting {fileInfo.FullName}");
@@ -427,14 +403,12 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             return true;
         }
 
-        private static void Reset()
+        public static void Dispose()
         {
-            Cache = JObject.FromObject(new
-            {
-                Downloadables = new JArray(),
-                Version = JValue.CreateNull(),
-                Externals = new JArray()
-            });
+            CProvider.UEFNProvider?.Dispose();
+            CProvider.UEFNProvider = null!;
         }
+
+        #endregion
     }
 }
