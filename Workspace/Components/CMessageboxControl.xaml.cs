@@ -1,35 +1,42 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Utilities;
 using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.Media;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 
 namespace Galaxy_Swapper_v2.Workspace.Components
 {
-    /// <summary>
-    /// Interaction logic for CMessageboxControl.xaml
-    /// </summary>
     public partial class CMessageboxControl : Window
     {
-        public MessageBoxResult Result { get; set; } = default!;
-        private MessageBoxButton ButtonType { get; set; } = default!;
-        private List<string> Socials { get; set; } = default!;
-        private List<string> Solutions { get; set; } = default!;
-        private bool ShouldClose = false;
-        public CMessageboxControl(string header, string description, MessageBoxButton buttontype, List<string> socials = null, List<string> solutions = null, bool close = false)
+        public MessageBoxResult Result = MessageBoxResult.None;
+        private MessageBoxButton Button = MessageBoxButton.OK;
+        private Storyboard DiscordHover = null!;
+        private string[] Links = null!;
+        private string[] Solutions = null!;
+        private bool Discord = true;
+        private bool Exit;
+        public CMessageboxControl(string header, string context, MessageBoxButton buttons = MessageBoxButton.OK, string[] links = null, string[] solutions = null, bool discord = false, bool exit = false)
         {
             InitializeComponent();
-            ButtonType = buttontype;
             Header.Text = header;
-            Description.Text = description;
-            Socials = socials;
+            Context.Text = context;
+            Links = links;
             Solutions = solutions;
-            ShouldClose = close;
+            Button = buttons;
         }
 
-        private void CMessageboxControl_Loaded(object sender, RoutedEventArgs e)
+        private void MessageView_Loaded(object sender, RoutedEventArgs e)
         {
-            switch (ButtonType)
+            if (Discord && !string.IsNullOrEmpty(Global.Discord))
+            {
+                DiscordLogo.Visibility = Visibility.Visible;
+                DiscordLogo.IsEnabled = true;
+            }
+
+            switch (Button)
             {
                 case MessageBoxButton.OK:
                     Ok.IsEnabled = true;
@@ -52,62 +59,131 @@ namespace Galaxy_Swapper_v2.Workspace.Components
                     break;
             }
 
-            if (Solutions != null)
+            if (Solutions is not null)
             {
-                //Need to make lan
-                Description.Text += "\n\nPlease try the following solutions";
-                foreach (string Solution in Solutions)
+                Context.Text += "\n\nPlease try the following solutions:";
+                Solutions.ToList().ForEach(delegate (string solution)
                 {
-                    Description.Text += $"\n・{Solution}";
-                }
+                    TextBlock context2 = Context;
+                    context2.Text = context2.Text + "\n・" + solution;
+                });
             }
 
-            System.Media.SystemSounds.Beep.Play();
+            SystemSounds.Beep.Play();
         }
 
-        private void Drag_Click(object sender, MouseButtonEventArgs e) => this.DragMove();
-        private void Close_Click(object sender, MouseButtonEventArgs e) => MessageClose();
-        private void MessageClose()
-        {
-            if (Socials != null)
-            {
-                foreach (string Social in Socials)
-                {
-                    if (string.IsNullOrEmpty(Social))
-                        continue;
+        private void Drag_Click(object sender, MouseButtonEventArgs e) => DragMove();
 
-                    Social.UrlStart();
-                }
+        private void Close_Click(object sender, MouseButtonEventArgs e) => Result_Click(Cancel, null!);
+
+        private void Discord_Click(object sender, RoutedEventArgs e) => Global.Discord.UrlStart();
+
+        private void Discord_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (DiscordHover is not null)
+            {
+                DiscordHover.Stop();
             }
 
-            if (ShouldClose)
-                Environment.Exit(0);
+            DiscordHover = Interface.SetElementAnimations(
+            new Interface.BaseAnim
+            {
+                Element = DiscordLogo,
+                Property = new PropertyPath(FrameworkElement.HeightProperty),
+                ElementAnim = new DoubleAnimation
+                {
+                    From = DiscordLogo.Height,
+                    To = 30.0,
+                    Duration = new TimeSpan(0, 0, 0, 0, 200)
+                }
+            },
+            new Interface.BaseAnim
+            {
+                Element = DiscordLogo,
+                Property = new PropertyPath(FrameworkElement.WidthProperty),
+                ElementAnim = new DoubleAnimation
+                {
+                    From = DiscordLogo.Width,
+                    To = 30.0,
+                    Duration = new TimeSpan(0, 0, 0, 0, 200)
+                }
+            });
+
+            DiscordHover.Begin();
+        }
+
+        private void Discord_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (DiscordHover is not null)
+            {
+                DiscordHover.Stop();
+            }
+
+            DiscordHover = Interface.SetElementAnimations(
+            new Interface.BaseAnim
+            {
+                Element = DiscordLogo,
+                Property = new PropertyPath(FrameworkElement.HeightProperty),
+                ElementAnim = new DoubleAnimation
+                {
+                    From = DiscordLogo.Height,
+                    To = 25.0,
+                    Duration = new TimeSpan(0, 0, 0, 0, 200)
+                }
+            },
+            new Interface.BaseAnim
+            {
+                Element = DiscordLogo,
+                Property = new PropertyPath(FrameworkElement.WidthProperty),
+                ElementAnim = new DoubleAnimation
+                {
+                    From = DiscordLogo.Width,
+                    To = 25.0,
+                    Duration = new TimeSpan(0, 0, 0, 0, 200)
+                }
+            });
+
+            DiscordHover.Begin();
+        }
+
+        private void Result_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            
+            switch (button.Name.ToUpper())
+            {
+                case "OK":
+                    Result = MessageBoxResult.OK;
+                    break;
+                case "YES":
+                    Result = MessageBoxResult.Yes;
+                    break;
+                case "NO":
+                    Result = MessageBoxResult.No;
+                    break;
+                case "CANCEL":
+                    Result = MessageBoxResult.Cancel;
+                    break;
+                default:
+                    Result = MessageBoxResult.Cancel;
+                    break;
+            }
+
+            if (Links is not null)
+            {
+                Links.ToList().ForEach(delegate (string link)
+                {
+                    if (!string.IsNullOrWhiteSpace(link))
+                    {
+                        link.UrlStart();
+                    }
+                });
+            }
+
+            if (Exit)
+                Application.Current.Shutdown();
             else
                 Close();
-        }
-
-        private void Ok_Click(object sender, RoutedEventArgs e)
-        {
-            Result = MessageBoxResult.OK;
-            MessageClose();
-        }
-
-        private void Yes_Click(object sender, RoutedEventArgs e)
-        {
-            Result = MessageBoxResult.Yes;
-            MessageClose();
-        }
-
-        private void No_Click(object sender, RoutedEventArgs e)
-        {
-            Result = MessageBoxResult.No;
-            MessageClose();
-        }
-
-        private void Cancel_Click(object sender, RoutedEventArgs e)
-        {
-            Result = MessageBoxResult.Cancel;
-            MessageClose();
         }
     }
 }

@@ -17,7 +17,7 @@
                 <effects:BlurEffect x:Name="Blur" Radius="20" RenderingBias="Quality" KernelType="Gaussian"/>
             </Image.Effect>
         </Image>
-        <TextBlock x:Name="NsfwHeader" Text="18+ Mature content" TextAlignment="Center" VerticalAlignment="Center" Foreground="#EFEFF0" FontWeight="SemiBold" FontSize="14" IsEnabled="False"/>
+        <TextBlock x:Name="NsfwHeader" Text="18+ Mature content" TextAlignment="Center" VerticalAlignment="Center" Foreground="#EFEFF0" FontWeight="SemiBold" FontSize="14" MouseEnter="root_MouseEnter" MouseLeave="root_MouseLeave" MouseLeftButtonDown="Lobby_Convert"/>
         <Image x:Name="Show" Source="/Workspace/Assets/Show.png" Width="20" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" MouseLeftButtonDown="Show_Click"/>
         <Image x:Name="Hide" Source="/Workspace/Assets/Hide.png" Width="20" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" MouseLeftButtonDown="Hide_Click" Visibility="Hidden"/>
     </Grid>

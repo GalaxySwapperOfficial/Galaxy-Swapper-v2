@@ -1,8 +1,6 @@
-﻿using CUE4Parse.UE4.Objects.Engine;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -10,10 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
-using System.Security.Policy;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -216,7 +211,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                 catch (Exception Exception)
                 {
                     Log.Error(Exception, $"Failed to download {name}");
-                    Message.DisplaySTA("Error", $"Webclient caught a exception while downloading {name}!", MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
+                    Message.DisplaySTA("Error", $"Webclient caught a exception while downloading {name}!", discord: true, solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
                     throw new CustomException($"Webclient caught a exception while downloading {name}!");
                 }
             }

@@ -267,12 +267,12 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             catch (CustomException CustomException)
             {
                 Log.Error(CustomException.Message, "Caught CustomException");
-                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "ConvertError"), Option.Name, CustomException.Message), MessageBoxButton.OK, new List<string> { Global.Discord });
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "ConvertError"), Option.Name, CustomException.Message), discord: true);
             }
             catch (Exception Exception)
             {
                 Log.Error(Exception.Message, "Caught Exception");
-                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "ConvertError"), Option.Name, Exception.Message), MessageBoxButton.OK, new List<string> { Global.Discord }, Languages.ReadSolutions(Languages.Type.Message, "ConvertError"));
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "ConvertError"), Option.Name, Exception.Message), solutions: Languages.ReadSolutions(Languages.Type.Message, "ConvertError"), discord: true);
             }
         }
 
@@ -332,12 +332,12 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             catch (CustomException CustomException)
             {
                 Log.Error(CustomException.Message, "Caught CustomException");
-                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "RevertError"), Option.Name, CustomException.Message), MessageBoxButton.OK, new List<string> { Global.Discord });
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "RevertError"), Option.Name, CustomException.Message), discord: true);
             }
             catch (Exception Exception)
             {
                 Log.Error(Exception.Message, "Caught Exception");
-                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "RevertError"), Option.Name, Exception.Message), MessageBoxButton.OK, new List<string> { Global.Discord }, Languages.ReadSolutions(Languages.Type.Message, "ConvertError"));
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "RevertError"), Option.Name, Exception.Message), discord: true, solutions: Languages.ReadSolutions(Languages.Type.Message, "ConvertError"));
             }
         }
 

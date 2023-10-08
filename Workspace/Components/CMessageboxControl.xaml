@@ -14,18 +14,19 @@
         WindowStartupLocation="CenterScreen"
         Background="Transparent"
         AllowsTransparency="True"
-        Loaded="CMessageboxControl_Loaded"
+        Loaded="MessageView_Loaded"
         >
-    <Border x:Name="Main" Background="#090B0E" BorderBrush="#050608" BorderThickness="1" CornerRadius="10">
+    <Border Name="Main" Background="#090B0E" BorderBrush="#050608" BorderThickness="1" CornerRadius="10">
         <Grid>
-            <TextBlock x:Name="Header" Text="Info" FontSize="14" FontWeight="SemiBold" Foreground="#EFEFF0" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 14, 60, 30"/>
-            <TextBlock x:Name="Description" Text="Info" FontSize="13" FontWeight="Normal" Foreground="#EFEFF0" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 40, 60, 60"/>
-            <Button x:Name="Ok" Content="Ok" Width="100" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" IsEnabled="False" Visibility="Collapsed" Click="Ok_Click"/>
-            <Button x:Name="Yes" Content="Yes" Width="100" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" IsEnabled="False" Visibility="Collapsed" Click="Yes_Click"/>
-            <Button x:Name="No" Content="No" Width="100" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5, 5, 110, 5" IsEnabled="False" Visibility="Collapsed" Click="No_Click"/>
-            <Button x:Name="Cancel" Content="Cancel" Width="100" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5, 5, 215, 5" IsEnabled="False" Visibility="Collapsed" Click="Cancel_Click"/>
-            <Border Background="Transparent" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="30" MouseLeftButtonDown="Drag_Click"/>
-            <local:CCloseControl x:Name="CloseButton" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5, 5, 5, 5" MouseLeftButtonDown="Close_Click" IsEnabled="False"/>
+            <local:CCloseControl x:Name="CloseButton" MouseLeftButtonDown="Close_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5, 5, 5, 5" IsEnabled="False"/>
+            <TextBlock Name="Header" Text="Header" FontSize="14" FontWeight="SemiBold" Foreground="#EFEFF0" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 14, 60, 30" />
+            <TextBlock Name="Context" Text="Context" FontSize="13" FontWeight="Normal" Foreground="#EFEFF0" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 40, 60, 60" />
+            <Border Background="#00FFFFFF" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="30" Margin="0, 0, 50, 0" MouseLeftButtonDown="Drag_Click" />
+            <Button Name="Ok" Content="Ok" Width="100" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" IsEnabled="False" Visibility="Hidden" Click="Result_Click" />
+            <Button Name="Yes" Content="Yes" Width="100" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" IsEnabled="False" Visibility="Hidden" Click="Result_Click" />
+            <Button Name="No" Content="No" Width="100" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5, 5, 110, 5" IsEnabled="False" Visibility="Hidden" Click="Result_Click" />
+            <Button Name="Cancel" Content="Cancel" Width="100" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5, 5, 215, 5" IsEnabled="False" Visibility="Hidden" Click="Result_Click" />
+            <Image Name="DiscordLogo" Source="/Workspace/Assets/Backpacks.png" Width="25" Height="25" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5, 5, 5, 5" IsEnabled="False" Visibility="Hidden" Cursor="Hand" MouseEnter="Discord_MouseEnter" MouseLeave="Discord_MouseLeave" MouseLeftButtonDown="Discord_Click" />
         </Grid>
     </Border>
 </Window>

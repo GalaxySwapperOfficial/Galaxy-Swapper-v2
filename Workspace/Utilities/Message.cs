@@ -1,31 +1,28 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Components;
 using System;
-using System.Collections.Generic;
 using System.Windows;
 
 namespace Galaxy_Swapper_v2.Workspace.Utilities
 {
     public static class Message
     {
-        public static MessageBoxResult DisplaySTA(string header, string description, MessageBoxButton buttontype, List<string> socials = null, List<string> solutions = null, bool close = false)
+        public static MessageBoxResult DisplaySTA(string header, string description, MessageBoxButton button = MessageBoxButton.OK, string[] links = null, string[] solutions = null, bool discord = false, bool exit = false)
         {
-            var Result = MessageBoxResult.Cancel;
+            var result = MessageBoxResult.Cancel;
             Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                var NMessage = new CMessageboxControl(header, description, buttontype, socials, solutions, close);
-                NMessage.ShowDialog();
-
-                Result = NMessage.Result;
+                var messageView = new CMessageboxControl(header, description, button, links, solutions, discord, exit);
+                messageView.ShowDialog();
+                result = messageView.Result;
             });
-
-            return Result;
+            return result;
         }
 
-        public static MessageBoxResult Display(string header, string description, MessageBoxButton buttontype, List<string> socials = null, List<string> solutions = null, bool close = false)
+        public static MessageBoxResult Display(string header, string description, MessageBoxButton button = MessageBoxButton.OK, string[] links = null, string[] solutions = null, bool discord = false, bool exit = false)
         {
-            var NMessage = new CMessageboxControl(header, description, buttontype, socials, solutions, close);
-            NMessage.ShowDialog();
-            return NMessage.Result;
+            var messageView = new CMessageboxControl(header, description, button, links, solutions, discord, exit);
+            messageView.ShowDialog();
+            return messageView.Result;
         }
     }
 }

@@ -135,7 +135,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
                     Log.Fatal($"Failed to download response from endpoint! Expected: {HttpStatusCode.OK} Received: {response.StatusCode}");
-                    Message.DisplaySTA("Error", "Webclient caught a exception while downloading response from Endpoint.", MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, close: true);
+                    Message.DisplaySTA("Error", "Webclient caught a exception while downloading response from Endpoint.", solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, exit: true);
                 }
 
                 Log.Information($"Finished {request.Method} request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
@@ -148,13 +148,13 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                         if (!Create(parse["days"].Value<int>()))
                             return false;
 
-                        Message.Display(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.Message, "LoginSuccess"), parse["days"].Value<int>()), MessageBoxButton.OK);
+                        Message.Display(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.Message, "LoginSuccess"), parse["days"].Value<int>()));
                         return true;
                     case 409:
-                        Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Languages.Read(Languages.Type.Message, "LoginInvalid"), MessageBoxButton.OK);
+                        Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Languages.Read(Languages.Type.Message, "LoginInvalid"));
                         return false;
                     default:
-                        Message.Display(Languages.Read(Languages.Type.Header, "Error"), parse["message"].Value<string>(), MessageBoxButton.OK, solutions: new () { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
+                        Message.Display(Languages.Read(Languages.Type.Header, "Error"), parse["message"].Value<string>(), solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
                         return false;
                 }
             }

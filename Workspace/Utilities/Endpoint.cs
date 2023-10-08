@@ -35,7 +35,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             if (!Parse.ContainsKey(Type.ToString()))
             {
                 Log.Fatal($"Failed to find {Type} in endpoint cache.");
-                Message.DisplaySTA("Error", $"Failed to find {Type} in endpoint cache.", MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, close: true);
+                Message.DisplaySTA("Error", $"Failed to find {Type} in endpoint cache.", exit: true, solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
             }
 
             if (File.Exists("D:\\Galaxy Swapper v2\\Backend\\API\\1.13\\Cosmetics.json")) //Local API for debugging
@@ -65,7 +65,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
                     Log.Fatal($"Failed to download response from endpoint! Expected: {HttpStatusCode.OK} Received: {response.StatusCode}");
-                    Message.DisplaySTA("Error", "Webclient caught a exception while downloading response from Endpoint.", MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, close: true);
+                    Message.DisplaySTA("Error", "Webclient caught a exception while downloading response from Endpoint.", discord: true, solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, exit: true);
                 }
 
                 Parse = JsonConvert.DeserializeObject<JObject>(response.Content);
@@ -73,7 +73,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                 if (Parse["status"].Value<int>() != 200)
                 {
                     Log.Fatal($"Endpoint did not return with code 200! Expected: 200 Received: {Parse["status"].Value<int>()}");
-                    Message.DisplaySTA("Error", Parse["message"].Value<string>(), MessageBoxButton.OK, solutions: new List<string> { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, close: true);
+                    Message.DisplaySTA("Error", Parse["message"].Value<string>(), solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, exit: true);
                 }
 
                 Log.Information($"Finished GET request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");

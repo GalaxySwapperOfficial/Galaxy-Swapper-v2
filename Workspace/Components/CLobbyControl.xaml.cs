@@ -1,7 +1,10 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Windows;
@@ -27,7 +30,6 @@ namespace Galaxy_Swapper_v2.Workspace.Components
                 Blur.Radius = 0;
                 NsfwHeader.Visibility = Visibility.Hidden;
                 Show.Visibility = Visibility.Hidden;
-                NsfwHeader.IsEnabled = false;
                 Show.IsEnabled = false;
             }
         }
@@ -53,7 +55,6 @@ namespace Galaxy_Swapper_v2.Workspace.Components
 
             Blur.Radius = 0;
             NsfwHeader.Visibility = Visibility.Hidden;
-            NsfwHeader.IsEnabled = false;
         }
 
         private void Hide_Click(object sender, MouseButtonEventArgs e)
@@ -63,7 +64,6 @@ namespace Galaxy_Swapper_v2.Workspace.Components
 
             Blur.Radius = 20;
             NsfwHeader.Visibility = Visibility.Visible;
-            NsfwHeader.IsEnabled = true;
         }
 
         private void Lobby_Convert(object sender, MouseButtonEventArgs e)
@@ -73,12 +73,13 @@ namespace Galaxy_Swapper_v2.Workspace.Components
                 return;
             }
 
-            if (!Directory.Exists(PersistentDownloadDir))
+            var Stopwatch = new Stopwatch();
+            Stopwatch.Start();
+
+            if (!Directory.Exists(PersistentDownloadDir) || !File.Exists($"{PersistentDownloadDir}\\{DownloadCache}"))
             {
-                return;
-            }
-            if (!File.Exists($"{PersistentDownloadDir}\\{DownloadCache}"))
-            {
+                Log.Error($"Caught exception while converting lobby screen: Directory does not exist: {PersistentDownloadDir}");
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "PersistentDownloadDirError"), PersistentDownloadDir), discord: true, solutions: Languages.ReadSolutions(Languages.Type.Message, "PersistentDownloadDirError"));
                 return;
             }
 
@@ -86,6 +87,8 @@ namespace Galaxy_Swapper_v2.Workspace.Components
 
             if (!content.ValidJson())
             {
+                Log.Error($"Caught exception while converting lobby screen: DownloadCache.json is not in a valid JSON format");
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "DownloadCacheInvalidJSON"), discord: true, solutions: Languages.ReadSolutions(Languages.Type.Message, "DownloadCacheInvalidJSON"));
                 return;
             }
 
@@ -105,8 +108,26 @@ namespace Galaxy_Swapper_v2.Workspace.Components
                     File.Delete(filePath);
                 }
 
-                Misc.Download(filePath, LobbyData.Download, "Lobby");
+                using (WebClient WC = new WebClient())
+                {
+                    try
+                    {
+                        WC.DownloadFile(LobbyData.Download, filePath);
+                    }
+                    catch (Exception Exception)
+                    {
+                        Log.Error(Exception, $"Failed to download {LobbyData.Name}");
+                        Message.DisplaySTA("Error", $"Webclient caught a exception while downloading {LobbyData.Name}!", discord: true, solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
+                        return;
+                    }
+                }
             }
+
+            TimeSpan TimeSpan = Stopwatch.Elapsed;
+            if (TimeSpan.Minutes > 0)
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.View, "SwapView", "ConvertedMinutes"), TimeSpan.Minutes), MessageBoxButton.OK);
+            else
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.View, "SwapView", "Converted"), TimeSpan.Seconds), MessageBoxButton.OK);
         }
     }
 }

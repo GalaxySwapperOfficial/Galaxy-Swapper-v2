@@ -95,13 +95,13 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 Message.DisplaySTA(parse["Warning"]["Header"].Value<string>(), parse["Warning"]["Content"].Value<string>(), MessageBoxButton.OK);
 
             if (parse["DownTime"]["Enabled"].Value<bool>())
-                Message.DisplaySTA(parse["DownTime"]["Header"].Value<string>(), parse["DownTime"]["Content"].Value<string>(), MessageBoxButton.OK, new List<string> { Global.Discord }, close: false);
+                Message.DisplaySTA(parse["DownTime"]["Header"].Value<string>(), parse["DownTime"]["Content"].Value<string>(), discord: true, exit: true);
 
             if (parse["Update"]["Enabled"].Value<bool>())
             {
                 if (parse["Update"]["Force"]["Enabled"].Value<bool>())
                 {
-                    Message.DisplaySTA(parse["Update"]["Force"]["Header"].Value<string>(), parse["Update"]["Force"]["Content"].Value<string>(), MessageBoxButton.OK, new List<string> { Global.Discord, Global.Download, Global.Website });
+                    Message.DisplaySTA(parse["Update"]["Force"]["Header"].Value<string>(), parse["Update"]["Force"]["Content"].Value<string>(), discord: true, exit: true, links: new[] { Global.Download });
                     Environment.Exit(0);
                 }
                 else if (Message.DisplaySTA(parse["Update"]["Header"].Value<string>(), parse["Update"]["Content"].Value<string>(), MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
