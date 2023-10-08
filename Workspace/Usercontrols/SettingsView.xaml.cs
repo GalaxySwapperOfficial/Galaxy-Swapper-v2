@@ -11,10 +11,8 @@ using Serilog;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Shapes;
 using WindowsAPICodePack.Dialogs;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols
@@ -212,7 +210,6 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                     CProvider.DefaultProvider = null!;
                     CProvider.UEFNProvider?.Dispose();
                     CProvider.UEFNProvider = null!;
-                    PaksCheck.Validate(paks);
 
                     foreach (FileInfo item in directoryInfo.EnumerateFiles("*.utoc*", SearchOption.TopDirectoryOnly))
                     {
@@ -254,11 +251,6 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                     return;
                 }
             }
-        }
-
-        private void ResetUEFN_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void StartFortnite_Click(object sender, RoutedEventArgs e)
@@ -306,6 +298,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
         {
             Settings.Edit(Settings.Type.HideNsfw, Nsfw.IsChecked);
             Memory.Clear();
+            Memory.LobbyView = new();
             Generate.Cache.Clear();
         }
 

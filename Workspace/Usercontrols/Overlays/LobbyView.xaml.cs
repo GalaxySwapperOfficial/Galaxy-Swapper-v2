@@ -1,23 +1,31 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Components;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Structs;
+using Galaxy_Swapper_v2.Workspace.Swapping;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using WindowsAPICodePack.Dialogs;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 {
     public partial class LobbyView : UserControl
     {
-        public LobbyView()
-        {
-            InitializeComponent();
-        }
-
+        public LobbyView() => InitializeComponent();
+        private bool IsLoaded = false;
         private void LobbyView_Loaded(object sender, RoutedEventArgs e)
         {
+            Import.Content = Languages.Read(Languages.Type.View, "LobbyView", "Import");
+            Reset.Content = Languages.Read(Languages.Type.View, "LobbyView", "Reset");
+
+            if (IsLoaded)
+                return;
+            else
+                IsLoaded = true;
+
             var parse = Endpoint.Read(Endpoint.Type.Lobby);
             foreach (var item in parse["Array"])
             {
@@ -38,5 +46,22 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
         }
 
         private void Close_Click(object sender, MouseButtonEventArgs e) => Memory.MainView.RemoveOverlay();
+        private void Reset_Click(object sender, RoutedEventArgs e) => LobbyBGSwap.Revert();
+
+        private void Import_Click(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new CommonOpenFileDialog() { Title = Languages.Read(Languages.Type.View, "LobbyView", "LobbyImportTip") })
+            {
+                dialog.Filters.Add(new CommonFileDialogFilter("Image Files", "*.png;*.jpg"));
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    var fileInfo = new FileInfo(dialog.FileName);
+                    if (fileInfo.Exists)
+                    {
+                        LobbyBGSwap.Convert(fileInfo);
+                    }
+                }
+            }
+        }
     }
 }

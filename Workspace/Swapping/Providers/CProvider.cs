@@ -34,8 +34,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
                 throw new CustomException(Languages.Read(Languages.Type.Message, "FortniteDirectoryEmpty"));
             }
 
-            PaksCheck.Validate(paks);
-            PaksCheck.Backup(paks);
+            Pakchunks.Validate(paks);
             AesProvider.Initialize();
 
             DefaultProvider = new ();

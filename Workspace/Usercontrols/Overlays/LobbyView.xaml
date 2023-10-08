@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays"
              xmlns:components="clr-namespace:Galaxy_Swapper_v2.Workspace.Components"
              mc:Ignorable="d" 
-             Height="424" 
+             Height="550" 
              Width="860"
              Loaded="LobbyView_Loaded"
              >
@@ -15,11 +15,11 @@
             <DropShadowEffect ShadowDepth="0" Opacity="0.3" BlurRadius="10"/>
         </Border.Effect>
         <Grid>
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0, 40, 0, 0">
-                <WrapPanel Name="Options_Items">
-                    
-                </WrapPanel>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0, 45, 0, 65">
+                <WrapPanel Name="Options_Items"/>
             </ScrollViewer>
+            <Button x:Name="Import" Content="Import" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="150" Height="38" Margin="20, 8" Foreground="#D3D3D6" Click="Import_Click"/>
+            <Button x:Name="Reset" Content="Reset" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="150" Height="38" Margin="178, 8" Foreground="#D3D3D6" Click="Reset_Click"/>
             <components:CCloseControl x:Name="CloseButton" HorizontalAlignment="Right" VerticalAlignment="Top" MouseLeftButtonDown="Close_Click" Margin="5, 5, 5, 5"/>
         </Grid>
     </Border>
