@@ -5,6 +5,7 @@ using System.Media;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media.Animation;
 
 namespace Galaxy_Swapper_v2.Workspace.Components
@@ -67,6 +68,14 @@ namespace Galaxy_Swapper_v2.Workspace.Components
                     TextBlock context2 = Context;
                     context2.Text = context2.Text + "\n・" + solution;
                 });
+            }
+
+            //Load messagebox on current screen
+            if (App.Current.MainWindow.IsActive)
+            {
+                var mainScreen = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(App.Current.MainWindow).Handle);
+                Left = mainScreen.WorkingArea.Left + (mainScreen.WorkingArea.Width - Width) / 2;
+                Top = mainScreen.WorkingArea.Top + (mainScreen.WorkingArea.Height - Height) / 2;
             }
 
             SystemSounds.Beep.Play();
