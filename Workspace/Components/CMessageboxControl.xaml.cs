@@ -17,7 +17,7 @@ namespace Galaxy_Swapper_v2.Workspace.Components
         private Storyboard DiscordHover = null!;
         private string[] Links = null!;
         private string[] Solutions = null!;
-        private bool Discord = true;
+        private bool Discord = false;
         private bool Exit;
         public CMessageboxControl(string header, string context, MessageBoxButton buttons = MessageBoxButton.OK, string[] links = null, string[] solutions = null, bool discord = false, bool exit = false)
         {
@@ -27,6 +27,7 @@ namespace Galaxy_Swapper_v2.Workspace.Components
             Links = links;
             Solutions = solutions;
             Button = buttons;
+            Discord = discord;
         }
 
         private void MessageView_Loaded(object sender, RoutedEventArgs e)
@@ -70,7 +71,7 @@ namespace Galaxy_Swapper_v2.Workspace.Components
                 });
             }
 
-            //Load messagebox on current screen
+            //Load messagebox on active monitor
             if (App.Current.MainWindow.IsActive)
             {
                 var mainScreen = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(App.Current.MainWindow).Handle);

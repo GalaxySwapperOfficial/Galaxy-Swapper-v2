@@ -26,7 +26,7 @@
             <Button Name="Yes" Content="Yes" Width="100" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" IsEnabled="False" Visibility="Hidden" Click="Result_Click" />
             <Button Name="No" Content="No" Width="100" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5, 5, 110, 5" IsEnabled="False" Visibility="Hidden" Click="Result_Click" />
             <Button Name="Cancel" Content="Cancel" Width="100" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5, 5, 215, 5" IsEnabled="False" Visibility="Hidden" Click="Result_Click" />
-            <Image Name="DiscordLogo" Source="/Workspace/Assets/Backpacks.png" Width="25" Height="25" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5, 5, 5, 5" IsEnabled="False" Visibility="Hidden" Cursor="Hand" MouseEnter="Discord_MouseEnter" MouseLeave="Discord_MouseLeave" MouseLeftButtonDown="Discord_Click" />
+            <Image Name="DiscordLogo" Source="/Workspace/Assets/Discord.png" Width="25" Height="25" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5, 5, 5, 5" IsEnabled="False" Visibility="Hidden" Cursor="Hand" MouseEnter="Discord_MouseEnter" MouseLeave="Discord_MouseLeave" MouseLeftButtonDown="Discord_Click" />
         </Grid>
     </Border>
 </Window>

@@ -34,6 +34,7 @@
     <None Remove="Workspace\Assets\Dances_Clicked.png" />
     <None Remove="Workspace\Assets\Dashboard.png" />
     <None Remove="Workspace\Assets\Dashboard_Clicked.png" />
+    <None Remove="Workspace\Assets\discord.png" />
     <None Remove="Workspace\Assets\Embed.png" />
     <None Remove="Workspace\Assets\Gliders.png" />
     <None Remove="Workspace\Assets\Gliders_Clicked.png" />
@@ -89,6 +90,7 @@
     <Resource Include="Workspace\Assets\Dances_Clicked.png" />
     <Resource Include="Workspace\Assets\Dashboard.png" />
     <Resource Include="Workspace\Assets\Dashboard_Clicked.png" />
+    <Resource Include="Workspace\Assets\Discord.png" />
     <Resource Include="Workspace\Assets\Embed.png" />
     <Resource Include="Workspace\Assets\Gliders.png" />
     <Resource Include="Workspace\Assets\Gliders_Clicked.png" />
