@@ -21,6 +21,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             Import.Content = Languages.Read(Languages.Type.View, "LobbyView", "Import");
             Reset.Content = Languages.Read(Languages.Type.View, "LobbyView", "Reset");
 
+            Presence.Update("Lobby Background Changer");
+
             if (IsLoaded)
                 return;
             else
@@ -52,7 +54,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
         {
             using (var dialog = new CommonOpenFileDialog() { Title = Languages.Read(Languages.Type.View, "LobbyView", "LobbyImportTip") })
             {
-                dialog.Filters.Add(new CommonFileDialogFilter("Image Files", "*.png;*.jpg"));
+                dialog.Filters.Add(new CommonFileDialogFilter("Image Files", "*.png;*.jpg;*.jpeg"));
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
                     var fileInfo = new FileInfo(dialog.FileName);
