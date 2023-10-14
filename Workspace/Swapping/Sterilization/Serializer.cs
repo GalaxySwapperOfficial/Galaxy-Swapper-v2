@@ -7,93 +7,96 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
 {
     public class Serializer
     {
-        private Deserializer Deserializer { get; set; }
-        public Serializer(Deserializer deserializer)
+        public Deserializer Deserializer;
+        public Serializer(Deserializer deserializer) => Deserializer = deserializer;
+
+        public byte[] Write()
         {
-            Deserializer = deserializer;
-        }
+            var writer = new Writer(Enumerable.Repeat((byte)0, Deserializer.RestOfData.Length + 65536).ToArray());
 
-        public byte[] Serialize()
-        {
-            Writer writer = new Writer(Enumerable.Repeat((byte)0, Deserializer.RestOfData.Length + 65536).ToArray());
-            writer.Write(Deserializer.Summary);
+            writer.Write(Deserializer.Summary.bHasVersioningInfo);
+            writer.Write(Deserializer.Summary.HeaderSize);
+            writer.Write(Deserializer.Summary.Name);
+            writer.Write(Deserializer.Summary.PackageFlags);
+            writer.Write(Deserializer.Summary.CookedHeaderSize);
+            writer.Write(Deserializer.Summary.ImportedPublicExportHashesOffset);
+            writer.Write(Deserializer.Summary.ImportMapOffset);
+            writer.Write(Deserializer.Summary.ExportMapOffset);
+            writer.Write(Deserializer.Summary.ExportBundleEntriesOffset);
+            writer.Write(Deserializer.Summary.DependencyBundleHeadersOffset);
+            writer.Write(Deserializer.Summary.DependencyBundleEntriesOffset);
+            writer.Write(Deserializer.Summary.ImportedPackageNamesOffset);
 
-            SerializeNameBatch(writer, Deserializer.NameMap);
+            WriteNameMaps(writer);
+            WriteBulkData(writer);
 
-            if (Deserializer.ExtraOfData != null)
-                writer.WriteBytes(Deserializer.ExtraOfData);
-
-            Deserializer.Summary.ImportedPublicExportHashesOffset = (int)writer.Position;
             writer.WriteBytes(Deserializer.RestOfData);
+            long finalsize = writer.Position;
 
-            long position = writer.Position;
-            int diff = (int)(position - Deserializer.Size);
+            WriteExportMap(writer);
 
-            Deserializer.Summary.ImportMapOffset += diff;
-            Deserializer.Summary.ExportMapOffset += diff;
-            Deserializer.Summary.ExportBundleEntriesOffset += diff;
-            Deserializer.Summary.DependencyBundleHeadersOffset += diff;
-            Deserializer.Summary.DependencyBundleEntriesOffset += diff;
-            Deserializer.Summary.ImportedPackageNamesOffset += diff;
-
-            writer.Position = Deserializer.Summary.ExportMapOffset;
-            SerializeExportMap(writer);
-
-            writer.Position = 0L;
-
-            Deserializer.Summary.HeaderSize += (uint)diff;
-            Deserializer.Summary.CookedHeaderSize += (uint)diff;
-
-            writer.Write(Deserializer.Summary);
-
-            return writer.ToByteArray(position);
+            return writer.ToByteArray(finalsize);
         }
 
-
-        private void SerializeExportMap(Writer Ar)
+        public void WriteNameMaps(Writer writer)
         {
+            writer.Write(Deserializer.Entires.Length);
+
+            if (Deserializer.Entires.Length == 0)
+                return;
+
+            writer.Write(Deserializer.Entires.Sum(x => x.Name.Length));
+            writer.Write(Deserializer.HashVersion);
+
+            foreach (ulong hash in Deserializer.Hashes)
+            {
+                writer.Write(hash);
+            }
+
+            foreach (var entry in Deserializer.Entires)
+            {
+                writer.WriteBytes(new byte[] { 0, (byte)entry.Name.Length });
+            }
+
+            foreach (var entry in Deserializer.Entires)
+            {
+                writer.WriteBytes(Encoding.ASCII.GetBytes(entry.Name));
+            }
+        }
+
+        public void WriteBulkData(Writer writer)
+        {
+            writer.Write((ulong)Deserializer.BulkDataMap.Length * FBulkDataMapEntry.Size);
+            foreach (var bulk in Deserializer.BulkDataMap)
+            {
+                writer.Write(bulk.SerialOffset);
+                writer.Write(bulk.DuplicateSerialOffset);
+                writer.Write(bulk.SerialSize);
+                writer.Write(bulk.Flags);
+                writer.Write(bulk.Pad);
+            }
+        }
+
+        public void WriteExportMap(Writer writer)
+        {
+            writer.Position = Deserializer.Summary.ExportMapOffset;
+
             FExportMapEntry[] ExportMap = Deserializer.ExportMap;
             for (int i = 0; i < ExportMap.Length; i++)
             {
                 FExportMapEntry fExportMapEntry = ExportMap[i];
 
-                Ar.Write(fExportMapEntry.CookedSerialOffset);
-                Ar.Write(fExportMapEntry.CookedSerialSize);
-                Ar.Write(fExportMapEntry.ObjectName._nameIndex);
-                Ar.Write(fExportMapEntry.ObjectName.ExtraIndex);
-                Ar.Write(fExportMapEntry.OuterIndex);
-                Ar.Write(fExportMapEntry.ClassIndex);
-                Ar.Write(fExportMapEntry.SuperIndex);
-                Ar.Write(fExportMapEntry.TemplateIndex);
-                Ar.Write(fExportMapEntry.PublicExportHash);
-                Ar.Write(fExportMapEntry.ObjectFlags);
-                Ar.WriteBytes(new byte[] { fExportMapEntry.FilterFlags, 0, 0, 0 });
-            }
-        }
-
-        public void SerializeNameBatch(Writer Ar, string[] names)
-        {
-            Ar.Write(names.Length); //Amount of strings
-
-            if (names.Length != 0)
-            {
-                Ar.Write(names.Sum(x => x.Length)); //Lengths of strings
-                Ar.Write(Deserializer.HashVersion); //Hash version (It's always null but yk)
-
-                foreach (string text in names) //Write all string hashes
-                {
-                    Ar.Write(CityHash.Hash(Encoding.ASCII.GetBytes(text.ToLower())));
-                }
-
-                foreach (string text in names) //Write each strings length
-                {
-                    Ar.WriteBytes(new byte[] { 0, (byte)text.Length });
-                }
-
-                foreach (string text in names) //Write the string itself
-                {
-                    Ar.WriteBytes(Encoding.ASCII.GetBytes(text));
-                }
+                writer.Write(fExportMapEntry.CookedSerialOffset);
+                writer.Write(fExportMapEntry.CookedSerialSize);
+                writer.Write(fExportMapEntry.ObjectName._nameIndex);
+                writer.Write(fExportMapEntry.ObjectName.ExtraIndex);
+                writer.Write(fExportMapEntry.OuterIndex);
+                writer.Write(fExportMapEntry.ClassIndex);
+                writer.Write(fExportMapEntry.SuperIndex);
+                writer.Write(fExportMapEntry.TemplateIndex);
+                writer.Write(fExportMapEntry.PublicExportHash);
+                writer.Write(fExportMapEntry.ObjectFlags);
+                writer.WriteBytes(new byte[] { fExportMapEntry.FilterFlags, 0, 0, 0 });
             }
         }
     }

@@ -1,5 +1,7 @@
 ﻿using Galaxy_Swapper_v2.Workspace;
 using Galaxy_Swapper_v2.Workspace.Properties;
+using Galaxy_Swapper_v2.Workspace.Swapping.Other;
+using Galaxy_Swapper_v2.Workspace.Swapping.Sterilization;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Serilog;
 using System;

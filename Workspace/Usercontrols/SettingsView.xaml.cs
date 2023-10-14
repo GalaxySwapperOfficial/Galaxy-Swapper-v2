@@ -141,9 +141,9 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 string Installtion = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
 
                 EpicGamesLauncher.Close();
-                CProvider.DefaultProvider.Dispose();
+                CProvider.DefaultProvider?.Dispose();
                 CProvider.DefaultProvider = null!;
-                CProvider.UEFNProvider.Dispose();
+                CProvider.UEFNProvider?.Dispose();
                 CProvider.UEFNProvider = null!;
 
                 Log.Information("Scanning for unknown game files");

@@ -49,8 +49,14 @@ namespace CUE4Parse.UE4.VirtualFileSystem
 
         protected void ValidateMountPoint(ref string mountPoint)
         {
-            var badMountPoint = !mountPoint.StartsWith("../../..");
-            mountPoint = mountPoint.SubstringAfter("../../..");
+            var badMountPoint = false;
+
+            if (!mountPoint.StartsWith(",./../..") && !mountPoint.StartsWith("../../.."))
+            {
+                badMountPoint = true;
+            }
+
+            mountPoint = mountPoint.SubstringAfter("../../..").SubstringAfter(",./../..");
             if (mountPoint[0] != '/' || ( (mountPoint.Length > 1) && (mountPoint[1] == '.') ))
                 badMountPoint = true;
 

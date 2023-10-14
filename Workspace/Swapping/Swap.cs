@@ -35,18 +35,18 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
         public bool Convert()
         {
-            var Deserializer = new Deserializer(Asset.Export.Buffer.Length);
+            var Deserializer = new Deserializer(Asset.Export.Buffer);
 
             Output(Languages.Read(Languages.Type.View, "SwapView", "Deserializing"), SwapView.Type.Info);
-            Deserializer.Deserialize(Asset.Export.Buffer);
+            Deserializer.Read();
 
             if (Asset.OverrideObject != null && !string.IsNullOrEmpty(Asset.OverrideObject))
             {
-                var OverrideDeserializer = new Deserializer(Asset.OverrideExport.Buffer.Length);
-                OverrideDeserializer.Deserialize(Asset.OverrideExport.Buffer);
+                var OverrideDeserializer = new Deserializer(Asset.OverrideExport.Buffer);
+                OverrideDeserializer.Read();
 
-                OverrideDeserializer.ReplaceNameMapAndHashes(Deserializer, Asset.OverrideObject.Split('.')[0], Asset.Object.Split('.')[0]);
-                OverrideDeserializer.ReplaceNameMapAndHashes(Deserializer, System.IO.Path.GetFileNameWithoutExtension(Asset.OverrideObject), System.IO.Path.GetFileNameWithoutExtension(Asset.Object));
+                OverrideDeserializer.ReplaceEntry(Deserializer, Asset.OverrideObject.Split('.')[0], Asset.Object.Split('.')[0]);
+                OverrideDeserializer.ReplaceEntry(Deserializer, System.IO.Path.GetFileNameWithoutExtension(Asset.OverrideObject), System.IO.Path.GetFileNameWithoutExtension(Asset.Object));
 
                 ulong publicExportHash = Deserializer.ExportMap[Deserializer.ExportMap.Length - 1].PublicExportHash;
                 OverrideDeserializer.ExportMap[OverrideDeserializer.ExportMap.Length - 1].PublicExportHash = publicExportHash;
@@ -74,15 +74,15 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
                                     OverrideObjectPath = CProvider.FormatUEFNGamePath(OverrideObjectPath);
                                 }
 
-                                Deserializer.ReplaceNameMap(ObjectPath, OverrideObjectPath);
+                                Deserializer.ReplaceEntry(ObjectPath, OverrideObjectPath);
 
                                 if (!string.IsNullOrEmpty(ObjectName) && !string.IsNullOrEmpty(OverrideObjectName))
-                                    Deserializer.ReplaceNameMap(ObjectName, OverrideObjectName);
+                                    Deserializer.ReplaceEntry(ObjectName, OverrideObjectName);
                             }
                             break;
                         case "tag":
                             {
-                                Deserializer.ReplaceNameMap(Object["search"].Value<string>(), Object["replace"].Value<string>());
+                                Deserializer.ReplaceEntry(Object["search"].Value<string>(), Object["replace"].Value<string>());
                             }
                             break;
                     }
@@ -90,7 +90,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
             }
 
             Output(Languages.Read(Languages.Type.View, "SwapView", "Sterilizing"), SwapView.Type.Info);
-            List<byte> Buffer = new List<byte>(new Serializer(Deserializer).Serialize());
+            List<byte> Buffer = new List<byte>(new Serializer(Deserializer).Write());
 
             if (Asset.Swaps != null)
             {

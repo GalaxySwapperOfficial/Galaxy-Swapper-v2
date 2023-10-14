@@ -11,176 +11,174 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
 {
     public class Deserializer
     {
-        public Structs.FZenPackageSummary Summary;
-        public FPackageObjectIndex[] ImportMap;
+        public byte[] Asset;
+        public FZenPackageSummary Summary;
+        public FBulkDataMapEntry[] BulkDataMap;
         public FExportMapEntry[] ExportMap;
-        public string[] NameMap;
-        public ulong[] NameMapHashes;
+        public FNameEntrySerialized[] Entires;
+        public ulong[] Hashes;
+        public ulong HashVersion;
         public byte[] RestOfData;
-        public int ExtraOfDataSize = 0;
-        public byte[] ExtraOfData;
-        public int Size;
-        public ulong HashVersion = 0;
+        public Deserializer(byte[] buffer) => Asset = buffer;
 
-        public Deserializer(int size)
+        public void Read()
         {
-            Size = size;
+            var reader = new Reader(Asset);
+
+            Summary = new FZenPackageSummary()
+            {
+                bHasVersioningInfo = reader.Read<uint>(),
+                HeaderSize = reader.Read<uint>(),
+                Name = reader.Read<FMappedName>(),
+                PackageFlags = reader.Read<EPackageFlags>(),
+                CookedHeaderSize = reader.Read<uint>(),
+                ImportedPublicExportHashesOffset = reader.Read<int>(),
+                ImportMapOffset = reader.Read<int>(),
+                ExportMapOffset = reader.Read<int>(),
+                ExportBundleEntriesOffset = reader.Read<int>(),
+                DependencyBundleHeadersOffset = reader.Read<int>(),
+                DependencyBundleEntriesOffset = reader.Read<int>(),
+                ImportedPackageNamesOffset = reader.Read<int>()
+            };
+
+            LoadNameMaps(reader);
+            LoadBulkDataMaps(reader);
+            LoadExportMap(reader);
+
+            reader.Position = Summary.ImportedPublicExportHashesOffset;
+            RestOfData = reader.ReadBytes((int)(reader.Length - reader.Position));
         }
 
-        public void Deserialize(byte[] Asset)
+        private void LoadNameMaps(Reader reader)
         {
-            Reader Reader = new Reader(Asset);
-            Reader.Position = 0L;
+            int numStrings = reader.Read<int>();
+            uint numBuffer = reader.Read<uint>();
 
-            Summary = Reader.Read<Structs.FZenPackageSummary>();
-            NameMap = DeserializeNameBatch(Reader);
+            HashVersion = reader.Read<ulong>();
+            Hashes = reader.ReadArray<ulong>(numStrings);
 
-            if (Summary.ImportedPublicExportHashesOffset - Reader.Position > 0)
+            var headers = reader.ReadArray<FSerializedNameHeader>(numStrings);
+            Entires = new FNameEntrySerialized[numStrings];
+            for (var i = 0; i < numStrings; i++)
             {
-                ExtraOfDataSize = (int)(Summary.ImportedPublicExportHashesOffset - Reader.Position);
-                ExtraOfData = Reader.ReadBytes(ExtraOfDataSize);
+                var header = headers[i];
+                var length = (int)header.Length;
+                var s = header.IsUtf16 ? new string(reader.ReadArray<char>(length)) : Encoding.UTF8.GetString(reader.ReadBytes(length));
+                Entires[i] = new FNameEntrySerialized(s);
             }
+        }
 
-            Reader.Position = Summary.ImportedPublicExportHashesOffset;
-            RestOfData = Reader.ReadBytes((int)(Reader.Length - Reader.Position));
-
-            Reader.Position = Summary.ImportMapOffset;
-            ImportMap = Reader.ReadArray<FPackageObjectIndex>((Summary.ExportMapOffset - Summary.ImportMapOffset) / 8);
-
-            Reader.Position = Summary.ExportMapOffset;
+        private void LoadExportMap(Reader reader)
+        {
             ExportMap = new FExportMapEntry[(Summary.ExportBundleEntriesOffset - Summary.ExportMapOffset) / 72];
-
-            DeserializeExportMap(Reader);
-        }
-
-        public string[] DeserializeNameBatch(Reader Reader)
-        {
-            ulong[] hashes;
-            int count = Reader.Read<int>();
-
-            if (count == 0)
-            {
-                hashes = Array.Empty<ulong>();
-                return Array.Empty<string>();
-            }
-
-            Reader.Position += sizeof(uint); // numStringBytes
-            HashVersion = Reader.Read<ulong>(); // hashVersion
-
-            hashes = Reader.ReadArray<ulong>(count);
-
-            uint[] array = new uint[count];
-            string[] array2 = new string[count];
-
-            array = (from x in Reader.ReadArray<FSerializedNameHeader>(count) select x.Length).ToArray();
-
-            for (int i = 0; i < array2.Length; i++)
-            {
-                byte[] array3 = Reader.ReadBytes((int)array[i]);
-                array2[i] = Encoding.ASCII.GetString(array3);
-            }
-
-            NameMapHashes = hashes;
-            ExtraOfDataSize = (int)Reader.Position;
-
-            return array2;
-        }
-
-        public void DeserializeExportMap(Reader Reader)
-        {
+            reader.Position = Summary.ExportMapOffset;
             for (int i = 0; i < ExportMap.Length; i++)
             {
-                long position = Reader.Position;
-                ExportMap[i].CookedSerialOffset = Reader.Read<ulong>();
-                ExportMap[i].CookedSerialSize = Reader.Read<ulong>();
-                ExportMap[i].ObjectName = Reader.Read<FMappedName>();
-                ExportMap[i].OuterIndex = Reader.Read<FPackageObjectIndex>();
-                ExportMap[i].ClassIndex = Reader.Read<FPackageObjectIndex>();
-                ExportMap[i].SuperIndex = Reader.Read<FPackageObjectIndex>();
-                ExportMap[i].TemplateIndex = Reader.Read<FPackageObjectIndex>();
-                ExportMap[i].PublicExportHash = Reader.Read<ulong>();
-                ExportMap[i].ObjectFlags = Reader.Read<EObjectFlags>();
-                ExportMap[i].FilterFlags = Reader.Read<byte>();
-                Reader.Position = position + 72;
+                long position = reader.Position;
+                ExportMap[i].CookedSerialOffset = reader.Read<ulong>();
+                ExportMap[i].CookedSerialSize = reader.Read<ulong>();
+                ExportMap[i].ObjectName = reader.Read<FMappedName>();
+                ExportMap[i].OuterIndex = reader.Read<FPackageObjectIndex>();
+                ExportMap[i].ClassIndex = reader.Read<FPackageObjectIndex>();
+                ExportMap[i].SuperIndex = reader.Read<FPackageObjectIndex>();
+                ExportMap[i].TemplateIndex = reader.Read<FPackageObjectIndex>();
+                ExportMap[i].PublicExportHash = reader.Read<ulong>();
+                ExportMap[i].ObjectFlags = reader.Read<EObjectFlags>();
+                ExportMap[i].FilterFlags = reader.Read<byte>();
+                reader.Position = position + 72;
             }
         }
 
-        public void ReplaceNameMap(string Search, string Replace)
+        private void LoadBulkDataMaps(Reader reader)
         {
-            try
-            {
-                int num = NameMap.ToList().FindIndex((string x) => x.ToLower() == Search.ToLower());
-                if (!NameMap.ToList().Contains(Search))
-                {
-                    Log.Warning($"Failed to replace {Search} to {Replace}");
-                    return;
-                }
-                if (num < 0)
-                {
-                    Log.Warning($"Failed to replace {Search} to {Replace}");
-                    return;
-                }
-                if (Replace.Length > 255)
-                {
-                    Log.Error($"{Replace} is longer then 255 chars");
-                    return;
-                }
+            var bulkDataMapSize = reader.Read<UInt64>();
 
-                NameMap[num] = Replace;
+            BulkDataMap = new FBulkDataMapEntry[bulkDataMapSize / FBulkDataMapEntry.Size];
 
-                Log.Information($"Replaced {Search} to {Replace} namemap");
-            }
-            catch (Exception Exception)
+            for (int i = 0; i < BulkDataMap.Length; i++)
             {
-                Log.Error(Exception, $"Failed to replace {Search} to {Replace} namemap");
+                BulkDataMap[i].SerialOffset = reader.Read<UInt64>();
+                BulkDataMap[i].DuplicateSerialOffset = reader.Read<UInt64>();
+                BulkDataMap[i].SerialSize = reader.Read<UInt64>();
+                BulkDataMap[i].Flags = reader.Read<uint>();
+                BulkDataMap[i].Pad = reader.Read<uint>();
             }
         }
 
-        public void ReplaceNameMapAndHashes(Deserializer AssetDeserializer, string Search, string Replace)
+        public void ReplaceEntry(string search, string replace)
         {
-            try
+            int index = Entires.ToList().FindIndex(entry => entry.Name.Equals(search, StringComparison.OrdinalIgnoreCase));
+            if (index < 0)
             {
-                int SearchIndex = this.NameMap.ToList().FindIndex((string x) => x.ToLower() == Search.ToLower());
-
-                if (SearchIndex < 0)
-                {
-                    Log.Error($"Failed to find {Search} namemap attempting _C ?");
-
-                    SearchIndex = this.NameMap.ToList().FindIndex((string x) => x.ToLower() == $"{Search.ToLower()}_c");
-                    Search = $"{Search}_C";
-
-                    if (SearchIndex < 0)
-                    {
-                        Log.Error($"Failed to find {Search} namemap even with _C");
-                        throw new Exception($"Failed to find {Search} namemap!");
-                    }
-                }
-
-                int ReplaceIndex = AssetDeserializer.NameMap.ToList().FindIndex((string x) => x.ToLower() == Replace.ToLower());
-                if (ReplaceIndex < 0)
-                {
-                    Log.Error($"Failed to find {Replace} namemap attempting _C ?");
-
-                    ReplaceIndex = AssetDeserializer.NameMap.ToList().FindIndex((string x) => x.ToLower() == $"{Replace.ToLower()}_c");
-                    Replace = $"{Replace}_C";
-
-                    if (ReplaceIndex < 0)
-                    {
-                        Log.Error($"Failed to find {Replace} namemap even with _C");
-                        throw new Exception($"Failed to find {Replace} namemap!");
-                    }
-                }
-
-                this.NameMapHashes[SearchIndex] = AssetDeserializer.NameMapHashes[ReplaceIndex];
-                this.NameMap[SearchIndex] = AssetDeserializer.NameMap[ReplaceIndex];
-
-                Log.Information($"Replaced {Search} to {Replace} namemap and hashes");
+                Log.Error($"Failed to find index for: {search}");
+                return;
             }
-            catch (Exception Exception)
+            if (replace.Length > 255)
             {
-                Log.Error(Exception, $"Failed to replace {Search} to {Replace} namemap and hashes");
-                throw new Exception($"Failed to replace {Search} To {Replace} namemap and hashes");
+                Log.Error($"{replace} is longer then 255 chars");
+                return;
             }
+
+            Entires[index].Name = replace;
+            Hashes[index] = CityHash.Hash(Encoding.ASCII.GetBytes(replace.ToLower()));
+
+            Log.Information($"Replaced: {search} to {replace}");
+
+            Adjust(replace.Length - search.Length);
+        }
+
+        public void ReplaceEntry(Deserializer deserializer, string search, string replace)
+        {
+            int index = Entires.ToList().FindIndex(entry => entry.Name.Equals(search, StringComparison.OrdinalIgnoreCase));
+            int overrideindex = deserializer.Entires.ToList().FindIndex(entry => entry.Name.Equals(replace, StringComparison.OrdinalIgnoreCase));
+
+            if (index < 0)
+            {
+                Log.Warning($"Failed to find index for: {search} attaching _C and trying again");
+                search = $"{search}_C";
+                index = Entires.ToList().FindIndex(entry => entry.Name.Equals(search, StringComparison.OrdinalIgnoreCase));
+
+                if (index < 0)
+                {
+                    Log.Error($"Failed to find index for: {search}");
+                    throw new Exception($"Failed to find index for: {search}");
+                }
+            }
+
+            if (overrideindex < 0)
+            {
+                Log.Warning($"Failed to find index for: {replace} attaching _C and trying again");
+                replace = $"{replace}_C";
+                overrideindex = deserializer.Entires.ToList().FindIndex(entry => entry.Name.Equals(replace, StringComparison.OrdinalIgnoreCase));
+
+                if (overrideindex < 0)
+                {
+                    Log.Error($"Failed to find index for: {replace}");
+                    throw new Exception($"Failed to find index for: {replace}");
+                }
+            }
+
+            Entires[index].Name = deserializer.Entires[overrideindex].Name;
+            Hashes[index] = deserializer.Hashes[overrideindex];
+
+            Log.Information($"Replaced: {search} to {replace} with hashes");
+
+            Adjust(replace.Length - search.Length);
+        }
+
+        public void Adjust(int diff)
+        {
+            Summary.ImportMapOffset += diff;
+            Summary.ExportMapOffset += diff;
+            Summary.ExportBundleEntriesOffset += diff;
+            Summary.DependencyBundleHeadersOffset += diff;
+            Summary.DependencyBundleEntriesOffset += diff;
+            Summary.ImportedPackageNamesOffset += diff;
+            Summary.ImportedPublicExportHashesOffset += diff;
+            Summary.HeaderSize += (uint)diff;
+            Summary.CookedHeaderSize += (uint)diff;
+
+            Log.Information($"Adjusting asset with for: {diff} difference");
         }
     }
 }
