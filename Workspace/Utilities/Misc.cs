@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Galaxy_Swapper_v2.Workspace.Hashes;
+using Galaxy_Swapper_v2.Workspace.Properties;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
 using System.Diagnostics;
@@ -85,37 +87,42 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
 
         public static void LoadImage(this Image Image, string url, string invalid = "https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API/blob/main/In%20Game/Icons/invalid.png?raw=true")
         {
-            var Icon = new BitmapImage();
+            var bitmapImage = new BitmapImage();
+            string name = $"{Fnv1a.Hash(url)}-{Image.Width}x{Image.Height}.cache";
 
-            Icon.BeginInit();
-            Icon.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
-            Icon.CacheOption = BitmapCacheOption.OnLoad;
-            Icon.DownloadFailed += IconDownloadFailed;
-            Icon.EndInit();
+            if (!ImageCache.ReadCache(name, bitmapImage))
+            {
+                bitmapImage.BeginInit();
+                bitmapImage.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.DownloadFailed += IconDownloadFailed;
+                bitmapImage.DownloadCompleted += IconDownloadComplete;
+                bitmapImage.EndInit();
+            }
+
+            Image.Source = bitmapImage;
 
             void IconDownloadFailed(object sender, ExceptionEventArgs e)
             {
-                Icon = new BitmapImage();
-                Icon.BeginInit();
-                Icon.UriSource = new Uri(invalid, UriKind.RelativeOrAbsolute);
-                Icon.CacheOption = BitmapCacheOption.OnLoad;
-                Icon.EndInit();
+                bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.UriSource = new Uri(invalid, UriKind.RelativeOrAbsolute);
+                bitmapImage.CacheOption = BitmapCacheOption.None;
+                bitmapImage.EndInit();
 
-                Image.Source = Icon;
+                Image.Source = bitmapImage;
             }
 
-            Image.Source = Icon;
+            void IconDownloadComplete(object sender, EventArgs e) => ImageCache.Cache(name, bitmapImage);
         }
 
         public static BitmapImage LoadImageToBitmap(string url)
         {
             var Icon = new BitmapImage();
-
             Icon.BeginInit();
             Icon.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
             Icon.CacheOption = BitmapCacheOption.OnLoad;
             Icon.EndInit();
-
             return Icon;
         }
 

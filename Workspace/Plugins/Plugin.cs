@@ -1,4 +1,5 @@
-﻿using Galaxy_Swapper_v2.Workspace.Structs;
+﻿using Galaxy_Swapper_v2.Workspace.Hashes;
+using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;

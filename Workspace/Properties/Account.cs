@@ -1,16 +1,15 @@
-﻿using Galaxy_Swapper_v2.Workspace.Swapping.Other;
+﻿using Galaxy_Swapper_v2.Workspace.Hashes;
+using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Windows;
 
 namespace Galaxy_Swapper_v2.Workspace.Properties
 {

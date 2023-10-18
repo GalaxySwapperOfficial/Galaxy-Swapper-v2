@@ -206,7 +206,6 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     replace = string.Format(Parse["Replace"].Value<string>(), Misc.ByteToHex(BitConverter.GetBytes(GetSliderValue())))
                 }));
 
-                Log.Information(CProvider.Export.Utoc);
                 Ucas.AddRange(Ucas.Contains(CProvider.Export.Ucas) ? Enumerable.Empty<string>() : new[] { CProvider.Export.Ucas });
                 Utocs.AddRange(Utocs.Contains(CProvider.Export.Utoc) ? Enumerable.Empty<string>() : new[] { CProvider.Export.Utoc });
 
