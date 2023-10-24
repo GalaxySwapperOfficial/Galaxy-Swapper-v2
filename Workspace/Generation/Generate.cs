@@ -140,7 +140,11 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
                     }
                 }
 
-                NewCache.Cosmetics = NewCache.Cosmetics.OrderByDescending(pair => pair.Value.Stats).ToDictionary(pair => pair.Key, pair => pair.Value);
+                if (Settings.Read(Settings.Type.SortByStats).Value<bool>())
+                {
+                    NewCache.Cosmetics = NewCache.Cosmetics.OrderByDescending(pair => pair.Value.Stats).ToDictionary(pair => pair.Key, pair => pair.Value);
+                }
+
                 Cache.Add(Type, NewCache);
                 Log.Information($"Loaded {Type} in {Stopwatch.Elapsed.TotalSeconds} seconds, With {Array.Count()} items!");
             }

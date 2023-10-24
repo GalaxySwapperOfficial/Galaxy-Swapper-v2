@@ -82,6 +82,10 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 BackPackGender.IsChecked = true;
             if (Settings.Read(Settings.Type.HideNsfw).Value<bool>())
                 Nsfw.IsChecked = true;
+            if (Settings.Read(Settings.Type.ShareStats).Value<bool>())
+                ShareStats.IsChecked = true;
+            if (Settings.Read(Settings.Type.SortByStats).Value<bool>())
+                SortByStats.IsChecked = true;
 
             IsLoaded = true;
         }
@@ -287,11 +291,19 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
         private void AutoCloseFortnite_Click(object sender, RoutedEventArgs e) => Settings.Edit(Settings.Type.CloseFortnite, AutoCloseFortnite.IsChecked);
         private void KickWarning_Click(object sender, RoutedEventArgs e) => Settings.Edit(Settings.Type.KickWarning, KickWarning.IsChecked);
+        private void ShareStats_Click(object sender, RoutedEventArgs e) => Settings.Edit(Settings.Type.ShareStats, ShareStats.IsChecked);
         private void BackPackGender_Click(object sender, RoutedEventArgs e)
         {
             Settings.Edit(Settings.Type.BackpackGender, BackPackGender.IsChecked);
             if (Generate.Cache.ContainsKey(Generate.Type.Backpacks))
                 Generate.Cache[Generate.Type.Backpacks]?.Cosmetics.Values.Where(cosmetic => cosmetic.Options.Count != 0).ToList().ForEach(cosmetic => cosmetic.Options.Clear());
+        }
+
+        private void SortByStats_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Edit(Settings.Type.SortByStats, SortByStats.IsChecked);
+            Generate.Cache.Clear();
+            Memory.Clear();
         }
 
         private void Nsfw_Click(object sender, RoutedEventArgs e)

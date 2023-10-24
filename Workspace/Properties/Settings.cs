@@ -23,7 +23,9 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             Reminded,
             CharacterGender,
             BackpackGender,
-            HideNsfw
+            HideNsfw,
+            ShareStats,
+            SortByStats
         }
         public static void Initialize()
         {
@@ -72,7 +74,9 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 Reminded = string.Empty,
                 CharacterGender = true,
                 BackpackGender = true,
-                HideNsfw = false
+                HideNsfw = false,
+                ShareStats = true,
+                SortByStats = true
             });
 
             Parse = Object;

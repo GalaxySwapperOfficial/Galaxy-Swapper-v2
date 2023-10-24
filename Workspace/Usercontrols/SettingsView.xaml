@@ -94,6 +94,20 @@
                             <ToggleButton x:Name="Nsfw" Background="#454B56" BorderBrush="#EFEFF0" Height="40" Width="40" Margin="879,14,19,14" Click="Nsfw_Click"/>
                         </Grid>
                     </Border>
+                    <Border Style="{StaticResource Settings}">
+                        <Grid>
+                            <TextBlock x:Name="ShareStatsHeader" Text="Share Usage Statistics" FontSize="13" FontWeight="SemiBold" Foreground="#EFEFF0" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 10, 0, 0"/>
+                            <TextBlock x:Name="ShareStatsDescription" Text="Share statistics about what you are swapping so we can enhance your experience and viewing." FontSize="10" FontWeight="SemiBold" Foreground="#454B56" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 32, 0, 0"/>
+                            <ToggleButton x:Name="ShareStats" Background="#454B56" BorderBrush="#EFEFF0" Height="40" Width="40" Margin="879,14,19,14" Click="ShareStats_Click"/>
+                        </Grid>
+                    </Border>
+                    <Border Style="{StaticResource Settings}">
+                        <Grid>
+                            <TextBlock x:Name="SortByStatsHeader" Text="Sort Cosmetics By Statistics" FontSize="13" FontWeight="SemiBold" Foreground="#EFEFF0" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 10, 0, 0"/>
+                            <TextBlock x:Name="SortByStatsDescription" Text="Sorts the cosmetics based on what all users are using and what is popular." FontSize="10" FontWeight="SemiBold" Foreground="#454B56" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 32, 0, 0"/>
+                            <ToggleButton x:Name="SortByStats" Background="#454B56" BorderBrush="#EFEFF0" Height="40" Width="40" Margin="879,14,19,14" Click="SortByStats_Click"/>
+                        </Grid>
+                    </Border>
                 </WrapPanel>
             </ScrollViewer>
         </Grid>

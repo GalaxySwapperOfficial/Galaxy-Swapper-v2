@@ -1,11 +1,9 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 {
