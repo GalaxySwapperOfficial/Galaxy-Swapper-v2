@@ -5,6 +5,7 @@ using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -30,6 +31,9 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
             if (!Cache.ContainsKey(Type))
             {
                 var Parse = Endpoint.Read(Endpoint.Type.Cosmetics);
+                var parseStats = Endpoint.Read(Endpoint.Type.Stats);
+                var stats = parseStats[Type.ToString()].ToDictionary(c => c["key"].Value<string>(), c => c["count"].Value<int>());
+
                 var Stopwatch = new Stopwatch();
                 Stopwatch.Start();
 
@@ -109,7 +113,14 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
                                 }
                             }
 
-                            NewCache.Cosmetics.Add($"{NewCosmetic.Name}:{NewCosmetic.ID}", NewCosmetic);
+                            string key = $"{NewCosmetic.Name}:{NewCosmetic.ID}";
+
+                            if (stats.ContainsKey(key))
+                            {
+                                NewCosmetic.Stats = stats[key];
+                            }
+
+                            NewCache.Cosmetics.Add(key, NewCosmetic);
                         }
 
                         if (Cosmetic["Option"] != null && Cosmetic["Option"].Value<bool>())
@@ -129,6 +140,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
                     }
                 }
 
+                NewCache.Cosmetics = NewCache.Cosmetics.OrderByDescending(pair => pair.Value.Stats).ToDictionary(pair => pair.Key, pair => pair.Value);
                 Cache.Add(Type, NewCache);
                 Log.Information($"Loaded {Type} in {Stopwatch.Elapsed.TotalSeconds} seconds, With {Array.Count()} items!");
             }

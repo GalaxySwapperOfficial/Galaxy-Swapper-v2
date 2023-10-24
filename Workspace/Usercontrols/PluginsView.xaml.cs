@@ -119,7 +119,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
             newcomsetic.Cosmetic.MouseLeftButtonDown += delegate
             {
-                var newoption = new Option() { Name = name, OverrideIcon = icon, Message = parse["Message"].Value<string>() };
+                var newoption = new Option() { Name = name, OverrideIcon = icon, Message = parse["Message"].Value<string>(), IsPlugin = true };
 
                 //These functions can load no matter what type it is
                 if (parse["Downloadables"] != null)

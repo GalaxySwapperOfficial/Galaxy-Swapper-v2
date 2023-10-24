@@ -16,6 +16,8 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Formats
         public bool Nsfw = false;
         public bool UseMainUEFN = false;
         public bool UEFNFormat = false;
+        public bool IsPlugin = false;
+        public Cosmetic Cosmetic;
         public JToken Parse;
         public List<Asset> Exports = new List<Asset>();
         public List<Downloadable> Downloadables = new List<Downloadable>();

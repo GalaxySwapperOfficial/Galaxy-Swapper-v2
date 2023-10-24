@@ -23,7 +23,8 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             FOV,
             Lobby,
             UEFN,
-            Socials
+            Socials,
+            Stats
         }
 
         public static JToken Read(Type Type)
