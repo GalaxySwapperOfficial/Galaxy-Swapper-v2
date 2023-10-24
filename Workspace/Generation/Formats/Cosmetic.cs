@@ -14,6 +14,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Formats
         public bool Nsfw = false;
         public bool UseMainUEFN = false;
         public int Stats = 0;
+        public Generate.Type Type;
         public JToken Parse;
         public List<Option> Options = new List<Option>();
         public List<Downloadable> Downloadables = new List<Downloadable>();

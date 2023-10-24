@@ -5,7 +5,6 @@ using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -56,7 +55,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
                     {
                         if (Cosmetic["Frontend"].Value<bool>())
                         {
-                            var NewCosmetic = new Cosmetic() { Name = Cosmetic["Name"].Value<string>(), ID = Cosmetic["ID"].Value<string>(), Parse = Cosmetic };
+                            var NewCosmetic = new Cosmetic() { Name = Cosmetic["Name"].Value<string>(), ID = Cosmetic["ID"].Value<string>(), Parse = Cosmetic, Type = Type };
 
                             if (!Cosmetic["Message"].KeyIsNullOrEmpty())
                                 NewCosmetic.Message = Cosmetic["Message"].Value<string>();

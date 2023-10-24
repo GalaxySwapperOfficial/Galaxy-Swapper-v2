@@ -52,6 +52,10 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             BackPackGenderDescription.Text = Languages.Read(Languages.Type.View, "SettingsView", "BackPackGenderDescription");
             NsfwHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "NsfwHeader");
             NsfwDescription.Text = Languages.Read(Languages.Type.View, "SettingsView", "NsfwDescription");
+            ShareStatsHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "ShareStatsHeader");
+            ShareStatsDescription.Text = Languages.Read(Languages.Type.View, "SettingsView", "ShareStatsDescription");
+            SortByStatsHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "SortByStatsHeader");
+            SortByStatsDescription.Text = Languages.Read(Languages.Type.View, "SettingsView", "SortByStatsDescription");
 
             //Buttons
             EditPath.Content = Languages.Read(Languages.Type.View, "SettingsView", "EditPath");

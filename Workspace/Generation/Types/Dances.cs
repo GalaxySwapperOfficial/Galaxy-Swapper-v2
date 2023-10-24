@@ -40,6 +40,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                                     Name = $"{Override["Name"].Value<string>()} to {Cosmetic.Name}",
                                     ID = Override["ID"].Value<string>(),
                                     OverrideIcon = Cosmetic.Icon,
+                                    Cosmetic = Cosmetic,
                                     Parse = null // Not needed we will never use it
                                 };
 
@@ -179,6 +180,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                 NewOption.Nsfw = Cosmetic.Nsfw;
                 NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
                 NewOption.Socials = Cosmetic.Socials;
+                NewOption.Cosmetic = Cosmetic;
 
                 Cosmetic.Options.Add(NewOption);
             }

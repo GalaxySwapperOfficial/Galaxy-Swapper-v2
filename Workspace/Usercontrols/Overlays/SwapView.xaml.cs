@@ -253,7 +253,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
                 if (Option.Cosmetic is not null && Settings.Read(Settings.Type.ShareStats).Value<bool>())
                 {
-                    CosmeticTracker.Update(Option.Cosmetic.Name, Option.Cosmetic.ID);
+                    CosmeticTracker.Update(Option.Cosmetic.Name, Option.Cosmetic.ID, Option.Cosmetic.Type.ToString());
                 }
 
                 SwapLogs.Add(Option.Name, Option.Icon, Option.OverrideIcon, Option.Exports.Count, Ucas, Utocs, Option.UEFNFormat);

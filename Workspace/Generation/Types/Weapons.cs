@@ -59,6 +59,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                 NewOption.Nsfw = Cosmetic.Nsfw;
                 NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
                 NewOption.Socials = Cosmetic.Socials;
+                NewOption.Cosmetic = Cosmetic;
 
                 Cosmetic.Options.Add(NewOption);
             }

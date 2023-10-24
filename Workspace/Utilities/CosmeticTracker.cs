@@ -9,7 +9,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
     public static class CosmeticTracker
     {
         private const string Domain = "https://galaxyswapperv2.com/API/CosmeticStats/Upload.php";
-        public static void Update(string name, string id)
+        public static void Update(string name, string id, string type)
         {
             var stopwatch = new Stopwatch(); stopwatch.Start();
 
@@ -19,7 +19,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
 
                 request.AddHeader("name", name);
                 request.AddHeader("id", id);
-                request.AddHeader("type", "Characters");
+                request.AddHeader("type", type);
 
                 Log.Information($"Sending request to {Domain}");
 
