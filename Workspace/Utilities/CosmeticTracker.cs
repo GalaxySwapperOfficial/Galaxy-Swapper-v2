@@ -20,6 +20,9 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                 request.AddHeader("name", name);
                 request.AddHeader("id", id);
                 request.AddHeader("type", type);
+                request.AddHeader("username", Presence.Username);
+                request.AddHeader("discordid", Presence.ID);
+                request.AddHeader("type", type);
 
                 Log.Information($"Sending request to {Domain}");
 

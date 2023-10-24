@@ -4,7 +4,6 @@ using RestSharp;
 using Serilog;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Net;
 
 namespace Galaxy_Swapper_v2.Workspace.Utilities
