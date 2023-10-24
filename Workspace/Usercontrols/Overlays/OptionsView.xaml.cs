@@ -40,13 +40,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
         private Image CreateCosmetic(Option Option)
         {
-            var Icon = new BitmapImage();
-            Icon.BeginInit();
-            Icon.UriSource = new Uri(Option.Icon, UriKind.RelativeOrAbsolute);
-            Icon.CacheOption = BitmapCacheOption.OnLoad;
-            Icon.EndInit();
-
-            var NewCosmetic = new Image() { Source = Icon, Height = 85, Width = 85, Margin = new Thickness(10), Cursor = Cursors.Hand, ToolTip = Option.Name };
+            var NewCosmetic = new Image() { Height = 85, Width = 85, Margin = new Thickness(10), Cursor = Cursors.Hand, ToolTip = Option.Name };
+            NewCosmetic.LoadImage(Option.Icon);
             NewCosmetic.MouseEnter += Cosmetic_MouseEnter;
             NewCosmetic.MouseLeave += Cosmetic_MouseLeave;
             NewCosmetic.MouseLeftButtonDown += delegate
