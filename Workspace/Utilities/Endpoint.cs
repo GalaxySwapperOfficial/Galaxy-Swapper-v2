@@ -55,7 +55,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
 
             using (var client = new RestClient())
             {
-                var request = new RestRequest(new Uri(Domain));
+                var request = new RestRequest(new Uri(Domain), Method.Get);
                 request.AddHeader("version", Global.Version);
                 request.AddHeader("apiversion", Global.ApiVersion);
 
@@ -77,7 +77,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                     Message.DisplaySTA("Error", Parse["message"].Value<string>(), solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, exit: true);
                 }
 
-                Log.Information($"Finished GET request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
+                Log.Information($"Finished {request.Method} request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
             }
         }
 
