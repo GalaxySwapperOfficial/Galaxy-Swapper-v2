@@ -1,6 +1,7 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Components;
 using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Plugins;
+using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
@@ -230,6 +231,16 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                                     NewAsset.Swaps = Asset["Swaps"];
 
                                 uefnoption.Exports.Add(NewAsset);
+                            }
+
+                            if (Settings.Read(Settings.Type.HeroDefinition).Value<bool>() && parse["HeroDefinition"] is not null && !option["HeroDefinition"].KeyIsNullOrEmpty())
+                            {
+                                var cid = new Asset() { Object = option["HeroDefinition"].Value<string>(), OverrideObject = parse["HeroDefinition"]["Object"].Value<string>() };
+
+                                if (parse["HeroDefinition"]["Swaps"] is not null)
+                                    cid.Swaps = parse["HeroDefinition"]["Swaps"];
+
+                                uefnoption.Exports.Add(cid);
                             }
 
                             var fallback = new Asset() { Object = "/Game/Athena/Heroes/Meshes/Bodies/CP_Athena_Body_F_Fallback", OverrideObject = parse["AssetPathTo"].Value<string>(), Swaps = parse["Swaps"] };
