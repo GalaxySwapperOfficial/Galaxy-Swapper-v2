@@ -25,7 +25,8 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             BackpackGender,
             HideNsfw,
             ShareStats,
-            SortByStats
+            SortByStats,
+            HeroDefinition
         }
         public static void Initialize()
         {
@@ -76,7 +77,8 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 BackpackGender = true,
                 HideNsfw = false,
                 ShareStats = true,
-                SortByStats = true
+                SortByStats = true,
+                HeroDefinition = true
             });
 
             Parse = Object;

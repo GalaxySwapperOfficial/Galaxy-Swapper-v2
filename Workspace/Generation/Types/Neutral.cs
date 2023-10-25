@@ -1,6 +1,8 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
+using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -139,6 +141,16 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                             NewAsset.Swaps = Asset["Swaps"];
 
                         NewOption.Exports.Add(NewAsset);
+                    }
+
+                    if (Settings.Read(Settings.Type.HeroDefinition).Value<bool>() && Parse["HeroDefinition"] is not null && !option["HeroDefinition"].KeyIsNullOrEmpty())
+                    {
+                        var cid = new Asset() { Object = option["HeroDefinition"].Value<string>(), OverrideObject = Parse["HeroDefinition"]["Object"].Value<string>() };
+
+                        if (Parse["HeroDefinition"]["Swaps"] is not null)
+                            cid.Swaps = Parse["HeroDefinition"]["Swaps"];
+
+                        NewOption.Exports.Add(cid);
                     }
 
                     var newfallback = new Asset() { Object = "/Game/Athena/Heroes/Meshes/Bodies/CP_Athena_Body_F_Fallback", OverrideObject = Parse["Object"].Value<string>(), Swaps = Parse["Swaps"] };
