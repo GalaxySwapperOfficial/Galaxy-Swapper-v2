@@ -251,7 +251,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                         return;
                 }
 
-                if (Option.Cosmetic is not null && Settings.Read(Settings.Type.ShareStats).Value<bool>())
+                if (Option.Cosmetic is not null && !Option.IsPlugin && Settings.Read(Settings.Type.ShareStats).Value<bool>())
                 {
                     CosmeticTracker.Update(Option.Cosmetic.Name, Option.Cosmetic.ID, Option.Cosmetic.Type.ToString());
                 }

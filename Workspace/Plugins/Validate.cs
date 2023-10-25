@@ -1,4 +1,5 @@
-﻿using Galaxy_Swapper_v2.Workspace.Utilities;
+﻿using CUE4Parse.Utils;
+using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System.IO;
@@ -14,20 +15,34 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
 
             string content = File.ReadAllText(fileInfo.FullName);
 
-            if (content.Encrypted())
+            if (fileInfo.Extension.SubstringAfter('.').ToUpper() == "PLUGIN" && !content.Contains("Object")) //Most likely a packed plugin
             {
-                Log.Information($"Decrypting {fileInfo.Name}");
-                content = content.Decompress();
+                var exported = Plugin.Export(fileInfo);
+                if (exported is null)
+                {
+                    Log.Information($"{fileInfo.Name} failed to unpack plugin file");
+                    Message.Display("Error", $"Failed to unpack {fileInfo.Name}.", MessageBoxButton.OK);
+                    return false;
+                }
+                parse = exported.Parse;
             }
-
-            if (!content.ValidJson())
+            else
             {
-                Log.Information($"{fileInfo.Name} is not in a valid JSON format");
-                Message.Display("Error", $"{fileInfo.Name} is not in a valid JSON format!", MessageBoxButton.OK);
-                return false;
-            }
+                if (content.Encrypted())
+                {
+                    Log.Information($"Decrypting {fileInfo.Name}");
+                    content = content.Decompress();
+                }
 
-            parse = JObject.Parse(content);
+                if (!content.ValidJson())
+                {
+                    Log.Information($"{fileInfo.Name} is not in a valid JSON format");
+                    Message.Display("Error", $"{fileInfo.Name} is not in a valid JSON format!", MessageBoxButton.OK);
+                    return false;
+                }
+
+                parse = JObject.Parse(content);
+            }
 
             if (parse["Icon"].KeyIsNullOrEmpty())
             {
