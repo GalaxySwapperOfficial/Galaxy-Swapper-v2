@@ -109,6 +109,11 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                         Parse = null // Not needed we will never use it
                     };
 
+                    if (Cosmetic.Options.Exists(option => option.ID == NewOption.ID && option.Name == NewOption.Name))
+                    {
+                        continue;
+                    }
+
                     if (!option["Override"].KeyIsNullOrEmpty())
                         NewOption.Icon = option["Override"].Value<string>();
                     else if (!option["Icon"].KeyIsNullOrEmpty())
