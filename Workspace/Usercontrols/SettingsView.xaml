@@ -89,6 +89,13 @@
                     </Border>
                     <Border Style="{StaticResource Settings}">
                         <Grid>
+                            <TextBlock x:Name="HeroDefinitionHeader" Text="Icon Swapping" FontSize="13" FontWeight="SemiBold" Foreground="#EFEFF0" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 10, 0, 0"/>
+                            <TextBlock x:Name="HeroDefinitionDescription" Text="Swap icons with your skins! This will take an extra asset." FontSize="10" FontWeight="SemiBold" Foreground="#454B56" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 32, 0, 0"/>
+                            <ToggleButton x:Name="HeroDefinition" Background="#454B56" BorderBrush="#EFEFF0" Height="40" Width="40" Margin="879,14,19,14" Click="HeroDefinition_Click"/>
+                        </Grid>
+                    </Border>
+                    <Border Style="{StaticResource Settings}">
+                        <Grid>
                             <TextBlock x:Name="NsfwHeader" Text="Skin Gender Check" FontSize="13" FontWeight="SemiBold" Foreground="#EFEFF0" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 10, 0, 0"/>
                             <TextBlock x:Name="NsfwDescription" Text="Match skin option genders (When disabled you will be able to swap female to male and male to female but they will apear default in lobby)" FontSize="10" FontWeight="SemiBold" Foreground="#454B56" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 32, 0, 0"/>
                             <ToggleButton x:Name="Nsfw" Background="#454B56" BorderBrush="#EFEFF0" Height="40" Width="40" Margin="879,14,19,14" Click="Nsfw_Click"/>

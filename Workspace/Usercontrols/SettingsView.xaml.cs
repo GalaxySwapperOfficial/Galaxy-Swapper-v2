@@ -56,6 +56,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             ShareStatsDescription.Text = Languages.Read(Languages.Type.View, "SettingsView", "ShareStatsDescription");
             SortByStatsHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "SortByStatsHeader");
             SortByStatsDescription.Text = Languages.Read(Languages.Type.View, "SettingsView", "SortByStatsDescription");
+            HeroDefinitionHeader.Text = Languages.Read(Languages.Type.View, "SettingsView", "HeroDefinitionHeader");
+            HeroDefinitionDescription.Text = Languages.Read(Languages.Type.View, "SettingsView", "HeroDefinitionDescription");
 
             //Buttons
             EditPath.Content = Languages.Read(Languages.Type.View, "SettingsView", "EditPath");
@@ -84,6 +86,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 KickWarning.IsChecked = true;
             if (Settings.Read(Settings.Type.BackpackGender).Value<bool>())
                 BackPackGender.IsChecked = true;
+            if (Settings.Read(Settings.Type.HeroDefinition).Value<bool>())
+                HeroDefinition.IsChecked = true;
             if (Settings.Read(Settings.Type.HideNsfw).Value<bool>())
                 Nsfw.IsChecked = true;
             if (Settings.Read(Settings.Type.ShareStats).Value<bool>())
@@ -301,6 +305,13 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             Settings.Edit(Settings.Type.BackpackGender, BackPackGender.IsChecked);
             if (Generate.Cache.ContainsKey(Generate.Type.Backpacks))
                 Generate.Cache[Generate.Type.Backpacks]?.Cosmetics.Values.Where(cosmetic => cosmetic.Options.Count != 0).ToList().ForEach(cosmetic => cosmetic.Options.Clear());
+        }
+
+        private void HeroDefinition_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Edit(Settings.Type.HeroDefinition, HeroDefinition.IsChecked);
+            if (Generate.Cache.ContainsKey(Generate.Type.Characters))
+                Generate.Cache[Generate.Type.Characters]?.Cosmetics.Values.Where(cosmetic => cosmetic.Options.Count != 0).ToList().ForEach(cosmetic => cosmetic.Options.Clear());
         }
 
         private void SortByStats_Click(object sender, RoutedEventArgs e)

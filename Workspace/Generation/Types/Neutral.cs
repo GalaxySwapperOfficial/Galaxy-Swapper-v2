@@ -85,6 +85,22 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                                     NewOption.Exports.Add(NewAsset);
                                 }
 
+                                if (CacheType == Generate.Type.Characters && Settings.Read(Settings.Type.HeroDefinition).Value<bool>() && !Override["HID"].KeyIsNullOrEmpty())
+                                {
+                                    var NewAsset = new Asset() { Object = Override["HID"]["AssetPath"].Value<string>() };
+
+                                    if (Override["HID"]["AssetPathTo"] != null)
+                                        NewAsset.OverrideObject = Override["HID"]["AssetPathTo"].Value<string>();
+
+                                    if (Override["HID"]["Buffer"] != null)
+                                        NewAsset.OverrideBuffer = Override["HID"]["Buffer"].Value<string>();
+
+                                    if (Override["HID"]["Swaps"] != null)
+                                        NewAsset.Swaps = Override["HID"]["Swaps"];
+
+                                    NewOption.Exports.Add(NewAsset);
+                                }
+
                                 Cosmetic.Options.Add(NewOption);
                             }
                             break;
