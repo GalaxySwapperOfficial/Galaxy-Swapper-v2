@@ -21,5 +21,16 @@ namespace Galaxy_Swapper_v2.Workspace
             {
             }
         }
+
+        public class FortniteDirectoryEmptyException : Exception
+        {
+            public FortniteDirectoryEmptyException(string message) : base(message)
+            {
+            }
+
+            public FortniteDirectoryEmptyException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+        }
     }
 }

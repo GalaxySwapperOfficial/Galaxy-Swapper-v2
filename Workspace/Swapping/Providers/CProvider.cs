@@ -31,7 +31,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
 
             if (paks is null || string.IsNullOrEmpty(paks) || !Directory.Exists(paks))
             {
-                throw new CustomException(Languages.Read(Languages.Type.Message, "FortniteDirectoryEmpty"));
+                throw new FortniteDirectoryEmptyException(Languages.Read(Languages.Type.Message, "FortniteDirectoryEmpty"));
             }
 
             Pakchunks.Validate(paks);

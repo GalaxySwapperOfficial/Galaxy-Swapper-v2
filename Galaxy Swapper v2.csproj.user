@@ -57,6 +57,12 @@
     <Compile Update="Workspace\Usercontrols\Overlays\DiscordView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Workspace\Usercontrols\Overlays\EpicGamesLauncherDirEmpty.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Workspace\Usercontrols\Overlays\FortniteDirEmpty.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Workspace\Usercontrols\Overlays\FovView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -141,6 +147,12 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Usercontrols\Overlays\DiscordView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Workspace\Usercontrols\Overlays\EpicGamesLauncherDirEmpty.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Workspace\Usercontrols\Overlays\FortniteDirEmpty.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Usercontrols\Overlays\FovView.xaml">

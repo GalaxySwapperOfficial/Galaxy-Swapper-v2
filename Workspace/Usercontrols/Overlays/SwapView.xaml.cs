@@ -21,9 +21,6 @@ using static Galaxy_Swapper_v2.Workspace.Global;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 {
-    /// <summary>
-    /// Interaction logic for SwapView.xaml
-    /// </summary>
     public partial class SwapView : UserControl
     {
         private Option Option;
@@ -132,7 +129,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
         private BackgroundWorker Worker { get; set; } = default!;
         private void Worker_Click(object sender, RoutedEventArgs e)
         {
-            if (Worker != null && Worker.IsBusy)
+            if (Worker is not null && Worker.IsBusy)
             {
                 Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Languages.Read(Languages.Type.View, "SwapView", "WorkerBusy"), MessageBoxButton.OK);
                 return;
@@ -141,7 +138,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             string epicinstallation = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
             if (string.IsNullOrEmpty(epicinstallation) || !File.Exists(epicinstallation))
             {
-                Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Languages.Read(Languages.Type.Message, "EpicGamesLauncherPathEmpty"), MessageBoxButton.OK);
+                Log.Information(Languages.Read(Languages.Type.Message, "EpicGamesLauncherPathEmpty"));
+                Memory.MainView.SetOverlay(new EpicGamesLauncherDirEmpty());
                 return;
             }
 
@@ -270,6 +268,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 else
                     Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.View, "SwapView", "Converted"), TimeSpan.Seconds), MessageBoxButton.OK);
             }
+            catch (FortniteDirectoryEmptyException Exception)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    Log.Error(Exception.Message, "Fortnite directory is null or empty");
+                    Memory.MainView.SetOverlay(new FortniteDirEmpty());
+                });
+            }
             catch (CustomException CustomException)
             {
                 Log.Error(CustomException.Message, "Caught CustomException");
@@ -334,6 +340,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.View, "SwapView", "RevertedMinutes"), TimeSpan.Minutes), MessageBoxButton.OK);
                 else
                     Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.View, "SwapView", "Reverted"), TimeSpan.Seconds), MessageBoxButton.OK);
+            }
+            catch (FortniteDirectoryEmptyException Exception)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    Log.Error(Exception.Message, "Fortnite directory is null or empty");
+                    Memory.MainView.SetOverlay(new FortniteDirEmpty());
+                });
             }
             catch (CustomException CustomException)
             {

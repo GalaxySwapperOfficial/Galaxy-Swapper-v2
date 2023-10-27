@@ -56,6 +56,7 @@
     <None Remove="Workspace\Assets\Settings.png" />
     <None Remove="Workspace\Assets\Settings_Clicked.png" />
     <None Remove="Workspace\Assets\Show.png" />
+    <None Remove="Workspace\Assets\ThumbsUp.png" />
     <None Remove="Workspace\Assets\Wave.png" />
     <None Remove="Workspace\Assets\Weapons.png" />
     <None Remove="Workspace\Assets\Weapons_Clicked.png" />
@@ -112,6 +113,7 @@
     <Resource Include="Workspace\Assets\Settings.png" />
     <Resource Include="Workspace\Assets\Settings_Clicked.png" />
     <Resource Include="Workspace\Assets\Show.png" />
+    <Resource Include="Workspace\Assets\ThumbsUp.png" />
     <Resource Include="Workspace\Assets\Wave.png" />
     <Resource Include="Workspace\Assets\Weapons.png" />
     <Resource Include="Workspace\Assets\Weapons_Clicked.png" />

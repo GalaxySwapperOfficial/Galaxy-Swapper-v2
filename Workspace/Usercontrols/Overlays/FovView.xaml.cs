@@ -16,12 +16,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using static Galaxy_Swapper_v2.Workspace.Global;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 {
-    /// <summary>
-    /// Interaction logic for FovView.xaml
-    /// </summary>
     public partial class FovView : UserControl
     {
         public FovView()
@@ -146,7 +144,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             string epicinstallation = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
             if (string.IsNullOrEmpty(epicinstallation) || !File.Exists(epicinstallation))
             {
-                Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Languages.Read(Languages.Type.Message, "EpicGamesLauncherPathEmpty"), MessageBoxButton.OK);
+                Log.Information(Languages.Read(Languages.Type.Message, "EpicGamesLauncherPathEmpty"));
+                Memory.MainView.SetOverlay(new EpicGamesLauncherDirEmpty());
                 return;
             }
 
@@ -243,6 +242,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 else
                     Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.View, "SwapView", "Converted"), TimeSpan.Seconds), MessageBoxButton.OK);
             }
+            catch (FortniteDirectoryEmptyException Exception)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    Log.Error(Exception.Message, "Fortnite directory is null or empty");
+                    Memory.MainView.SetOverlay(new FortniteDirEmpty());
+                });
+            }
             catch (Global.CustomException CustomException)
             {
                 Log.Error(CustomException.Message, "Caught CustomException");
@@ -295,7 +302,15 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 else
                     Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.View, "SwapView", "Reverted"), TimeSpan.Seconds), MessageBoxButton.OK);
             }
-            catch (Global.CustomException CustomException)
+            catch (FortniteDirectoryEmptyException Exception)
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    Log.Error(Exception.Message, "Fortnite directory is null or empty");
+                    Memory.MainView.SetOverlay(new FortniteDirEmpty());
+                });
+            }
+            catch (CustomException CustomException)
             {
                 Log.Error(CustomException.Message, "Caught CustomException");
                 Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "RevertError"), "FOV", CustomException.Message), discord: true);
