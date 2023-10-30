@@ -1,11 +1,10 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Compression;
+using Galaxy_Swapper_v2.Workspace.Hashes;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Serilog;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Galaxy_Swapper_v2.Workspace.Plugins
 {
@@ -36,16 +35,49 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             return true;
         }
 
-        public static bool Decompress(byte[] buffer, byte[] key, out string decompressed, Type type)
+        public static bool Decompress(Reader reader, FileInfo fileInfo, out string decompressed, Type type)
         {
             decompressed = null!;
+            bool haskey = false;
+
+            switch (type)
+            {
+                case Type.Aes:
+                    haskey = true;
+                    break;
+            }
+
+            byte[] key = null!;
+            if (haskey)
+            {
+                ulong keyhash = reader.Read<ulong>();
+                int keylength = reader.Read<int>();
+                key = reader.ReadBytes(keylength);
+
+                if (CityHash.Hash(key) != keyhash)
+                {
+                    Log.Warning($"{fileInfo.Name} encryption key hash was not as expected plugin will be skipped");
+                    return false;
+                }
+            }
+
+            ulong pluginhash = reader.Read<ulong>();
+            int pluginlength = reader.Read<int>();
+            byte[] compressedbuffer = reader.ReadBytes(pluginlength);
+
+            if (CityHash.Hash(compressedbuffer) != pluginhash)
+            {
+                Log.Warning($"{fileInfo.Name} buffer hash was not as expected plugin will be skipped");
+                return false;
+            }
+
             switch (type)
             {
                 case Type.None:
-                    decompressed = Encoding.ASCII.GetString(buffer);
+                    decompressed = Encoding.ASCII.GetString(compressedbuffer);
                     break;
                 case Type.Aes:
-                    decompressed = aes.Decrypt(buffer, key);
+                    decompressed = aes.Decrypt(compressedbuffer, key);
                     break;
             }
 

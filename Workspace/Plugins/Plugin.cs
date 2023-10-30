@@ -65,32 +65,8 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             int importpathlength = reader.Read<int>();
             string importpath = reader.ReadStrings(importpathlength);
 
-            byte[] key = null!;
-
-            if (type != Compression.Type.None)
-            {
-                ulong keyhash = reader.Read<ulong>();
-                int keylength = reader.Read<int>();
-                key = reader.ReadBytes(keylength);
-
-                if (CityHash.Hash(key) != keyhash)
-                {
-                    Log.Warning($"{fileInfo.Name} encryption key hash was not as expected plugin will be skipped");
-                    return null!;
-                }
-            }
-
-            ulong pluginhash = reader.Read<ulong>();
-            int pluginlength = reader.Read<int>();
-            byte[] pluginbuffer = reader.ReadBytes(pluginlength);
-
-            if (CityHash.Hash(pluginbuffer) != pluginhash)
-            {
-                Log.Warning($"{fileInfo.Name} buffer hash was not as expected plugin will be skipped");
+            if (!Compression.Decompress(reader, fileInfo, out string decompressed, type))
                 return null!;
-            }
-
-            Compression.Decompress(pluginbuffer, key, out string decompressed, type);
 
             if (!decompressed.ValidJson())
             {
@@ -99,7 +75,6 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             }
 
             var parse = JObject.Parse(decompressed);
-
             return new() { Import = importpath, Path = fileInfo.FullName, Content = decompressed, Parse = parse };
         }
 
