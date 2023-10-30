@@ -27,7 +27,8 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
 
             writer.Write(type); //1 = encrypted in case I want to add other formats later on
 
-            Compression.Compress(out byte[] compressed, out byte[] key, out int uncompressedsize, parse.ToString(Newtonsoft.Json.Formatting.None), type);
+            if (!Compression.Compress(out byte[] compressed, out byte[] key, out int uncompressedsize, parse.ToString(Newtonsoft.Json.Formatting.None), type))
+                return;
 
             //Import directory
             byte[] importpath = Encoding.ASCII.GetBytes(fileInfo.FullName);

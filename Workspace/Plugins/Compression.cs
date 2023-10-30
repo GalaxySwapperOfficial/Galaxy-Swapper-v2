@@ -3,6 +3,7 @@ using Galaxy_Swapper_v2.Workspace.Hashes;
 using Galaxy_Swapper_v2.Workspace.Swapping.Compression.Types;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Serilog;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -27,26 +28,34 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             key = null!;
 
             byte[] uncompressed = Encoding.ASCII.GetBytes(content);
-            switch (type)
+            try
             {
-                case Type.None:
-                    buffer = uncompressed;
-                    break;
-                case Type.Aes:
-                    key = GenerateKey(16);
-                    buffer = aes.Encrypt(content, key);
-                    break;
-                case Type.Zlib:
-                    buffer = zlib.Compress(uncompressed);
-                    uncompressedsize = uncompressed.Length;
-                    break;
-                case Type.Oodle:
-                    buffer = Oodle.Compress(uncompressed, Oodle.OodleCompressionLevel.Level5);
-                    uncompressedsize = uncompressed.Length;
-                    break;
-                case Type.GZip:
-                    buffer = gzip.Compress(uncompressed);
-                    break;
+                switch (type)
+                {
+                    case Type.None:
+                        buffer = uncompressed;
+                        break;
+                    case Type.Aes:
+                        key = GenerateKey(16);
+                        buffer = aes.Encrypt(content, key);
+                        break;
+                    case Type.Zlib:
+                        buffer = zlib.Compress(uncompressed);
+                        uncompressedsize = uncompressed.Length;
+                        break;
+                    case Type.Oodle:
+                        buffer = Oodle.Compress(uncompressed, Oodle.OodleCompressionLevel.Level5);
+                        uncompressedsize = uncompressed.Length;
+                        break;
+                    case Type.GZip:
+                        buffer = gzip.Compress(uncompressed);
+                        break;
+                }
+            }
+            catch (Exception Exception)
+            {
+                Log.Error(Exception, $"Failed to compress plugin file with type {type}");
+                return false;
             }
 
             return true;
@@ -102,23 +111,31 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
                 return false;
             }
 
-            switch (type)
+            try
             {
-                case Type.None:
-                    decompressed = Encoding.ASCII.GetString(compressedbuffer);
-                    break;
-                case Type.Aes:
-                    decompressed = aes.Decrypt(compressedbuffer, key);
-                    break;
-                case Type.Zlib:
-                    decompressed = Encoding.ASCII.GetString(zlib.Decompress(compressedbuffer, uncompressedsize));
-                    break;
-                case Type.Oodle:
-                    decompressed = Encoding.ASCII.GetString(Oodle.Decompress(compressedbuffer, uncompressedsize));
-                    break;
-                case Type.GZip:
-                    decompressed = Encoding.ASCII.GetString(gzip.Decompress(compressedbuffer));
-                    break;
+                switch (type)
+                {
+                    case Type.None:
+                        decompressed = Encoding.ASCII.GetString(compressedbuffer);
+                        break;
+                    case Type.Aes:
+                        decompressed = aes.Decrypt(compressedbuffer, key);
+                        break;
+                    case Type.Zlib:
+                        decompressed = Encoding.ASCII.GetString(zlib.Decompress(compressedbuffer, uncompressedsize));
+                        break;
+                    case Type.Oodle:
+                        decompressed = Encoding.ASCII.GetString(Oodle.Decompress(compressedbuffer, uncompressedsize));
+                        break;
+                    case Type.GZip:
+                        decompressed = Encoding.ASCII.GetString(gzip.Decompress(compressedbuffer));
+                        break;
+                }
+            }
+            catch (Exception Exception)
+            {
+                Log.Error(Exception, $"Failed to decompress {fileInfo.Name} plugin with type {type}");
+                return false;
             }
 
             return true;
