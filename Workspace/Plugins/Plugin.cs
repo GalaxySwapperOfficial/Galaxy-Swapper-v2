@@ -7,7 +7,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace Galaxy_Swapper_v2.Workspace.Plugins
@@ -19,14 +18,21 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
         {
             None = 0,
             Aes = 1,
-            Base64 = 2,
-            GZip = 3
+            Oodle
         }
         public static void Import(FileInfo fileInfo, JObject parse)
         {
             var writer = new Writer(new byte[fileInfo.Length + 60000]);
+            var type = Compression.Type.Aes;
 
-            writer.Write(Type.Aes); //1 = encrypted in case I want to add other formats later on
+            if (!parse["Compression"].KeyIsNullOrEmpty() && Enum.TryParse(typeof(Compression.Type), parse["Compression"].Value<string>(), true, out object newtype))
+            {
+                type = (Compression.Type)newtype;
+            }
+
+            writer.Write(type); //1 = encrypted in case I want to add other formats later on
+
+            Compression.Compress(out byte[] compressed, out byte[] key, parse.ToString(Newtonsoft.Json.Formatting.None), type);
 
             //Import directory
             byte[] importpath = Encoding.ASCII.GetBytes(fileInfo.FullName);
@@ -34,18 +40,17 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             writer.WriteBytes(importpath);
 
             //Encryption key
-            byte[] key = GenerateKey(16);
-
-            writer.Write(CityHash.Hash(key));
-            writer.Write(key.Length); //Will always be 16 but If I do other formats it may change.
-            writer.WriteBytes(key);
+            if (type != Compression.Type.None)
+            {
+                writer.Write(CityHash.Hash(key));
+                writer.Write(key.Length);
+                writer.WriteBytes(key);
+            }
 
             //Plugin buffer
-            byte[] encrypted = Encrypt(parse.ToString(Newtonsoft.Json.Formatting.None), key);
-
-            writer.Write(CityHash.Hash(encrypted));
-            writer.Write(encrypted.Length);
-            writer.WriteBytes(encrypted);
+            writer.Write(CityHash.Hash(compressed));
+            writer.Write(compressed.Length);
+            writer.WriteBytes(compressed);
 
             string output = $"{Path}\\{System.IO.Path.GetRandomFileName()}.plugin";
             File.WriteAllBytes(output, writer.ToByteArray(writer.Position));
@@ -56,20 +61,23 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
         public static PluginData Export(FileInfo fileInfo)
         {
             var reader = new Reader(File.ReadAllBytes(fileInfo.FullName));
-
-            reader.BaseStream.Position += sizeof(int); //encryption/compression format currently not used
-
+            var type = (Compression.Type)reader.Read<int>();
             int importpathlength = reader.Read<int>();
             string importpath = reader.ReadStrings(importpathlength);
 
-            ulong keyhash = reader.Read<ulong>();
-            int keylength = reader.Read<int>();
-            byte[] key = reader.ReadBytes(keylength);
+            byte[] key = null!;
 
-            if (CityHash.Hash(key) != keyhash)
+            if (type != Compression.Type.None)
             {
-                Log.Warning($"{fileInfo.Name} encryption key hash was not as expected plugin will be skipped");
-                return null!;
+                ulong keyhash = reader.Read<ulong>();
+                int keylength = reader.Read<int>();
+                key = reader.ReadBytes(keylength);
+
+                if (CityHash.Hash(key) != keyhash)
+                {
+                    Log.Warning($"{fileInfo.Name} encryption key hash was not as expected plugin will be skipped");
+                    return null!;
+                }
             }
 
             ulong pluginhash = reader.Read<ulong>();
@@ -82,24 +90,24 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
                 return null!;
             }
 
-            string decrypted = Decrypt(pluginbuffer, key);
+            Compression.Decompress(pluginbuffer, key, out string decompressed, type);
 
-            if (!decrypted.ValidJson())
+            if (!decompressed.ValidJson())
             {
                 Log.Warning($"{fileInfo.Name} is not in a valid json format and will be skipped");
                 return null!;
             }
 
-            var parse = JObject.Parse(decrypted);
+            var parse = JObject.Parse(decompressed);
 
-            return new() { Import = importpath, Path = fileInfo.FullName, Content = decrypted, Parse = parse };
+            return new() { Import = importpath, Path = fileInfo.FullName, Content = decompressed, Parse = parse };
         }
 
         public static PluginData ExportOld(FileInfo fileInfo)
         {
             string content = File.ReadAllText(fileInfo.FullName);
 
-            content = Encoding.ASCII.GetString(Compression.Decompress(content));
+            content = Encoding.ASCII.GetString(Utilities.Compression.Decompress(content));
 
             if (!content.ValidJson())
             {
@@ -134,62 +142,6 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             }
 
             return list;
-        }
-
-        private static byte[] GenerateKey(int keyLengthInBytes)
-        {
-            using (RNGCryptoServiceProvider rngCrypto = new RNGCryptoServiceProvider())
-            {
-                byte[] randomKey = new byte[keyLengthInBytes];
-                rngCrypto.GetBytes(randomKey);
-                return randomKey;
-            }
-        }
-
-        private static byte[] Encrypt(string plainText, byte[] key)
-        {
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = key;
-                aesAlg.Mode = CipherMode.CBC;
-                aesAlg.Padding = PaddingMode.PKCS7;
-
-                using (ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV))
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    memoryStream.Write(aesAlg.IV, 0, aesAlg.IV.Length);
-
-                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
-                    using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
-                    {
-                        streamWriter.Write(plainText);
-                    }
-
-                    return memoryStream.ToArray();
-                }
-            }
-        }
-
-        private static string Decrypt(byte[] encryptedBytes, byte[] key)
-        {
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = key;
-                aesAlg.Mode = CipherMode.CBC;
-                aesAlg.Padding = PaddingMode.PKCS7;
-
-                byte[] iv = new byte[16];
-                Array.Copy(encryptedBytes, 0, iv, 0, 16);
-                aesAlg.IV = iv;
-
-                using (ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV))
-                using (MemoryStream memoryStream = new MemoryStream(encryptedBytes, 16, encryptedBytes.Length - 16))
-                using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
-                using (StreamReader streamReader = new StreamReader(cryptoStream))
-                {
-                    return streamReader.ReadToEnd();
-                }
-            }
         }
     }
 }
