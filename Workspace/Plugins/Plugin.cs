@@ -1,4 +1,5 @@
-﻿using Galaxy_Swapper_v2.Workspace.Hashes;
+﻿using Galaxy_Swapper_v2.Workspace.Compression;
+using Galaxy_Swapper_v2.Workspace.Hashes;
 using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
@@ -81,7 +82,7 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
         {
             string content = File.ReadAllText(fileInfo.FullName);
 
-            content = Encoding.ASCII.GetString(Utilities.Compression.Decompress(content));
+            content = Encoding.ASCII.GetString(gzip.Decompress(content));
 
             if (!content.ValidJson())
             {

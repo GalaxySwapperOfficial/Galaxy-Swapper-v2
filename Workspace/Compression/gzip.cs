@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
+using System.Text;
 
 namespace Galaxy_Swapper_v2.Workspace.Compression
 {
@@ -16,6 +18,11 @@ namespace Galaxy_Swapper_v2.Workspace.Compression
 
                 return compressedStream.ToArray();
             }
+        }
+
+        public static byte[] Compress(string data)
+        {
+            return Compress(Encoding.ASCII.GetBytes(data));
         }
 
         public static byte[] Decompress(byte[] compressedData)
@@ -35,6 +42,11 @@ namespace Galaxy_Swapper_v2.Workspace.Compression
 
                 return decompressedStream.ToArray();
             }
+        }
+
+        public static byte[] Decompress(string base64)
+        {
+            return Decompress(Convert.FromBase64String(base64));
         }
     }
 }
