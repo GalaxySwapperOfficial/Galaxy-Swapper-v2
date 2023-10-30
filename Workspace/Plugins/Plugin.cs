@@ -14,12 +14,6 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
     public static class Plugin
     {
         public static readonly string Path = $"{App.Config}\\Plugins";
-        public enum Type
-        {
-            None = 0,
-            Aes = 1,
-            Oodle
-        }
         public static void Import(FileInfo fileInfo, JObject parse)
         {
             var writer = new Writer(new byte[fileInfo.Length + 60000]);
@@ -32,7 +26,7 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
 
             writer.Write(type); //1 = encrypted in case I want to add other formats later on
 
-            Compression.Compress(out byte[] compressed, out byte[] key, parse.ToString(Newtonsoft.Json.Formatting.None), type);
+            Compression.Compress(out byte[] compressed, out byte[] key, out int uncompressedsize, parse.ToString(Newtonsoft.Json.Formatting.None), type);
 
             //Import directory
             byte[] importpath = Encoding.ASCII.GetBytes(fileInfo.FullName);
@@ -40,11 +34,16 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             writer.WriteBytes(importpath);
 
             //Encryption key
-            if (type != Compression.Type.None)
+            if (key is not null)
             {
                 writer.Write(CityHash.Hash(key));
                 writer.Write(key.Length);
                 writer.WriteBytes(key);
+            }
+
+            if (uncompressedsize != 0)
+            {
+                writer.Write<int>(uncompressedsize);
             }
 
             //Plugin buffer

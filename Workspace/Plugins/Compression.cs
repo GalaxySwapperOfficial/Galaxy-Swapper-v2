@@ -1,5 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Compression;
 using Galaxy_Swapper_v2.Workspace.Hashes;
+using Galaxy_Swapper_v2.Workspace.Swapping.Compression.Types;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Serilog;
 using System.IO;
@@ -14,21 +15,37 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
         {
             None = 0,
             Aes = 1,
-            Oodle
+            Zlib = 2,
+            Oodle = 3,
+            GZip = 4
         }
 
-        public static bool Compress(out byte[] buffer, out byte[] key, string content, Type type)
+        public static bool Compress(out byte[] buffer, out byte[] key, out int uncompressedsize, string content, Type type)
         {
             buffer = null!;
-            key = GenerateKey(16);
+            uncompressedsize = 0;
+            key = null!;
 
+            byte[] uncompressed = Encoding.ASCII.GetBytes(content);
             switch (type)
             {
                 case Type.None:
-                    buffer = Encoding.ASCII.GetBytes(content);
+                    buffer = uncompressed;
                     break;
                 case Type.Aes:
+                    key = GenerateKey(16);
                     buffer = aes.Encrypt(content, key);
+                    break;
+                case Type.Zlib:
+                    buffer = zlib.Compress(uncompressed);
+                    uncompressedsize = uncompressed.Length;
+                    break;
+                case Type.Oodle:
+                    buffer = Oodle.Compress(uncompressed, Oodle.OodleCompressionLevel.Level5);
+                    uncompressedsize = uncompressed.Length;
+                    break;
+                case Type.GZip:
+                    buffer = gzip.Compress(uncompressed);
                     break;
             }
 
@@ -39,11 +56,19 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
         {
             decompressed = null!;
             bool haskey = false;
+            bool hasuncompressedsize = false;
 
+            //Check for key or uncompressed size
             switch (type)
             {
                 case Type.Aes:
                     haskey = true;
+                    break;
+                case Type.Zlib:
+                    hasuncompressedsize = true;
+                    break;
+                case Type.Oodle:
+                    hasuncompressedsize = true;
                     break;
             }
 
@@ -59,6 +84,12 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
                     Log.Warning($"{fileInfo.Name} encryption key hash was not as expected plugin will be skipped");
                     return false;
                 }
+            }
+
+            int uncompressedsize = 0;
+            if (hasuncompressedsize)
+            {
+                uncompressedsize = reader.Read<int>();
             }
 
             ulong pluginhash = reader.Read<ulong>();
@@ -78,6 +109,15 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
                     break;
                 case Type.Aes:
                     decompressed = aes.Decrypt(compressedbuffer, key);
+                    break;
+                case Type.Zlib:
+                    decompressed = Encoding.ASCII.GetString(zlib.Decompress(compressedbuffer, uncompressedsize));
+                    break;
+                case Type.Oodle:
+                    decompressed = Encoding.ASCII.GetString(Oodle.Decompress(compressedbuffer, uncompressedsize));
+                    break;
+                case Type.GZip:
+                    decompressed = Encoding.ASCII.GetString(gzip.Decompress(compressedbuffer));
                     break;
             }
 
