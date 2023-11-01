@@ -1,5 +1,4 @@
-﻿using CUE4Parse.UE4.IO.Objects;
-using CUE4Parse.Utils;
+﻿using Galaxy_Swapper_v2.Workspace.CProvider;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Serilog;

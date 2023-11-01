@@ -1,12 +1,13 @@
-﻿using Galaxy_Swapper_v2.Workspace.CProvider.Objects;
+﻿using Galaxy_Swapper_v2.Workspace.CProvider.Encryption;
+using Galaxy_Swapper_v2.Workspace.CProvider.Objects;
+using Galaxy_Swapper_v2.Workspace.Utilities;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+using System.Windows.Shapes;
 
 namespace Galaxy_Swapper_v2.Workspace.CProvider
 {
@@ -106,6 +107,33 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
             }
 
             Log.Error($"Failed to locate a reader with {path}");
+            return null!;
+        }
+
+        public List<string> ListFiles()
+        {
+            var list = new List<string>();
+
+            foreach (var reader in IoStoreReaders)
+            {
+                list.AddRange(reader.Files.Keys);
+            }
+
+            return list;
+        }
+
+        public string FindGameFile(string path)
+        {
+            foreach (var reader in IoStoreReaders)
+            {
+                string formatted = reader.Files.Keys.FirstOrDefault(gamepath => gamepath.SubstringBeforeLast('.').ToLower().EndsWith(path))!;
+
+                if (string.IsNullOrEmpty(formatted))
+                    continue;
+
+                return formatted;
+            }
+
             return null!;
         }
 

@@ -1,4 +1,4 @@
-﻿using CUE4Parse.UE4.IO.Objects;
+﻿using Galaxy_Swapper_v2.Workspace.CProvider.Objects;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using System.Linq;
 using System.Text;

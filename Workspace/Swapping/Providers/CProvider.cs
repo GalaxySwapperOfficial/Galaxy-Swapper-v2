@@ -1,12 +1,13 @@
-﻿using Galaxy_Swapper_v2.Workspace.Properties;
-using Galaxy_Swapper_v2.Workspace.Structs;
+﻿using Galaxy_Swapper_v2.Workspace.CProvider;
+using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using static Galaxy_Swapper_v2.Workspace.Global;
 
@@ -14,10 +15,8 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
 {
     public static class CProvider
     {
-        public static ProviderData DefaultProvider = null!;
-        public static ProviderData UEFNProvider = null!;
-        public static Export Export = null!;
-        public static byte[] ExportName = null!;
+        public static DefaultFileProvider DefaultProvider = null!;
+        public static DefaultFileProvider UEFNProvider = null!;
         public const string Paks = "\\FortniteGame\\Content\\Paks";
 
         public static void InitDefault()
@@ -35,15 +34,21 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
             Pakchunks.Validate(paks);
             AesProvider.Initialize();
 
-            DefaultProvider = new ();
-            DefaultProvider.SaveStreams = true;
-            DefaultProvider.FileProvider = new(paks, SearchOption.TopDirectoryOnly, isCaseInsensitive: false, new(EGame.GAME_UE5_3));
-            DefaultProvider.FileProvider.Initialize();
-            DefaultProvider.FileProvider.SubmitKeys(AesProvider.Keys);
-            DefaultProvider.SaveStreams = false;
+            DefaultProvider = new(new(paks));
+            DefaultProvider.SubmitKeys(AesProvider.Keys);
+
+            var parse = Endpoint.Read(Endpoint.Type.UEFN);
+
+            if (parse["Enabled"].Value<bool>())
+            {
+                DefaultProvider.Initialize(parse["Slots"].ToObject<List<string>>());
+            }
+            else
+            {
+                DefaultProvider.Initialize();
+            }
 
             WaitForEpicGames();
-            Log.Information($"Loaded Provider with version: {DefaultProvider.FileProvider.Versions.Game} to path ({paks}) with {AesProvider.Keys.Count()} AES keys.");
         }
 
         public static void InitUEFN()
@@ -58,35 +63,10 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
                 throw new CustomException(Languages.Read(Languages.Type.Message, "FortniteDirectoryEmpty"));
             }
 
-            AesProvider.Initialize();
+            var parse = Endpoint.Read(Endpoint.Type.UEFN);
 
-            UEFNProvider = new();
-            UEFNProvider.SaveStreams = true;
-            UEFNProvider.FileProvider = new(paks, SearchOption.TopDirectoryOnly, isCaseInsensitive: false, new(EGame.GAME_UE5_3));
-            UEFNProvider.FileProvider.Initialize(true);
-            UEFNProvider.FileProvider.SubmitKeys(AesProvider.Keys);
-            UEFNProvider.SaveStreams = false;
-
-            Log.Information($"Loaded UEFN Provider with version: {UEFNProvider.FileProvider.Versions.Game} to path ({paks}) with {AesProvider.Keys.Count()} AES keys.");
-        }
-
-        public static bool Save(string path)
-        {
-            DefaultProvider.Save = true;
-            Export = null!;
-            ExportName = Encoding.ASCII.GetBytes(System.IO.Path.GetFileNameWithoutExtension(path));
-
-            bool result = DefaultProvider.FileProvider.TrySaveAsset(path, out byte[] buffer);
-
-            if (result)
-            {
-                Export.Buffer = buffer;
-                Log.Information($"Exported: {path}");
-                return true;
-            }
-
-            Log.Information($"Failed to export: {path}");
-            return false;
+            UEFNProvider = new(new(paks));
+            UEFNProvider.Initialize(parse["Slots"].ToObject<List<string>>(), true);
         }
 
         public static string FormatUEFNGamePath(string path)
@@ -94,7 +74,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
             const string game = "/game/";
             const string plugin = "fortnitegame/plugins/gamefeatures/";
             string search = path.ToLower();
-            string formatted = UEFNProvider.FileProvider.Files.Keys.FirstOrDefault(gamepath => gamepath.SubstringBeforeLast('.').ToLower().EndsWith(search))!;
+            string formatted = UEFNProvider.FindGameFile(search);
 
             if (string.IsNullOrEmpty(formatted))
             {

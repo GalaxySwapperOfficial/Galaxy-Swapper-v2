@@ -174,8 +174,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 string paks = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}{CProvider.Paks}";
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                CProvider.InitDefault();
-                CProvider.InitUEFN();
+                Swapping.Providers.CProvider.InitDefault();
+                Swapping.Providers.CProvider.InitUEFN();
 
                 List<string> Ucas = new List<string>();
                 List<string> Utocs = new List<string>();
@@ -203,7 +203,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                         else
                         {
                             Output(Languages.Read(Languages.Type.View, "SwapView", "Decompressing"), Type.Info);
-                            Asset.OverrideExport = new () { Buffer = gzip.Decompress(Asset.OverrideBuffer) };
+                            Asset.OverrideExport = new () { UncompressedBuffer = gzip.Decompress(Asset.OverrideBuffer) };
                         }
                         Asset.OverrideObject = FormatObject(Asset.OverrideObject);
                     }

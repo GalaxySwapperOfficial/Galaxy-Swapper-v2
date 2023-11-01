@@ -79,5 +79,31 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
             reader.Position += sizeof(uint);
             reader.Position += 5 * sizeof(ulong);
         }
+
+        public bool Compare(FIoStoreTocHeader header)
+        {
+            if (HeaderSize != header.HeaderSize)
+                return false;
+            if (EntryCount != header.EntryCount)
+                return false;
+            if (HeaderSize != header.HeaderSize)
+                return false;
+            if (CompressedBlockEntryCount != header.CompressedBlockEntryCount)
+                return false;
+            if (CompressedBlockEntrySize != header.CompressedBlockEntrySize)
+                return false;
+            if (CompressionMethodNameCount != header.CompressionMethodNameCount)
+                return false;
+            if (CompressionMethodNameLength != header.CompressionMethodNameLength)
+                return false;
+            if (CompressionBlockSize != header.CompressionBlockSize)
+                return false;
+            if (DirectoryIndexSize != header.DirectoryIndexSize)
+                return false;
+            if (ChunkPerfectHashSeedsCount != header.ChunkPerfectHashSeedsCount)
+                return false;
+
+            return true;
+        }
     }
 }

@@ -23,5 +23,10 @@
             ChunkOffsetLengths = chunkOffsetLengths;
             Size = (long)ChunkOffsetLengths.Length;
         }
+
+        public GameFile()
+        {
+
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using CUE4Parse.UE4.IO.Objects;
-using CUE4Parse.Utils;
+﻿using Galaxy_Swapper_v2.Workspace.CProvider;
 using Galaxy_Swapper_v2.Workspace.Generation;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
@@ -153,10 +152,10 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 string Installtion = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
 
                 EpicGamesLauncher.Close();
-                CProvider.DefaultProvider?.Dispose();
-                CProvider.DefaultProvider = null!;
-                CProvider.UEFNProvider?.Dispose();
-                CProvider.UEFNProvider = null!;
+                Swapping.Providers.CProvider.DefaultProvider?.Dispose();
+                Swapping.Providers.CProvider.DefaultProvider = null!;
+                Swapping.Providers.CProvider.UEFNProvider?.Dispose();
+                Swapping.Providers.CProvider.UEFNProvider = null!;
 
                 Log.Information("Scanning for unknown game files");
                 foreach (string Unkown in Directory.GetDirectories(Installtion))
@@ -218,10 +217,10 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
                     //So files aren't in use.
                     EpicGamesLauncher.Close();
-                    CProvider.DefaultProvider?.Dispose();
-                    CProvider.DefaultProvider = null!;
-                    CProvider.UEFNProvider?.Dispose();
-                    CProvider.UEFNProvider = null!;
+                    Swapping.Providers.CProvider.DefaultProvider?.Dispose();
+                    Swapping.Providers.CProvider.DefaultProvider = null!;
+                    Swapping.Providers.CProvider.UEFNProvider?.Dispose();
+                    Swapping.Providers.CProvider.UEFNProvider = null!;
 
                     foreach (FileInfo item in directoryInfo.EnumerateFiles("*.utoc*", SearchOption.TopDirectoryOnly))
                     {
