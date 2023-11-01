@@ -1,6 +1,4 @@
-﻿using CUE4Parse.UE4.IO.Objects;
-
-namespace Galaxy_Swapper_v2.Workspace.Structs
+﻿namespace Galaxy_Swapper_v2.Workspace.Structs
 {
     public class Export
     {

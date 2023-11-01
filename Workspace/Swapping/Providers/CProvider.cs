@@ -1,6 +1,4 @@
-﻿using CUE4Parse.UE4.Versions;
-using CUE4Parse.Utils;
-using Galaxy_Swapper_v2.Workspace.Properties;
+﻿using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;

@@ -1,5 +1,4 @@
-﻿using CUE4Parse.Utils;
-using Galaxy_Swapper_v2.Workspace.Utilities;
+﻿using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System.IO;
