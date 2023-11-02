@@ -12,6 +12,7 @@
         public string Ucas;
         public string LastUcas;
         public string Utoc;
+        public int LastPartition;
         public long Offset;
         public byte[] CompressedBuffer;
         public byte[] UncompressedBuffer;

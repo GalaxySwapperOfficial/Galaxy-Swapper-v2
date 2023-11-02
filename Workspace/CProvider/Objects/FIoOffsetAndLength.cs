@@ -7,9 +7,12 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider.Objects
         public readonly ulong Offset;
         public readonly ulong Length;
         public readonly long Position;
+        public readonly byte[] Buffer;
         public FIoOffsetAndLength(Reader reader)
         {
             Position = reader.Position;
+            Buffer = reader.ReadBytes(12);
+            reader.Position = Position;
 
             unsafe
             {

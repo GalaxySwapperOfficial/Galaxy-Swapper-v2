@@ -195,6 +195,7 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
             gamefile.Offset = partitionOffset;
             gamefile.Ucas = Partitions[partitionIndex];
             gamefile.LastUcas = Partitions.Last().Value;
+            gamefile.LastPartition = Partitions.Last().Key;
             gamefile.Utoc = IoFileInfo.Name.SubstringBefore('.');
             gamefile.CompressionBlock = compressionBlock;
 
@@ -205,6 +206,8 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
 
             reader.Position = gamefile.Offset;
             compressedbuffer = reader.ReadBytes((int)rawsize);
+
+            reader.Close();
 
             if (IoStoreTocHeader.ContainerFlags.HasFlag(EIoContainerFlags.Encrypted))
             {

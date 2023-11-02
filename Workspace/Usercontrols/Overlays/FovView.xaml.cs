@@ -1,4 +1,5 @@
-﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
+﻿using Galaxy_Swapper_v2.Workspace.CProvider;
+using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Swapping;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
@@ -183,7 +184,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 Stopwatch.Start();
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                CProvider.InitDefault();
+                CProviderManager.InitDefault();
 
                 List<string> Ucas = new List<string>();
                 List<string> Utocs = new List<string>();
@@ -195,7 +196,9 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
                 Output(string.Format(Languages.Read(Languages.Type.View, "SwapView", "Exporting"), "Asset"), Type.Info);
 
-                if (!CProvider.Save(Parse["Object"].Value<string>()))
+                var exported = CProviderManager.DefaultProvider.Save(Parse["Object"].Value<string>());
+
+                if (exported is null)
                     throw new Exception($"Failed to export asset");
 
                 var Swaps = new JArray(JObject.FromObject(new
@@ -205,8 +208,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     replace = string.Format(Parse["Replace"].Value<string>(), Misc.ByteToHex(BitConverter.GetBytes(GetSliderValue())))
                 }));
 
-                Ucas.AddRange(Ucas.Contains(CProvider.Export.Ucas) ? Enumerable.Empty<string>() : new[] { CProvider.Export.Ucas });
-                Utocs.AddRange(Utocs.Contains(CProvider.Export.Utoc) ? Enumerable.Empty<string>() : new[] { CProvider.Export.Utoc });
+                Ucas.AddRange(Ucas.Contains(exported.Ucas) ? Enumerable.Empty<string>() : new[] { exported.Ucas });
+                Utocs.AddRange(Utocs.Contains(exported.Utoc) ? Enumerable.Empty<string>() : new[] { exported.Utoc });
 
                 if (Settings.Read(Settings.Type.KickWarning).Value<bool>())
                 {
@@ -224,7 +227,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "ConvertingAssets"), Type.Info);
 
-                var Swap = new Swap(null, this, new Asset() { Object = FormatObject(Parse["Object"].Value<string>()), Swaps = Swaps, Export = CProvider.Export });
+                var Swap = new Swap(null, this, new Asset() { Object = FormatObject(Parse["Object"].Value<string>()), Swaps = Swaps, Export = exported });
                 if (!Swap.Convert())
                     return;
 
@@ -270,7 +273,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 Stopwatch.Start();
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                CProvider.InitDefault();
+                CProviderManager.InitDefault();
 
                 var Parse = Endpoint.Read(Endpoint.Type.FOV);
 
@@ -279,12 +282,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
                 Output(string.Format(Languages.Read(Languages.Type.View, "SwapView", "Exporting"), "Asset"), Type.Info);
 
-                if (!CProvider.Save(Parse["Object"].Value<string>()))
+                var exported = CProviderManager.DefaultProvider.Save(Parse["Object"].Value<string>());
+
+                if (exported is null)
                     throw new Exception($"Failed to export asset");
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "RevertingAssets"), Type.Info);
 
-                var Swap = new Swap(null, this, new Asset() { Object = FormatObject(Parse["Object"].Value<string>()), Export = CProvider.Export });
+                var Swap = new Swap(null, this, new Asset() { Object = FormatObject(Parse["Object"].Value<string>()), Export = exported });
                 if (!Swap.Revert())
                     return;
 

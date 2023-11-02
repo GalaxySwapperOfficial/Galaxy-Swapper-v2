@@ -2,6 +2,7 @@
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Serilog;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -12,6 +13,8 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
     {
         public static void Validate(string path)
         {
+            Log.Error(path);
+
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
@@ -74,6 +77,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
             Log.Information("Backing up game files");
             foreach (var file in directoryInfo.EnumerateFiles("*.backup*", SearchOption.TopDirectoryOnly))
             {
+                Log.Information(file.Name);
                 FileInfo fileInfo = new FileInfo(file.FullName.SubstringBeforeLast('.') + ".backup");
 
                 if (fileInfo.Exists)

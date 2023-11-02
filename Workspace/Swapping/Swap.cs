@@ -1,6 +1,6 @@
-﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
+﻿using Galaxy_Swapper_v2.Workspace.CProvider;
+using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Properties;
-using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
 using Galaxy_Swapper_v2.Workspace.Swapping.Sterilization;
 using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
@@ -71,7 +71,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
                                 if (!string.IsNullOrEmpty(OverrideObjectPath) && !Object["UEFN"].KeyIsNullOrEmpty() && Object["UEFN"].Value<bool>())
                                 {
-                                    OverrideObjectPath = Swapping.Providers.CProvider.FormatUEFNGamePath(OverrideObjectPath);
+                                    OverrideObjectPath = CProviderManager.FormatUEFNGamePath(OverrideObjectPath);
                                 }
 
                                 Deserializer.ReplaceEntry(ObjectPath, OverrideObjectPath);
@@ -153,7 +153,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
             using (BinaryWriter UtocEdit = new BinaryWriter(File.Open(Utoc, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite)))
             {
                 UtocEdit.Seek((int)Asset.Export.CompressionBlock.Position, SeekOrigin.Begin);
-                UtocEdit.Write(Misc.CompressionBlock((uint)position, (uint)BufferToWrite.Length, (uint)BufferToWrite.Length, Asset.Export.LastPartition, false), 0, 12);
+                UtocEdit.Write(Misc.CompressionBlock((uint)position, (uint)BufferToWrite.Length, (uint)BufferToWrite.Length, (uint)Asset.Export.LastPartition, false), 0, 12);
 
                 Log.Information($"Wrote to: {Utoc} at Offset: {Asset.Export.CompressionBlock.Position}");
 

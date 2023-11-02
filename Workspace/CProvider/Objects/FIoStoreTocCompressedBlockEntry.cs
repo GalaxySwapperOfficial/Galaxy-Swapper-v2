@@ -15,10 +15,13 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider.Objects
         public readonly uint UncompressedSize;
         public readonly byte CompressionMethodIndex;
         public readonly long Position;
+        public readonly byte[] Buffer;
 
         public FIoStoreTocCompressedBlockEntry(Reader reader)
         {
             Position = reader.Position;
+            Buffer = reader.ReadBytes(12);
+            reader.Position = Position;
 
             unsafe
             {

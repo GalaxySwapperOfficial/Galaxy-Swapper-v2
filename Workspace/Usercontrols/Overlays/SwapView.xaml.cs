@@ -1,5 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Components;
 using Galaxy_Swapper_v2.Workspace.Compression;
+using Galaxy_Swapper_v2.Workspace.CProvider;
 using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Swapping;
@@ -171,11 +172,11 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 var Stopwatch = new Stopwatch();
                 Stopwatch.Start();
 
-                string paks = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}{CProvider.Paks}";
+                string paks = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}{CProviderManager.Paks}";
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                Swapping.Providers.CProvider.InitDefault();
-                Swapping.Providers.CProvider.InitUEFN();
+                CProviderManager.InitDefault();
+                CProviderManager.InitUEFN();
 
                 List<string> Ucas = new List<string>();
                 List<string> Utocs = new List<string>();
@@ -183,11 +184,13 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 {
                     Output(string.Format(Languages.Read(Languages.Type.View, "SwapView", "Exporting"), System.IO.Path.GetFileNameWithoutExtension(Asset.Object)), Type.Info);
 
-                    if (!CProvider.Save(Asset.Object))
+                    var exported = CProviderManager.DefaultProvider.Save(Asset.Object);
+
+                    if (exported is null)
                         throw new Exception($"Failed to export {Asset.Object}");
 
                     Asset.Object = FormatObject(Asset.Object);
-                    Asset.Export = CProvider.Export;
+                    Asset.Export = exported;
 
                     if (!string.IsNullOrEmpty(Asset.OverrideObject))
                     {
@@ -195,10 +198,12 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                         {
                             Output(string.Format(Languages.Read(Languages.Type.View, "SwapView", "Exporting"), System.IO.Path.GetFileNameWithoutExtension(Asset.OverrideObject)), Type.Info);
 
-                            if (!CProvider.Save(Asset.OverrideObject))
+                            var overrideExported = CProviderManager.DefaultProvider.Save(Asset.OverrideObject);
+
+                            if (overrideExported is null)
                                 throw new Exception($"Failed to export {Asset.OverrideObject}");
 
-                            Asset.OverrideExport = CProvider.Export;
+                            Asset.OverrideExport = overrideExported;
                         }
                         else
                         {
@@ -297,17 +302,19 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 Stopwatch.Start();
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                CProvider.InitDefault();
+                CProviderManager.InitDefault();
 
                 foreach (var Asset in Option.Exports)
                 {
                     Output(string.Format(Languages.Read(Languages.Type.View, "SwapView", "Exporting"), System.IO.Path.GetFileNameWithoutExtension(Asset.Object)), Type.Info);
 
-                    if (!CProvider.Save(Asset.Object))
+                    var exported = CProviderManager.DefaultProvider.Save(Asset.Object);
+
+                    if (exported is null)
                         throw new Exception($"Failed to export {Asset.Object}");
 
                     Asset.Object = FormatObject(Asset.Object);
-                    Asset.Export = CProvider.Export;
+                    Asset.Export = exported;
                 }
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "RevertingAssets"), Type.Info);
