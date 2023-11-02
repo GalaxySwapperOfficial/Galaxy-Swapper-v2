@@ -176,7 +176,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             Slider.IsEnabled = true;
         }
 
-        private async void Worker_Convert(object sender, DoWorkEventArgs e)
+        private void Worker_Convert(object sender, DoWorkEventArgs e)
         {
             try
             {
@@ -253,7 +253,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     Memory.MainView.SetOverlay(new FortniteDirEmpty());
                 });
             }
-            catch (Global.CustomException CustomException)
+            catch (CustomException CustomException)
             {
                 Log.Error(CustomException.Message, "Caught CustomException");
                 Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "ConvertError"), "FOV", CustomException.Message), discord: true);
