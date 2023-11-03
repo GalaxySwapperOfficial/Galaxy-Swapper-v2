@@ -22,6 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="README.md" />
     <None Remove="Workspace\Assets\Arrow.png" />
     <None Remove="Workspace\Assets\Backpacks.png" />
     <None Remove="Workspace\Assets\Backpacks_Clicked.png" />
@@ -60,6 +61,7 @@
     <None Remove="Workspace\Assets\Wave.png" />
     <None Remove="Workspace\Assets\Weapons.png" />
     <None Remove="Workspace\Assets\Weapons_Clicked.png" />
+    <None Remove="Workspace\CProvider\README.md" />
   </ItemGroup>
 
   <ItemGroup>
@@ -101,6 +103,7 @@
     <Resource Include="Workspace\Assets\Minimize.png" />
     <Resource Include="Workspace\Assets\Misc.png" />
     <Resource Include="Workspace\Assets\Misc_Clicked.png" />
+    <EmbeddedResource Include="README.md" />
     <EmbeddedResource Include="Workspace\Assets\oo2core_5_win64.dll" />
     <Resource Include="Workspace\Assets\Pickaxes.png" />
     <Resource Include="Workspace\Assets\Pickaxes_Clicked.png" />
@@ -117,6 +120,7 @@
     <Resource Include="Workspace\Assets\Wave.png" />
     <Resource Include="Workspace\Assets\Weapons.png" />
     <Resource Include="Workspace\Assets\Weapons_Clicked.png" />
+    <EmbeddedResource Include="Workspace\CProvider\README.md" />
   </ItemGroup>
 
 </Project>

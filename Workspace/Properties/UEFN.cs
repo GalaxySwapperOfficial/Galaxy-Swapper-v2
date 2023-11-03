@@ -1,6 +1,5 @@
 ﻿using Galaxy_Swapper_v2.Workspace.CProvider;
 using Galaxy_Swapper_v2.Workspace.Generation.Formats;
-using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
