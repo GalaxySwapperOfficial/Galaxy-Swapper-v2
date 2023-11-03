@@ -37,14 +37,14 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                 Message.DisplaySTA("Error", $"Failed to find {Type} in endpoint cache.", exit: true, solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" });
             }
 
-            /*
+            
             if (File.Exists("D:\\Galaxy Swapper v2\\Backend\\API\\1.13\\Cosmetics.json")) //Local API for debugging
                 Parse["Cosmetics"] = JObject.Parse(File.ReadAllText("D:\\Galaxy Swapper v2\\Backend\\API\\1.13\\Cosmetics.json"));
             if (File.Exists("D:\\Galaxy Swapper v2\\Backend\\API\\1.15\\UEFN.json")) //Local API for debugging
                 Parse["UEFN"] = JObject.Parse(File.ReadAllText("D:\\Galaxy Swapper v2\\Backend\\API\\1.15\\UEFN.json"));
             if (File.Exists("D:\\Galaxy Swapper v2\\Backend\\API\\1.17\\Lobby.json")) //Local API for debugging
                 Parse["Lobby"] = JObject.Parse(File.ReadAllText("D:\\Galaxy Swapper v2\\Backend\\API\\1.17\\Lobby.json"));
-            */
+            
 
             return Parse[Type.ToString()];
         }

@@ -28,6 +28,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
             writer.Write(Deserializer.Summary.ImportedPackageNamesOffset);
 
             WriteNameMaps(writer);
+            WritePad(writer);
             WriteBulkData(writer);
 
             writer.WriteBytes(Deserializer.RestOfData);
@@ -62,6 +63,12 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
             {
                 writer.WriteBytes(Encoding.ASCII.GetBytes(entry.Name));
             }
+        }
+
+        public void WritePad(Writer writer)
+        {
+            writer.Write<ulong>((ulong)Deserializer.Pad.Length);
+            writer.WriteBytes(Deserializer.Pad);
         }
 
         public void WriteBulkData(Writer writer)
