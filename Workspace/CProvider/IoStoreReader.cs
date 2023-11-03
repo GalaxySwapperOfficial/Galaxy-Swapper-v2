@@ -1,4 +1,5 @@
-﻿using Galaxy_Swapper_v2.Workspace.CProvider.Encryption;
+﻿using Galaxy_Swapper_v2.Workspace.Compression;
+using Galaxy_Swapper_v2.Workspace.CProvider.Encryption;
 using Galaxy_Swapper_v2.Workspace.CProvider.Objects;
 using Galaxy_Swapper_v2.Workspace.Swapping.Compression.Types;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
@@ -234,6 +235,12 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
                             break;
                         case CompressionMethod.Oodle:
                             uncompressedbuffer = Oodle.Decompress(compressedbuffer, uncompressedbuffer.Length);
+                            break;
+                        case CompressionMethod.Zlib:
+                            uncompressedbuffer = zlib.Decompress(compressedbuffer, uncompressedbuffer.Length);
+                            break;
+                        case CompressionMethod.Gzip:
+                            uncompressedbuffer = gzip.Decompress(compressedbuffer);
                             break;
                     }
                 }

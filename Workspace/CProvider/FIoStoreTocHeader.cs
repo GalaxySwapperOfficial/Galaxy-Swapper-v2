@@ -1,5 +1,8 @@
 ﻿using Galaxy_Swapper_v2.Workspace.CProvider.Objects;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
+using Serilog;
+using System;
+using System.Linq;
 
 namespace Galaxy_Swapper_v2.Workspace.CProvider
 {
@@ -48,6 +51,13 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
         public FIoStoreTocHeader(Reader reader)
         {
             HeaderMagic = reader.ReadBytes(Magic.Length);
+
+            if (!HeaderMagic.SequenceEqual(Magic))
+            {
+                Log.Error($"{reader.Name} has invalid magic!");
+                throw new Exception($"{reader.Name} has invalid magic! Please verify your game files and try again.");
+            }
+
             Version = reader.Read<EIoStoreTocVersion>();
 
             //_reserved0 _reserved1 not needed so skip
