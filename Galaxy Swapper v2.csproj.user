@@ -87,6 +87,9 @@
     <Compile Update="Workspace\Usercontrols\Overlays\SwapView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Workspace\Usercontrols\Overlays\VerifyView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Workspace\Usercontrols\PluginsView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -177,6 +180,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Usercontrols\Overlays\SwapView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Workspace\Usercontrols\Overlays\VerifyView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Usercontrols\PluginsView.xaml">

@@ -76,6 +76,8 @@ namespace Galaxy_Swapper_v2.Workspace.Views
                     SearchBar.Visibility = Visibility.Hidden;
                     break;
                 case "Plugins":
+                    SetOverlay(new VerifyView());
+                    return;
                     NewTab = Memory.PluginsView;
                     SearchBar.Visibility = Visibility.Hidden;
                     break;
