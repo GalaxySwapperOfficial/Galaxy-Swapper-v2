@@ -30,7 +30,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
                 if (!file.FullName.CanEdit())
                 {
                     Log.Error(file.Name + " is in use!");
-                    throw new Global.CustomException("Fortnite game files are currently in use!\nPlease close anything that may be using your game files.");
+                    throw new CustomException("Fortnite game files are currently in use!\nPlease close anything that may be using your game files.");
                 }
             }
 

@@ -3,6 +3,8 @@ using Galaxy_Swapper_v2.Workspace.Hashes;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Serilog;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -18,6 +20,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
         public ulong[] Hashes;
         public ulong HashVersion;
         public byte[] RestOfData;
+        public byte[] Pad;
         public Deserializer(byte[] buffer) => Asset = buffer;
 
         public void Read()
@@ -41,6 +44,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
             };
 
             LoadNameMaps(reader);
+            LoadPad(reader);
             LoadBulkDataMaps(reader);
             LoadExportMap(reader);
 
@@ -86,6 +90,12 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
                 ExportMap[i].FilterFlags = reader.Read<byte>();
                 reader.Position = position + 72;
             }
+        }
+
+        private void LoadPad(Reader reader)
+        {
+            var padSize = reader.Read<ulong>();
+            Pad = reader.ReadBytes((int)padSize);
         }
 
         private void LoadBulkDataMaps(Reader reader)

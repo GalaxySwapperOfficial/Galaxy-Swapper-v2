@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Serilog;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace Galaxy_Swapper_v2.Workspace.Generation
