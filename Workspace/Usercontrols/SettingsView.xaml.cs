@@ -147,6 +147,9 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
         private void Verify_Click(object sender, RoutedEventArgs e)
         {
+            //Check If Fortnite install Is null or empty here and same with epic games also auto close epic games and fortnite here as well!
+
+
             try
             {
                 string Installtion = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";

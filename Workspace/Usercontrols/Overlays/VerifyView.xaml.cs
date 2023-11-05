@@ -1,5 +1,8 @@
-﻿using Galaxy_Swapper_v2.Workspace.Hashes;
+﻿using Galaxy_Swapper_v2.Workspace.CProvider;
+using Galaxy_Swapper_v2.Workspace.CProvider.Objects;
+using Galaxy_Swapper_v2.Workspace.Hashes;
 using Galaxy_Swapper_v2.Workspace.Properties;
+using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Galaxy_Swapper_v2.Workspace.Verify.EpicGames;
 using Galaxy_Swapper_v2.Workspace.Verify.EpicManifestParser.Objects;
@@ -9,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
@@ -67,6 +71,19 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
         //Need to check If fortnite dir is null
         private void Worker_Convert(object sender, DoWorkEventArgs e)
         {
+            string installtion = $"{Settings.Read(Settings.Type.Installtion)}";
+            var pakDirectoryInfo = new DirectoryInfo($"{installtion}\\FortniteGame\\Content\\Paks");
+
+            Output("Disposing providers", Type.Info);
+            CProviderManager.DefaultProvider?.Dispose();
+            CProviderManager.UEFNProvider?.Dispose();
+
+            Output("Restoring Epic Games Launcher", Type.Info);
+            CustomEpicGamesLauncher.Revert();
+
+            Output("Removing UEFN game files", Type.Info);
+            UEFN.Clear(pakDirectoryInfo.FullName);
+
             Output("Attempting to download Fortnite manifest file", Type.Info);
 
             var oauth = new OAuth();
@@ -84,120 +101,72 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             }
 
             Output("Parsing manifest", Type.Info);
+
             byte[] manifestBufer = new ManifestInfo(liveManifest.Parse.ToString()).DownloadManifestData();
             var manifest = new Manifest(manifestBufer);
-            var manifestPaths = new Dictionary<string, List<FileManifest>>();
 
+            Output("Populating file list", Type.Info);
+
+            var pakFileManifests = new List<FileManifest>();
             foreach (var fileManifest in manifest.FileManifests)
             {
                 var directoryPath = fileManifest.Name.SubstringBeforeWithLast('/');
+                if (directoryPath != "FortniteGame/Content/Paks/") continue;
 
-                if (manifestPaths.ContainsKey(directoryPath))
-                {
-                    manifestPaths[directoryPath].Add(fileManifest);
-                }
-                else
-                {
-                    manifestPaths[directoryPath] = new List<FileManifest>() { fileManifest };
-                }
+                pakFileManifests.Add(fileManifest);
             }
 
-            Output($"Validating game files in {manifestPaths.Count} directories", Type.Info);
+            Output("Validating game files", Type.Info);
 
-            string paks = $"{Settings.Read(Settings.Type.Installtion)}";
-
-            var failed = new List<string>();
-            var success = new List<string>();
-
-            foreach (var directoryPath in manifestPaths)
+            foreach (var gameFile in pakDirectoryInfo.GetFiles())
             {
-                var directoryInfo = new DirectoryInfo($"{paks}\\{directoryPath.Key}");
+                if (!gameFile.Exists || gameFile.Name.ToUpper().Contains("UEFN") || gameFile.Name.ToUpper().Contains("UNREALEDITOR") || gameFile.Name.ToUpper().Contains(".O."))
+                    continue;
 
-                if (!directoryInfo.Exists) continue;
+                Output($"Validating {gameFile.Name}", Type.Info);
 
-                foreach (var file in directoryInfo.GetFiles())
+                var fileManifest = pakFileManifests.Find((FileManifest x) => x.Name.Contains(gameFile.Name));
+                if (fileManifest is null)
                 {
-                    if (ShouldSkip(file)) continue;
+                    Output($"Deleting: {gameFile.Name} unknown file", Type.Warning);
+                    File.Delete(gameFile.FullName);
+                    continue;
+                }
 
-                    var fileManifest = directoryPath.Value.Find((FileManifest x) => x.Name.Contains(file.Name));
-                    if (fileManifest is null)
+                if (gameFile.Length > 2090000000)
+                {
+                    Output($"{gameFile.Name} is a large file and wont be hash checked", Type.Warning);
+                    continue;
+                }
+
+                using (FileStream fileStream = File.OpenRead(gameFile.FullName))
+                {
+                    if (SHA1Hash.HashStream(fileStream) == fileManifest.Hash)
                     {
-                        Output($"Unknown file: {file.Name}", Type.Warning);
-                        failed.Add($"{file.FullName}");
-                        continue;
+                        Output($"{gameFile.Name} hash Is OK", Type.Info);
+                        fileStream.Close();
                     }
-
-                    if (file.Length > 2090000000)
+                    else
                     {
-                        Output($"{file.Name} is a large file and may take a few minutes to verify", Type.Warning);
-                        continue;
-                    }
-
-                    Output($"Validating {file.Name} hash", Type.Info);
-
-                    using (FileStream fileStream = File.OpenRead(file.FullName))
-                    {
-                        if (SHA1Hash.HashStream(fileStream) == fileManifest.Hash)
-                        {
-                            Output($"{file.Name} hash Is valid", Type.Info);
-                            success.Add(file.FullName);
-                        }
-                        else
-                        {
-                            Output($"{file.Name} hash Is invalid", Type.Warning);
-                            failed.Add(file.FullName);
-                        }
+                        Output($"Deleting: {gameFile.Name} hash Is invalid", Type.Warning);
+                        fileStream.Close(); File.Delete(gameFile.FullName);
                     }
                 }
             }
 
-            if (Message.DisplaySTA("Info", string.Format("{0} files are valid.\n{1} files are invalid.\n\nWould you like to remove ALL invalid game files? If you agree the invalid files will be completely deleted\nThen we will redirect you to the Epic Games Launcher to reinstall these game files.", success.Count, failed.Count), System.Windows.MessageBoxButton.YesNoCancel) == System.Windows.MessageBoxResult.Yes)
+            Log.Information("Scanning for unknown game directories");
+
+            foreach (var gameDirectoryInfo in pakDirectoryInfo.GetDirectories())
             {
-                foreach (string file in failed)
-                {
-                    if (!Misc.CanEdit(file))
-                    {
-                        Output($"{file} Is currently In use and can not be removed!", Type.Error);
-                        continue;
-                    }
-
-                    try
-                    {
-                        File.Delete(file);
-                    }
-                    catch (Exception Exception)
-                    {
-                        Output($"Failed to delete {file}\n{Exception.Message}", Type.Error);
-                        continue;
-                    }
-
-                    Output($"Deleted {file}", Type.Info);
-                }
-            }
-        }
-
-        private bool ShouldSkip(FileInfo file)
-        {
-            if (!file.Exists || file.Name.ToUpper().Contains("UEFN") || file.Name.ToUpper().Contains("UNREALEDITOR") || file.Name.ToUpper().Contains(".O."))
-                return true;
-            else if (file.Extension.ToUpper() == ".DLL")
-            {
-                foreach (string whiteListedDLL in new string[] { "SHADERCOMPILEWORKER", "AGENTINTERFACE", "BOOST_", "DXCOMPILER", "EMBREE3", "KITT-", "KITT_", "OO2CORE", "OO2TEX", "OPENCOLORIO", "RAD_TM", "D3D12SDKLAYERS" })
-                {
-                    if (file.Name.ToUpper().Contains(whiteListedDLL))
-                        return true;
-                }
-            }
-            else if (file.Extension.ToUpper() == ".EXE")
-            {
-                foreach (string whiteListedEXE in new string[] { "CRASHREPORT", "XGECONTROLWORKER", "URC", "SHADERCOMPILEWORKER" })
-                {
-                    if (file.Name.ToUpper().Contains(whiteListedEXE))
-                        return true;
-                }
+                Output($"Deleting: {gameDirectoryInfo.Name}", Type.Info);
+                Directory.Delete(gameDirectoryInfo.FullName, true);
             }
 
-            return false;
+            SwapLogs.Clear();
+            EpicGamesLauncher.Verify();
+
+            Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), Languages.Read(Languages.Type.Message, "Verify"), MessageBoxButton.OK);
+            Environment.Exit(0);
         }
     }
 }

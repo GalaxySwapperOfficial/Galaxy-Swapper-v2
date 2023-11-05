@@ -15,7 +15,7 @@
         <Grid>
             <TextBlock x:Name="Header" Text="Verification In progress!" TextAlignment="Center" VerticalAlignment="Top" Foreground="#EFEFF0" FontWeight="SemiBold" FontSize="22" Margin="0,38,0,0"/>
             <TextBlock x:Name="Description" Text="Sit back and relax while we verify your game files. This may take a few minutes." TextAlignment="Center" VerticalAlignment="Top" Foreground="#D3D3D6" FontWeight="Light" FontSize="13" Margin="0,74,0,0"/>
-            <TextBlock x:Name="OutputBlock" Text="[LOG] afsaf" TextWrapping="Wrap" TextAlignment="Left" Foreground="#EFEFF0" Margin="24, 105, 24, 0"/>
+            <TextBlock x:Name="OutputBlock" TextWrapping="Wrap" TextAlignment="Left" Foreground="#EFEFF0" Margin="24, 105, 24, 0"/>
         </Grid>
     </Border>
 </UserControl>
