@@ -11,6 +11,9 @@
     <ApplicationIcon>Workspace\Assets\Logo.ico</ApplicationIcon>
     <Authors>Wslt#9596</Authors>
     <Copyright>Copyright © Galaxy Swapper v2</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2</RepositoryUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -22,7 +25,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="README.md" />
     <None Remove="Workspace\Assets\Arrow.png" />
     <None Remove="Workspace\Assets\Backpacks.png" />
     <None Remove="Workspace\Assets\Backpacks_Clicked.png" />
@@ -122,6 +124,17 @@
     <Resource Include="Workspace\Assets\Weapons.png" />
     <Resource Include="Workspace\Assets\Weapons_Clicked.png" />
     <EmbeddedResource Include="Workspace\CProvider\README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
