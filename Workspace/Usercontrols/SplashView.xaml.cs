@@ -120,51 +120,6 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 Settings.Edit(Settings.Type.Installtion, string.Empty);
                 return;
             }
-
-            //Remove next Fortnite update
-            if (!UEFN.Cache["Main"].KeyIsNullOrEmpty())
-            {
-                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), "The UEFN format has changed since v1.22. Please click 'OK' to begin the updating process.", MessageBoxButton.OK);
-
-                Log.Information("Attempting to remove old UEFN data from v1.22");
-
-                EpicGamesLauncher.Close();
-
-                try
-                {
-                    if (UEFN.Cache["Downloadables"] is null)
-                    {
-                        UEFN.Cache.Add("Downloadables", new JArray());
-                    }
-
-                    if (File.Exists($"{UEFN.Cache["Main"].Value<string>()}.ucas"))
-                    {
-                        UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.ucas");
-                        UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.utoc");
-                        UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.pak");
-                        UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.sig");
-                        UEFN.Delete($"{UEFN.Cache["Main"].Value<string>()}.backup");
-
-                        UEFN.Cache["Main"] = null;
-                        UEFN.DownloadMain(installation);
-                    }
-                    else
-                    {
-                        UEFN.Cache["Main"] = null;
-                        File.WriteAllText(UEFN.Path, UEFN.Cache.ToString());
-                    }
-
-                    Log.Information("Successfully removed old UEFN data");
-                }
-                catch (Exception exception)
-                {
-                    Log.Error(exception, $"Failed to remove old UEFN data");
-                    UEFN.Cache["Main"] = null;
-                    File.WriteAllText(UEFN.Path, UEFN.Cache.ToString());
-
-                    Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), "Failed to update the UEFN format! It is recommended to go to the 'Settings' tab in the swapper and click 'Verify' to resolve this issue.", MessageBoxButton.OK);
-                }
-            }
         }
 
         private void Drag_Click(object sender, MouseButtonEventArgs e) => Memory.MainView.DragMove();
