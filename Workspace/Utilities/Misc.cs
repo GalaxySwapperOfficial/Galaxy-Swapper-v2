@@ -349,5 +349,39 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
         {
             return new byte[Length];
         }
+
+        public static bool FilesInUse(DirectoryInfo directoryInfo)
+        {
+            foreach (var fileInfo in directoryInfo.GetFiles())
+            {
+                if (!fileInfo.Exists)
+                {
+                    continue;
+                }
+                else if (!CanEdit(fileInfo.FullName))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool FilesInUse(string directory)
+        {
+            foreach (var fileInfo in new DirectoryInfo(directory).GetFiles())
+            {
+                if (!fileInfo.Exists)
+                {
+                    continue;
+                }
+                else if (!CanEdit(fileInfo.FullName))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

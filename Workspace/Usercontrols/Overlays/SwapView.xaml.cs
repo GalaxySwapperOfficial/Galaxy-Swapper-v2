@@ -128,13 +128,16 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
         }
 
         private BackgroundWorker Worker { get; set; } = default!;
+        private bool IsWorkerBusy = false;
         private void Worker_Click(object sender, RoutedEventArgs e)
         {
-            if (Worker is not null && Worker.IsBusy)
+            if (IsWorkerBusy)
             {
                 Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Languages.Read(Languages.Type.View, "SwapView", "WorkerBusy"), MessageBoxButton.OK);
                 return;
             }
+
+            IsWorkerBusy = true;
 
             string epicinstallation = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
             if (string.IsNullOrEmpty(epicinstallation) || !File.Exists(epicinstallation))
@@ -162,7 +165,11 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             StoryBoard.Begin();
         }
 
-        private void Worker_Completed(object sender, RunWorkerCompletedEventArgs e) => Interface.SetElementAnimations(new Interface.BaseAnim { Element = DisplayName, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 0, To = 1, Duration = new TimeSpan(0, 0, 0, 0, 100), BeginTime = new TimeSpan(0, 0, 0, 0, 100) } }, new Interface.BaseAnim { Element = LOG, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 100) } }).Begin();
+        private void Worker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            IsWorkerBusy = false;
+            Interface.SetElementAnimations(new Interface.BaseAnim { Element = DisplayName, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 0, To = 1, Duration = new TimeSpan(0, 0, 0, 0, 100), BeginTime = new TimeSpan(0, 0, 0, 0, 100) } }, new Interface.BaseAnim { Element = LOG, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 100) } }).Begin();
+        }
 
         private void Worker_Convert(object sender, DoWorkEventArgs e)
         {

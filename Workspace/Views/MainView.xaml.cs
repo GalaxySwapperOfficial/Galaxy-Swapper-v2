@@ -114,6 +114,9 @@ namespace Galaxy_Swapper_v2.Workspace.Views
 
         public void RemoveOverlay()
         {
+            if (LastOverlay is null)
+                return;
+
             Main.Effect = null;
 
             var Storyboard = Interface.SetElementAnimations(new Interface.BaseAnim { Element = LastOverlay, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 400) } });

@@ -7,6 +7,7 @@
              mc:Ignorable="d" 
              Height="450" 
              Width="800"
+             Loaded="VerifyView_Loaded"
              >
     <Border CornerRadius="10" Background="#090B0E" BorderBrush="#050608" BorderThickness="1">
         <Border.Effect>

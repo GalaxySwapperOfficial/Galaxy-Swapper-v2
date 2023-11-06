@@ -94,6 +94,8 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
         {
             if (HeaderSize != header.HeaderSize)
                 return false;
+            if (Version != header.Version)
+                return false;
             if (EntryCount != header.EntryCount)
                 return false;
             if (HeaderSize != header.HeaderSize)
@@ -110,7 +112,19 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
                 return false;
             if (DirectoryIndexSize != header.DirectoryIndexSize)
                 return false;
+            if (PartitionCount != header.PartitionCount)
+                return false;
+            if (ContainerId.Id != header.ContainerId.Id)
+                return false;
+            if (EncryptionKeyGuid.A != header.EncryptionKeyGuid.A || EncryptionKeyGuid.B != header.EncryptionKeyGuid.B || EncryptionKeyGuid.C != header.EncryptionKeyGuid.C || EncryptionKeyGuid.D != header.EncryptionKeyGuid.D)
+                return false;
+            if (ContainerFlags != header.ContainerFlags)
+                return false;
             if (ChunkPerfectHashSeedsCount != header.ChunkPerfectHashSeedsCount)
+                return false;
+            if (PartitionSize != header.PartitionSize)
+                return false;
+            if (ChunksWithoutPerfectHashCount != header.ChunksWithoutPerfectHashCount)
                 return false;
 
             return true;

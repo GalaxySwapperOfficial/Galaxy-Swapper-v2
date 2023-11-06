@@ -16,9 +16,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
     public partial class EpicGamesLauncherDirEmpty : UserControl
     {
         private BackgroundWorker DetectWorker;
+        private bool EndWorker = false;
         public EpicGamesLauncherDirEmpty() => InitializeComponent();
 
-        private void Close_Click(object sender, MouseButtonEventArgs e) => Memory.MainView.RemoveOverlay();
+        private void Close_Click(object sender, MouseButtonEventArgs e)
+        {
+            EndWorker = true;
+            Memory.MainView.RemoveOverlay();
+        }
         private void EpicGamesLauncherDirEmpty_Loaded(object sender, RoutedEventArgs e)
         {
             Header.Text = Languages.Read(Languages.Type.View, "EpicGamesLauncherDirEmpty", "Header");
@@ -34,6 +39,9 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
         {
             while (true)
             {
+                if (EndWorker)
+                    return;
+
                 Process[] epicgamesLauncher = Process.GetProcessesByName("EpicGamesLauncher");
 
                 if (epicgamesLauncher.Length != 0)

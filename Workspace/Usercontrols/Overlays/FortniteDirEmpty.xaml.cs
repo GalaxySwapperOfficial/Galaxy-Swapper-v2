@@ -16,9 +16,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
     public partial class FortniteDirEmpty : UserControl
     {
         private BackgroundWorker DetectWorker;
+        private bool EndWorker = false;
         public FortniteDirEmpty() => InitializeComponent();
 
-        private void Close_Click(object sender, MouseButtonEventArgs e) => Memory.MainView.RemoveOverlay();
+        private void Close_Click(object sender, MouseButtonEventArgs e)
+        {
+            EndWorker = true;
+            Memory.MainView.RemoveOverlay();
+        }
         private void FortniteDirEmpty_Loaded(object sender, RoutedEventArgs e)
         {
             Header.Text = Languages.Read(Languages.Type.View, "FortniteDirEmpty", "Header");
@@ -34,6 +39,9 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
         {
             while (true)
             {
+                if (EndWorker)
+                    return;
+
                 Process[] fortniteLauncher = Process.GetProcessesByName("FortniteLauncher");
 
                 if (fortniteLauncher.Length != 0)

@@ -1,5 +1,4 @@
 ﻿using Galaxy_Swapper_v2.Workspace.CProvider;
-using Galaxy_Swapper_v2.Workspace.CProvider.Objects;
 using Galaxy_Swapper_v2.Workspace.Hashes;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
@@ -17,9 +16,6 @@ using System.Windows.Controls;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 {
-    /// <summary>
-    /// Interaction logic for VerifyView.xaml
-    /// </summary>
     public partial class VerifyView : UserControl
     {
         private BackgroundWorker Worker { get; set; } = default!;
@@ -29,6 +25,12 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             Worker = new BackgroundWorker();
             Worker.DoWork += Worker_Convert;
             Worker.RunWorkerAsync();
+        }
+
+        private void VerifyView_Loaded(object sender, RoutedEventArgs e)
+        {
+            Header.Text = Languages.Read(Languages.Type.View, "VerifyView", "Header");
+            Description.Text = Languages.Read(Languages.Type.View, "VerifyView", "Description");
         }
 
         public enum Type
@@ -68,7 +70,6 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
         private void Exit() => Memory.MainView.RemoveOverlay();
 
-        //Need to check If fortnite dir is null
         private void Worker_Convert(object sender, DoWorkEventArgs e)
         {
             string installtion = $"{Settings.Read(Settings.Type.Installtion)}";
@@ -76,7 +77,9 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
             Output("Disposing providers", Type.Info);
             CProviderManager.DefaultProvider?.Dispose();
+            CProviderManager.DefaultProvider = null!;
             CProviderManager.UEFNProvider?.Dispose();
+            CProviderManager.UEFNProvider = null!;
 
             Output("Restoring Epic Games Launcher", Type.Info);
             CustomEpicGamesLauncher.Revert();
@@ -156,10 +159,10 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
             Output("Checking for left over .backup files", Type.Info);
 
-            foreach (var gamefile in pakDirectoryInfo.GetFiles("*.backup*"))
+            foreach (var gamefile in pakDirectoryInfo.GetFiles("*.backup*", SearchOption.TopDirectoryOnly))
             {
                 Output($"Deleting: {gamefile.Name}", Type.Info);
-                Directory.Delete(gamefile.FullName, true);
+                File.Delete(gamefile.FullName);
             }
 
             Output("Scanning for unknown game directories", Type.Info);

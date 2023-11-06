@@ -10,6 +10,7 @@ using Serilog;
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using WindowsAPICodePack.Dialogs;
@@ -159,10 +160,17 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 Memory.MainView.SetOverlay(new EpicGamesLauncherDirEmpty());
                 return;
             }
-            if (paks is null || string.IsNullOrEmpty(paks) || !Directory.Exists(paks))
+            if (string.IsNullOrEmpty(paks) || !Directory.Exists(paks))
             {
                 Log.Error("Fortnite directory is null or empty");
                 Memory.MainView.SetOverlay(new FortniteDirEmpty());
+                return;
+            }
+
+            Log.Information("Checking If game files are in use");
+            if (Misc.FilesInUse(paks))
+            {
+                Message.Display("Error", "Fortnite game files are currently in use!\nPlease close anything that may be using your game files.");
                 return;
             }
 
@@ -182,57 +190,88 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
         {
             if (Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Question"), Languages.Read(Languages.Type.Message, "RevertAllCosmetics"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                try
+                EpicGamesLauncher.Close();
+
+                var pakDirectoryInfo = new DirectoryInfo($"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks");
+                string epicinstallation = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
+
+                if (string.IsNullOrEmpty(epicinstallation) || !File.Exists(epicinstallation))
                 {
-                    string paks = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
-                    var directoryInfo = new DirectoryInfo(paks);
-
-                    //So files aren't in use.
-                    EpicGamesLauncher.Close();
-                    CProviderManager.DefaultProvider?.Dispose();
-                    CProviderManager.DefaultProvider = null!;
-                    CProviderManager.UEFNProvider?.Dispose();
-                    CProviderManager.UEFNProvider = null!;
-
-                    foreach (FileInfo item in directoryInfo.EnumerateFiles("*.utoc*", SearchOption.TopDirectoryOnly))
-                    {
-                        FileInfo fileInfo = new FileInfo(item.FullName.SubstringBeforeLast('.') + ".backup");
-
-                        if (fileInfo.Exists)
-                        {
-                            var reader = new Reader(item.FullName);
-                            var readerbackup = new Reader(fileInfo.FullName);
-
-                            var header = new FIoStoreTocHeader(reader);
-                            var headerbackup = new FIoStoreTocHeader(readerbackup);
-
-                            if (header.Compare(headerbackup) && reader.Length == readerbackup.Length)
-                            {
-                                Log.Information($"{fileInfo.Name} IO header matches {item.Name} and will apply backup");
-                                reader.Dispose();
-                                readerbackup.Dispose();
-                                File.Move(fileInfo.FullName, item.FullName, true);
-                            }
-                            else
-                            {
-                                Log.Warning($"{fileInfo.Name} IO header does not match {item.Name} attempting to remove backup");
-                                reader.Dispose();
-                                readerbackup.Dispose();
-                                File.Delete(fileInfo.FullName);
-                            }
-                        }
-                    }
-
-                    UEFN.Clear(paks);
-                    SwapLogs.Clear();
-                    SwapLogsDescription.Text = string.Format(Languages.Read(Languages.Type.View, "SettingsView", "SwapLogsDescription"), 0, 0, 0);
-                }
-                catch (Exception Exception)
-                {
-                    Log.Error(Exception, $"Failed to revert all cosmetics");
-                    Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "RevertAllCosmeticsError"), MessageBoxButton.OK, solutions: Languages.ReadSolutions(Languages.Type.Message, "RemoveError"));
+                    Log.Information(Languages.Read(Languages.Type.Message, "EpicGamesLauncherPathEmpty"));
+                    Memory.MainView.SetOverlay(new EpicGamesLauncherDirEmpty());
                     return;
                 }
+                if (!pakDirectoryInfo.Exists || string.IsNullOrEmpty(pakDirectoryInfo.FullName))
+                {
+                    Log.Error("Fortnite directory is null or empty");
+                    Memory.MainView.SetOverlay(new FortniteDirEmpty());
+                    return;
+                }
+
+                Log.Information("Checking If game files are in use");
+                if (Misc.FilesInUse(pakDirectoryInfo))
+                {
+                    Message.Display("Error", "Fortnite game files are currently in use!\nPlease close anything that may be using your game files.");
+                    return;
+                }
+
+                Log.Information("Disposing providers");
+                CProviderManager.DefaultProvider?.Dispose();
+                CProviderManager.DefaultProvider = null!;
+                CProviderManager.UEFNProvider?.Dispose();
+                CProviderManager.UEFNProvider = null!;
+
+                Log.Information("Restoring Epic Games Launcher");
+                CustomEpicGamesLauncher.Revert();
+
+                Log.Information("Removing UEFN game files");
+                UEFN.Clear(pakDirectoryInfo.FullName);
+
+                Log.Information("Checking for outdated backup game files");
+                foreach (var backupIoFileInfo in pakDirectoryInfo.EnumerateFiles("*.backup*", SearchOption.TopDirectoryOnly))
+                {
+                    var ioFileInfo = new FileInfo($"{backupIoFileInfo.FullName.SubstringBeforeLast('.')}.utoc");
+
+                    //This should never happen but just incase.
+                    if (!ioFileInfo.Exists || !backupIoFileInfo.Exists)
+                        continue;
+
+                    var ioReader = new Reader(ioFileInfo.FullName);
+                    var backupIoReader = new Reader(backupIoFileInfo.FullName);
+
+                    byte[] Magic = { 0x2D, 0x3D, 0x3D, 0x2D, 0x2D, 0x3D, 0x3D, 0x2D, 0x2D, 0x3D, 0x3D, 0x2D, 0x2D, 0x3D, 0x3D, 0x2D };
+
+                    if (backupIoReader.ReadBytes(Magic.Length).SequenceEqual(Magic))
+                    {
+                        backupIoReader.Position = 0;
+
+                        var ioHeader = new FIoStoreTocHeader(ioReader);
+                        var backupIoHeader = new FIoStoreTocHeader(backupIoReader);
+
+                        if (ioHeader.Compare(backupIoHeader) && ioReader.Length == backupIoReader.Length)
+                        {
+                            ioReader.Close();
+                            backupIoReader.Close();
+
+                            File.Move(backupIoFileInfo.FullName, ioFileInfo.FullName, true);
+                            Log.Information($"Moved: {backupIoFileInfo.Name} to {ioFileInfo.Name}");
+                            continue;
+                        }
+                        else Log.Warning($"IO backup {backupIoFileInfo.Name} header does not match IO {ioFileInfo.Name} header and will be removed");
+                    }
+                    else Log.Warning($"IO backup {backupIoFileInfo.Name} has invalid magic and will be removed");
+
+                    ioReader.Close();
+                    backupIoReader.Close();
+
+                    if (!Misc.TryDelete(backupIoFileInfo.FullName))
+                    {
+                        throw new CustomException($"Failed to remove outdated IO backup file: {backupIoFileInfo.FullName}");
+                    }
+                }
+
+                SwapLogs.Clear();
+                SwapLogsDescription.Text = string.Format(Languages.Read(Languages.Type.View, "SettingsView", "SwapLogsDescription"), 0, 0, 0);
             }
         }
 
