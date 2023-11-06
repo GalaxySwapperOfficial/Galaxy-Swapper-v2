@@ -13,6 +13,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using WindowsAPICodePack.Dialogs;
+using static Galaxy_Swapper_v2.Workspace.Global;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 {
@@ -147,57 +148,25 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
         private void Verify_Click(object sender, RoutedEventArgs e)
         {
-            //Check If Fortnite install Is null or empty here and same with epic games also auto close epic games and fortnite here as well!
+            EpicGamesLauncher.Close();
 
+            string paks = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
+            string epicinstallation = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
 
-            try
+            if (string.IsNullOrEmpty(epicinstallation) || !File.Exists(epicinstallation))
             {
-                string Installtion = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks";
-
-                EpicGamesLauncher.Close();
-                CProviderManager.DefaultProvider?.Dispose();
-                CProviderManager.DefaultProvider = null!;
-                CProviderManager.UEFNProvider?.Dispose();
-                CProviderManager.UEFNProvider = null!;
-
-                Log.Information("Scanning for unknown game files");
-                foreach (string Unkown in Directory.GetDirectories(Installtion))
-                {
-                    Log.Information($"Found directory that contains game files: {Unkown}");
-                    if (Directory.GetFiles(Unkown, "*.ucas").Length != 0 || Directory.GetFiles(Unkown, "*.pak").Length != 0)
-                    {
-                        Directory.Delete(Unkown, true);
-                        Log.Information($"Deleted {Unkown}");
-                    }
-                    else
-                        Log.Information($"Skipped {Unkown} (Does not contain ucas or sig)");
-                }
-
-                foreach (var iostore in new DirectoryInfo(Installtion).GetFiles())
-                {
-                    var ext = iostore.Extension.SubstringAfter('.');
-
-                    if (ext != "backup")
-                        continue;
-
-                    Log.Information($"Deleting: {iostore.FullName}");
-                    File.Delete(iostore.FullName);
-                }
-
-                CustomEpicGamesLauncher.Revert();
-                SwapLogs.Clear();
-                UEFN.Clear(Installtion);
-
-                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), Languages.Read(Languages.Type.Message, "Verify"), MessageBoxButton.OK);
-                EpicGamesLauncher.Verify();
-                Environment.Exit(0);
-            }
-            catch (Exception Exception)
-            {
-                Log.Error(Exception, $"Failed to verify game files");
-                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "VerifyError"), MessageBoxButton.OK, solutions: Languages.ReadSolutions(Languages.Type.Message, "RemoveError"));
+                Log.Information(Languages.Read(Languages.Type.Message, "EpicGamesLauncherPathEmpty"));
+                Memory.MainView.SetOverlay(new EpicGamesLauncherDirEmpty());
                 return;
             }
+            if (paks is null || string.IsNullOrEmpty(paks) || !Directory.Exists(paks))
+            {
+                Log.Error("Fortnite directory is null or empty");
+                Memory.MainView.SetOverlay(new FortniteDirEmpty());
+                return;
+            }
+
+            Memory.MainView.SetOverlay(new VerifyView());
         }
 
         private void Reset_Click(object sender, RoutedEventArgs e)

@@ -154,8 +154,15 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 }
             }
 
-            Log.Information("Scanning for unknown game directories");
+            Output("Checking for left over .backup files", Type.Info);
 
+            foreach (var gamefile in pakDirectoryInfo.GetFiles("*.backup*"))
+            {
+                Output($"Deleting: {gamefile.Name}", Type.Info);
+                Directory.Delete(gamefile.FullName, true);
+            }
+
+            Output("Scanning for unknown game directories", Type.Info);
             foreach (var gameDirectoryInfo in pakDirectoryInfo.GetDirectories())
             {
                 Output($"Deleting: {gameDirectoryInfo.Name}", Type.Info);
