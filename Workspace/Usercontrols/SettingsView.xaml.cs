@@ -72,12 +72,11 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             RefreshCosmetics.Content = Languages.Read(Languages.Type.View, "SettingsView", "RefreshCosmetics");
             LanguageSelection.Content = Languages.Read(Languages.Type.View, "SettingsView", "LanguageSelection");
 
+            InstallationDescription.Text = Settings.Read(Settings.Type.Installtion).Value<string>();
+            EpicInstallationDescription.Text = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
 
             if (IsLoaded)
                 return;
-
-            InstallationDescription.Text = Settings.Read(Settings.Type.Installtion).Value<string>();
-            EpicInstallationDescription.Text = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
 
             if (Settings.Read(Settings.Type.RichPresence).Value<bool>())
                 DiscordRichPresence.IsChecked = true;

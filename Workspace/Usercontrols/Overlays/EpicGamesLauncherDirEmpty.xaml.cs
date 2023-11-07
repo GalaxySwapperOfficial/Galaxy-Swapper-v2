@@ -73,6 +73,10 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             }
         }
 
-        private void DetectWorker_Completed(object sender, RunWorkerCompletedEventArgs e) => Close_Click(null!, null!);
+        private void DetectWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Memory.SettingsView.SettingsView_Loaded(null!, null!);
+            Close_Click(null!, null!);
+        }
     }
 }
