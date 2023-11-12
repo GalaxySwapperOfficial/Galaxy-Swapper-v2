@@ -19,7 +19,7 @@
                 <TextBlock x:Name="Tip_1" Text="Be apart of our community be joining our"/>
                 <TextBlock x:Name="Tip_2" Text="Discord Server" Style="{ StaticResource Highlight }" MouseLeftButtonDown="Discord_Click"/>
             </TextBlock>
-            <Image Source="/Workspace/Assets/Wave.png" Margin="156,98,157,-5"/>
+            <Image Source="/Workspace/Assets/Wave.png" Margin="156,103,156,-10"/>
             <components:CCloseControl x:Name="CloseButton" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5, 5, 5, 5" MouseLeftButtonDown="Close_Click"/>
         </Grid>
     </Border>

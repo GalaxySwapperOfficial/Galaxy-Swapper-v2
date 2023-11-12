@@ -17,7 +17,7 @@
         <Grid>
             <TextBlock x:Name="Header" Text="Failed to locate Epic Games Launcher directory!" TextAlignment="Center" VerticalAlignment="Top" Foreground="#EFEFF0" FontWeight="SemiBold" FontSize="22" Margin="0,38,0,0"/>
             <TextBlock x:Name="Description" Text="But don't worry! Just launch Epic Games Launcher, and we will automatically detect the directory." TextAlignment="Center" VerticalAlignment="Top" Foreground="#D3D3D6" FontWeight="Light" FontSize="13" Margin="0,74,0,0"/>
-            <Image Source="/Workspace/Assets/ThumbsUp.png" Margin="0,110,0,0" HorizontalAlignment="Center"/>
+            <Image Source="/Workspace/Assets/Failed.png" Margin="0,110,0,0" HorizontalAlignment="Center"/>
             <components:CCloseControl x:Name="CloseButton" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5, 5, 5, 5" MouseLeftButtonDown="Close_Click"/>
         </Grid>
     </Border>

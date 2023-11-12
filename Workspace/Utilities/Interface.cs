@@ -7,49 +7,42 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
 {
     public static class Interface
     {
-        #region Elements
         public class ThicknessAnim
         {
-            public dynamic Element { get; set; } = default!;
-            public ThicknessAnimation ElementAnim { get; set; } = default!;
+            public FrameworkElement Element { get; set; }
+            public ThicknessAnimation ElementAnim { get; set; }
         }
+
         public class BaseAnim
         {
-            public dynamic Element { get; set; } = default!;
-            public DoubleAnimationBase ElementAnim { get; set; } = default!;
-            public PropertyPath Property { get; set; } = default!;
+            public DependencyObject Element { get; set; }
+            public DoubleAnimationBase ElementAnim { get; set; }
+            public PropertyPath Property { get; set; }
         }
-        #endregion
 
-        public static Storyboard SetThicknessAnimations(params ThicknessAnim[] Elements)
+        public static Storyboard SetThicknessAnimations(params ThicknessAnim[] elements)
         {
             var storyboard = new Storyboard();
 
-            foreach (var Element in Elements)
+            foreach (var element in elements)
             {
-                var ElementAnim = Element.ElementAnim;
-
-                ElementAnim.SetValue(Storyboard.TargetProperty, Element.Element);
-                Storyboard.SetTargetProperty(ElementAnim, new PropertyPath(FrameworkElement.MarginProperty));
-
-                storyboard.Children.Add(ElementAnim);
+                Storyboard.SetTarget(element.ElementAnim, element.Element);
+                Storyboard.SetTargetProperty(element.ElementAnim, new PropertyPath(FrameworkElement.MarginProperty));
+                storyboard.Children.Add(element.ElementAnim);
             }
 
             return storyboard;
         }
 
-        public static Storyboard SetElementAnimations(params BaseAnim[] Elements)
+        public static Storyboard SetElementAnimations(params BaseAnim[] elements)
         {
             var storyboard = new Storyboard();
 
-            foreach (var Element in Elements)
+            foreach (var element in elements)
             {
-                var ElementAnim = Element.ElementAnim;
-
-                ElementAnim.SetValue(Storyboard.TargetProperty, Element.Element);
-                Storyboard.SetTargetProperty(ElementAnim, Element.Property);
-
-                storyboard.Children.Add(ElementAnim);
+                Storyboard.SetTarget(element.ElementAnim, element.Element);
+                Storyboard.SetTargetProperty(element.ElementAnim, element.Property);
+                storyboard.Children.Add(element.ElementAnim);
             }
 
             return storyboard;
@@ -59,8 +52,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
         {
             foreach (var decorator in decorators)
             {
-                var Blur = new BlurEffect() { Radius = 10 };
-                decorator.Effect = Blur;
+                decorator.Effect = new BlurEffect { Radius = 10 };
             }
         }
     }

@@ -8,7 +8,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
     {
         public static MessageBoxResult DisplaySTA(string header, string description, MessageBoxButton button = MessageBoxButton.OK, string[] links = null, string[] solutions = null, bool discord = false, bool exit = false)
         {
-            var result = MessageBoxResult.Cancel;
+            MessageBoxResult result = MessageBoxResult.Cancel;
             Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 var messageView = new CMessageboxControl(header, description, button, links, solutions, discord, exit);

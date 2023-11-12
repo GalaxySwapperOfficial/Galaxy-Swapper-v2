@@ -16,20 +16,19 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
 {
     public static class CProvider
     {
-        public static ProviderData DefaultProvider = null!;
-        public static ProviderData UEFNProvider = null!;
-        public static Export Export = null!;
-        public static byte[] ExportName = null!;
+        public static ProviderData DefaultProvider, UEFNProvider;
+        public static Export Export;
+        public static byte[] ExportName;
         public const string Paks = "\\FortniteGame\\Content\\Paks";
 
-        public static void InitDefault()
+        public static void InitProvider(ref ProviderData provider)
         {
-            if (DefaultProvider is not null)
+            if (provider is not null)
                 return;
 
             string paks = $"{Settings.Read(Settings.Type.Installtion)}{Paks}";
 
-            if (paks is null || string.IsNullOrEmpty(paks) || !Directory.Exists(paks))
+            if (string.IsNullOrEmpty(paks) || !Directory.Exists(paks))
             {
                 throw new FortniteDirectoryEmptyException(Languages.Read(Languages.Type.Message, "FortniteDirectoryEmpty"));
             }
@@ -37,40 +36,21 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
             Pakchunks.Validate(paks);
             AesProvider.Initialize();
 
-            DefaultProvider = new ();
-            DefaultProvider.SaveStreams = true;
-            DefaultProvider.FileProvider = new(paks, SearchOption.TopDirectoryOnly, isCaseInsensitive: false, new(EGame.GAME_UE5_3));
-            DefaultProvider.FileProvider.Initialize();
-            DefaultProvider.FileProvider.SubmitKeys(AesProvider.Keys);
-            DefaultProvider.SaveStreams = false;
+            provider = new ProviderData
+            {
+                SaveStreams = true,
+                FileProvider = new(paks, SearchOption.TopDirectoryOnly, isCaseInsensitive: false, new(EGame.GAME_UE5_3))
+            };
+            provider.FileProvider.Initialize();
+            provider.FileProvider.SubmitKeys(AesProvider.Keys);
+            provider.SaveStreams = false;
 
             WaitForEpicGames();
-            Log.Information($"Loaded Provider with version: {DefaultProvider.FileProvider.Versions.Game} to path ({paks}) with {AesProvider.Keys.Count()} AES keys.");
+            Log.Information($"Loaded Provider with version: {provider.FileProvider.Versions.Game} to path ({paks}) with {AesProvider.Keys.Count()} AES keys.");
         }
 
-        public static void InitUEFN()
-        {
-            if (UEFNProvider is not null)
-                return;
-
-            string paks = $"{Settings.Read(Settings.Type.Installtion)}{Paks}";
-
-            if (paks is null || string.IsNullOrEmpty(paks) || !Directory.Exists(paks))
-            {
-                throw new CustomException(Languages.Read(Languages.Type.Message, "FortniteDirectoryEmpty"));
-            }
-
-            AesProvider.Initialize();
-
-            UEFNProvider = new();
-            UEFNProvider.SaveStreams = true;
-            UEFNProvider.FileProvider = new(paks, SearchOption.TopDirectoryOnly, isCaseInsensitive: false, new(EGame.GAME_UE5_3));
-            UEFNProvider.FileProvider.Initialize(true);
-            UEFNProvider.FileProvider.SubmitKeys(AesProvider.Keys);
-            UEFNProvider.SaveStreams = false;
-
-            Log.Information($"Loaded UEFN Provider with version: {UEFNProvider.FileProvider.Versions.Game} to path ({paks}) with {AesProvider.Keys.Count()} AES keys.");
-        }
+        public static void InitDefault() => InitProvider(ref DefaultProvider);
+        public static void InitUEFN() => InitProvider(ref UEFNProvider);
 
         public static bool Save(string path)
         {

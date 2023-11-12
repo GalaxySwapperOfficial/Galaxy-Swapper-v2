@@ -185,9 +185,6 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
                 CProvider.InitDefault();
 
-                List<string> Ucas = new List<string>();
-                List<string> Utocs = new List<string>();
-
                 var Parse = Endpoint.Read(Endpoint.Type.FOV);
 
                 if (!Parse["Enabled"].Value<bool>())
@@ -205,19 +202,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     replace = string.Format(Parse["Replace"].Value<string>(), Misc.ByteToHex(BitConverter.GetBytes(GetSliderValue())))
                 }));
 
-                Ucas.AddRange(Ucas.Contains(CProvider.Export.Ucas) ? Enumerable.Empty<string>() : new[] { CProvider.Export.Ucas });
-                Utocs.AddRange(Utocs.Contains(CProvider.Export.Utoc) ? Enumerable.Empty<string>() : new[] { CProvider.Export.Utoc });
-
-                if (Settings.Read(Settings.Type.KickWarning).Value<bool>())
-                {
-                    SwapLogs.Kick(out bool UcasK, out bool UtocK, Ucas, Utocs);
-
-                    if (UtocK)
-                    {
-                        Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Warning"), string.Format(Languages.Read(Languages.Type.Message, "MaxPakChunkCount"), "Utoc", 2), MessageBoxButton.OK);
-                        return;
-                    }
-                }
+                List<string> Ucas = new List<string> { CProvider.Export.Ucas };
+                List<string> Utocs = new List<string> { CProvider.Export.Utoc };
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "ModifyingEpicGamesLauncher"), Type.Info);
                 CustomEpicGamesLauncher.Convert();
@@ -241,19 +227,6 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.View, "SwapView", "ConvertedMinutes"), TimeSpan.Minutes), MessageBoxButton.OK);
                 else
                     Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Info"), string.Format(Languages.Read(Languages.Type.View, "SwapView", "Converted"), TimeSpan.Seconds), MessageBoxButton.OK);
-            }
-            catch (FortniteDirectoryEmptyException Exception)
-            {
-                this.Dispatcher.Invoke(() =>
-                {
-                    Log.Error(Exception.Message, "Fortnite directory is null or empty");
-                    Memory.MainView.SetOverlay(new FortniteDirEmpty());
-                });
-            }
-            catch (Global.CustomException CustomException)
-            {
-                Log.Error(CustomException.Message, "Caught CustomException");
-                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "ConvertError"), "FOV", CustomException.Message), discord: true);
             }
             catch (Exception Exception)
             {

@@ -3,6 +3,7 @@ using Galaxy_Swapper_v2.Workspace.Usercontrols;
 using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -31,57 +32,31 @@ namespace Galaxy_Swapper_v2.Workspace.Views
         public void Tab_Click(object sender, MouseButtonEventArgs e)
         {
             var Sender = (CTabControl)sender;
-
             LastTabBorder?.Tab_Default();
             LastTabBorder = Sender;
             Sender.Tab_Clicked();
 
-            UserControl NewTab;
-            switch (Sender.Name)
-            {
-                case "Dashboard":
-                    NewTab = Memory.DashboardView;
-                    SearchBar.Visibility = Visibility.Hidden;
-                    break;
-                case "Characters":
-                    NewTab = Memory.LoadCharacters(SearchBar.Searchbar);
-                    SearchBar.Visibility = Visibility.Visible;
-                    break;
-                case "Backpacks":
-                    NewTab = Memory.LoadBackpacks(SearchBar.Searchbar);
-                    SearchBar.Visibility = Visibility.Visible;
-                    break;
-                case "Pickaxes":
-                    NewTab = Memory.LoadPickaxes(SearchBar.Searchbar);
-                    SearchBar.Visibility = Visibility.Visible;
-                    break;
-                case "Dances":
-                    NewTab = Memory.LoadDances(SearchBar.Searchbar);
-                    SearchBar.Visibility = Visibility.Visible;
-                    break;
-                case "Gliders":
-                    NewTab = Memory.LoadGliders(SearchBar.Searchbar);
-                    SearchBar.Visibility = Visibility.Visible;
-                    break;
-                case "Weapons":
-                    NewTab = Memory.LoadWeapons(SearchBar.Searchbar);
-                    SearchBar.Visibility = Visibility.Visible;
-                    break;
-                case "Misc":
-                    NewTab = Memory.MiscView;
-                    SearchBar.Visibility = Visibility.Hidden;
-                    break;
-                case "Settings":
-                    NewTab = Memory.SettingsView;
-                    SearchBar.Visibility = Visibility.Hidden;
-                    break;
-                case "Plugins":
-                    NewTab = Memory.PluginsView;
-                    SearchBar.Visibility = Visibility.Hidden;
-                    break;
-                default:
-                    return;
-            }
+            var tabActions = new Dictionary<string, Func<UserControl>>
+    {
+        {"Dashboard", () => Memory.DashboardView},
+        {"Characters", () => Memory.LoadCharacters(SearchBar.Searchbar)},
+        {"Backpacks", () => Memory.LoadBackpacks(SearchBar.Searchbar)},
+        {"Pickaxes", () => Memory.LoadPickaxes(SearchBar.Searchbar)},
+        {"Dances", () => Memory.LoadDances(SearchBar.Searchbar)},
+        {"Gliders", () => Memory.LoadGliders(SearchBar.Searchbar)},
+        {"Weapons", () => Memory.LoadWeapons(SearchBar.Searchbar)},
+        {"Misc", () => Memory.MiscView},
+        {"Settings", () => Memory.SettingsView},
+        {"Plugins", () => Memory.PluginsView}
+    };
+
+            if (!tabActions.TryGetValue(Sender.Name, out var action))
+                return;
+
+            var NewTab = action();
+            var isSearchBarVisible = Sender.Name != "Dashboard" && Sender.Name != "Misc" && Sender.Name != "Settings" && Sender.Name != "Plugins";
+
+            SearchBar.Visibility = isSearchBarVisible ? Visibility.Visible : Visibility.Hidden;
 
             if (TabHolder.Child != null)
                 TabHolder.Child = null;
@@ -125,8 +100,8 @@ namespace Galaxy_Swapper_v2.Workspace.Views
             Storyboard.Begin();
         }
 
-        private void Close_Click(object sender, MouseButtonEventArgs e) => Memory.MainView.Close();
-        private void Minimize_Click(object sender, MouseButtonEventArgs e) => Memory.MainView.WindowState = WindowState.Minimized;
-        private void Drag_Click(object sender, MouseButtonEventArgs e) => Memory.MainView.DragMove();
+        private void Close_Click(object sender, MouseButtonEventArgs e) => Close();
+        private void Minimize_Click(object sender, MouseButtonEventArgs e) => WindowState = WindowState.Minimized;
+        private void Drag_Click(object sender, MouseButtonEventArgs e) => DragMove();
     }
 }
