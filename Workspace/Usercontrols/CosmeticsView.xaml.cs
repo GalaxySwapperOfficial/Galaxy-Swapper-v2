@@ -1,10 +1,12 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Generation;
 using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
+using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 {
@@ -86,8 +88,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             else
                 NewCosmetic.LoadImage(Frontend, invalid: "https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API/blob/main/In%20Game/Icons/InvalidCosmetic.png?raw=true");
 
-            NewCosmetic.MouseEnter += Cosmetic_MouseEnter;
-            NewCosmetic.MouseLeave += Cosmetic_MouseLeave;
+            NewCosmetic.MouseEnter += (sender, e) => AnimateSize((Image)sender, 95, 5);
+            NewCosmetic.MouseLeave += (sender, e) => AnimateSize((Image)sender, 85, 10);
             NewCosmetic.MouseLeftButtonDown += (sender, e) =>
             {
                 var Options = Generate.Options(CacheKey, Type);
@@ -100,19 +102,20 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             return NewCosmetic;
         }
 
-
-        private void Cosmetic_MouseEnter(object sender, MouseEventArgs e)
+        private void AnimateSize(Image image, int size, int margin)
         {
-            ((Image)sender).Margin = new Thickness(5);
-            ((Image)sender).Height += 10;
-            ((Image)sender).Width += 10;
-        }
+            var sizeAnimation = new DoubleAnimation(size, TimeSpan.FromMilliseconds(200))
+            {
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+            };
+            var marginAnimation = new ThicknessAnimation(new Thickness(margin), TimeSpan.FromMilliseconds(200))
+            {
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+            };
 
-        private void Cosmetic_MouseLeave(object sender, MouseEventArgs e)
-        {
-            ((Image)sender).Margin = new Thickness(10);
-            ((Image)sender).Height -= 10;
-            ((Image)sender).Width -= 10;
+            image.BeginAnimation(WidthProperty, sizeAnimation);
+            image.BeginAnimation(HeightProperty, sizeAnimation);
+            image.BeginAnimation(MarginProperty, marginAnimation);
         }
     }
 }
