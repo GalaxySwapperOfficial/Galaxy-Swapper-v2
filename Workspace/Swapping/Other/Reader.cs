@@ -58,6 +58,35 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
             return Unsafe.ReadUnaligned<T>(ref ReadBytes(Unsafe.SizeOf<T>())[0]);
         }
 
+        public virtual T[] ReadArray<T>(Func<T> getter)
+        {
+            var length = Read<int>();
+            return ReadArray(length, getter);
+        }
+
+        public T[] ReadArray<T>(int length, Func<T> getter)
+        {
+            var result = new T[length];
+
+            if (length == 0)
+            {
+                return result;
+            }
+
+            ReadArray(result, getter);
+
+            return result;
+        }
+
+        public void ReadArray<T>(T[] array, Func<T> getter)
+        {
+            // array is a reference type
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = getter();
+            }
+        }
+
         public T[] ReadArray<T>()
         {
             T[] array = new T[Read<int>()];
@@ -78,6 +107,61 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
             return array;
         }
 
+        public virtual string ReadFString()
+        {
+            // > 0 for ANSICHAR, < 0 for UCS2CHAR serialization
+            var length = Read<int>();
+
+            if (length == int.MinValue)
+                throw new ArgumentOutOfRangeException(nameof(length), "Archive is corrupted");
+
+            // if (length is < -512000 or > 512000)
+            //     throw new ParserException($"Invalid FString length '{length}'");
+
+            if (length == 0)
+            {
+                return string.Empty;
+            }
+
+            // 1 byte/char is removed because of null terminator ('\0')
+            if (length < 0) // LoadUCS2Char, Unicode, 16-bit, fixed-width
+            {
+                unsafe
+                {
+                    length = -length;
+                    var ucs2Length = length * sizeof(ushort);
+                    var ucs2Bytes = ucs2Length <= 1024 ? stackalloc byte[ucs2Length] : new byte[ucs2Length];
+                    fixed (byte* ucs2BytesPtr = ucs2Bytes)
+                    {
+                        Serialize(ucs2BytesPtr, ucs2Length);
+#if !NO_STRING_NULL_TERMINATION_VALIDATION
+                        if (ucs2Bytes[ucs2Length - 1] != 0 || ucs2Bytes[ucs2Length - 2] != 0)
+                        {
+                            throw new Exception("Serialized FString is not null terminated");
+                        }
+#endif
+                        return new string((char*)ucs2BytesPtr, 0, length - 1);
+                    }
+                }
+            }
+
+            unsafe
+            {
+                var ansiBytes = length <= 1024 ? stackalloc byte[length] : new byte[length];
+                fixed (byte* ansiBytesPtr = ansiBytes)
+                {
+                    Serialize(ansiBytesPtr, length);
+#if !NO_STRING_NULL_TERMINATION_VALIDATION
+                    if (ansiBytes[length - 1] != 0)
+                    {
+                        throw new Exception("Serialized FString is not null terminated");
+                    }
+#endif
+                    return new string((sbyte*)ansiBytesPtr, 0, length - 1);
+                }
+            }
+        }
+
         public static T ReadStruct<T>(byte[] buffer, int offset)
         {
             byte[] bytes = new byte[Marshal.SizeOf<T>()];
@@ -86,6 +170,12 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
             T data = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
 
             return data;
+        }
+
+        public virtual unsafe void Serialize(byte* ptr, int length)
+        {
+            var bytes = ReadBytes(length);
+            Unsafe.CopyBlockUnaligned(ref ptr[0], ref bytes[0], (uint)length);
         }
 
         public Dictionary<TKey, TValue> ReadMap<TKey, TValue>()

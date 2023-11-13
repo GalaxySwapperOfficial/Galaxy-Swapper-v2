@@ -305,6 +305,42 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                 return foundFiles[0];
         }
 
+        public static bool TryDelete(FileInfo fileInfo)
+        {
+            try
+            {
+                if (fileInfo.Exists)
+                {
+                    fileInfo.Delete();
+                }
+            }
+            catch (Exception Exception)
+            {
+                Log.Error(Exception, $"Failed to remove {fileInfo.FullName}");
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool TryDelete(string file)
+        {
+            try
+            {
+                if (File.Exists(file))
+                {
+                    File.Delete(file);
+                }
+            }
+            catch (Exception Exception)
+            {
+                Log.Error(Exception, $"Failed to remove {file}");
+                return false;
+            }
+
+            return true;
+        }
+
         public static string ByteToHex(byte[] byteArray) => BitConverter.ToString(byteArray).Replace("-", " ");
 
         public static long FileLength(this string path) => new FileInfo(path).Length;
@@ -312,6 +348,40 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
         public static byte[] CreateNull(int Length)
         {
             return new byte[Length];
+        }
+
+        public static bool FilesInUse(DirectoryInfo directoryInfo)
+        {
+            foreach (var fileInfo in directoryInfo.GetFiles())
+            {
+                if (!fileInfo.Exists)
+                {
+                    continue;
+                }
+                else if (!CanEdit(fileInfo.FullName))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool FilesInUse(string directory)
+        {
+            foreach (var fileInfo in new DirectoryInfo(directory).GetFiles())
+            {
+                if (!fileInfo.Exists)
+                {
+                    continue;
+                }
+                else if (!CanEdit(fileInfo.FullName))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

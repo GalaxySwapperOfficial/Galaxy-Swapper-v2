@@ -191,7 +191,7 @@ namespace Galaxy_Swapper_v2.Workspace.Components
             }
 
             if (Exit)
-                Application.Current.Shutdown();
+                Environment.Exit(0);
             else
                 Close();
         }

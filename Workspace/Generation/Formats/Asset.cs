@@ -1,4 +1,4 @@
-﻿using Galaxy_Swapper_v2.Workspace.Structs;
+﻿using Galaxy_Swapper_v2.Workspace.CProvider.Objects;
 using Newtonsoft.Json.Linq;
 using System;
 
@@ -10,8 +10,8 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Formats
         public string OverrideObject;
         public string OverrideBuffer;
         public JToken Swaps;
-        public Export Export { get; set; } = default!;
-        public Export OverrideExport { get; set; } = default!;
+        public GameFile Export { get; set; } = default!;
+        public GameFile OverrideExport { get; set; } = default!;
         public object Clone()
         {
             return this.MemberwiseClone();

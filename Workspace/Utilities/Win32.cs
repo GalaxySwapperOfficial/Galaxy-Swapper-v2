@@ -14,9 +14,9 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
 
         public static void SetProcessHigher(Process[] process)
         {
-            for (int i = 0; i < process.Length; i++)
+            foreach (var proc in process)
             {
-                SetForegroundWindow(process[i].MainWindowHandle);
+                SetForegroundWindow(proc.MainWindowHandle);
             }
         }
     }

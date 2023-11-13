@@ -11,6 +11,9 @@
     <ApplicationIcon>Workspace\Assets\Logo.ico</ApplicationIcon>
     <Authors>Wslt#9596</Authors>
     <Copyright>Copyright © Galaxy Swapper v2</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2</RepositoryUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -60,6 +63,7 @@
     <None Remove="Workspace\Assets\Wave.png" />
     <None Remove="Workspace\Assets\Weapons.png" />
     <None Remove="Workspace\Assets\Weapons_Clicked.png" />
+    <None Remove="Workspace\CProvider\README.md" />
   </ItemGroup>
 
   <ItemGroup>
@@ -69,6 +73,7 @@
   <ItemGroup>
     <PackageReference Include="DiscordRichPresence" Version="1.1.3.18" />
     <PackageReference Include="DotNetZip" Version="1.16.0" />
+    <PackageReference Include="GenericReader" Version="1.0.3" />
     <PackageReference Include="K4os.Compression.LZ4" Version="1.3.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="110.2.0" />
@@ -101,6 +106,7 @@
     <Resource Include="Workspace\Assets\Minimize.png" />
     <Resource Include="Workspace\Assets\Misc.png" />
     <Resource Include="Workspace\Assets\Misc_Clicked.png" />
+    <EmbeddedResource Include="README.md" />
     <EmbeddedResource Include="Workspace\Assets\oo2core_5_win64.dll" />
     <Resource Include="Workspace\Assets\Pickaxes.png" />
     <Resource Include="Workspace\Assets\Pickaxes_Clicked.png" />
@@ -117,6 +123,18 @@
     <Resource Include="Workspace\Assets\Wave.png" />
     <Resource Include="Workspace\Assets\Weapons.png" />
     <Resource Include="Workspace\Assets\Weapons_Clicked.png" />
+    <EmbeddedResource Include="Workspace\CProvider\README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

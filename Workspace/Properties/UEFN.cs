@@ -1,5 +1,5 @@
-﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
-using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
+﻿using Galaxy_Swapper_v2.Workspace.CProvider;
+using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -101,7 +101,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             File.WriteAllText(Path, Cache.ToString());
             Log.Information($"Wrote UEFN cache to {Path}");
 
-            CProvider.InitUEFN();
+            CProviderManager.InitUEFN();
         }
 
         public static void Add(string paks, string name, Downloadable downloadable)
@@ -123,7 +123,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             File.WriteAllText(Path, Cache.ToString());
             Log.Information($"Wrote UEFN cache to {Path}");
 
-            CProvider.InitUEFN();
+            CProviderManager.InitUEFN();
         }
 
         private static void Download(DirectoryInfo paks, List<Downloadable> downloadables, out List<string> usedslots)
@@ -369,8 +369,8 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
 
         public static void Dispose()
         {
-            CProvider.UEFNProvider?.Dispose();
-            CProvider.UEFNProvider = null!;
+            CProviderManager.UEFNProvider?.Dispose();
+            CProviderManager.UEFNProvider = null!;
         }
 
         #endregion

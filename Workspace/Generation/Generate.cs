@@ -31,7 +31,13 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
             {
                 var Parse = Endpoint.Read(Endpoint.Type.Cosmetics);
                 var parseStats = Endpoint.Read(Endpoint.Type.Stats);
-                var stats = parseStats[Type.ToString()].ToDictionary(c => c["key"].Value<string>(), c => c["count"].Value<int>());
+                Dictionary<string, int> stats;
+
+                if (parseStats is null)
+                {
+                    stats = new Dictionary<string, int>();
+                }
+                else stats = parseStats[Type.ToString()].ToDictionary(c => c["key"].Value<string>(), c => c["count"].Value<int>());
 
                 var Stopwatch = new Stopwatch();
                 Stopwatch.Start();

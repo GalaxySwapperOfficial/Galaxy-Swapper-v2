@@ -1,6 +1,6 @@
-﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
+﻿using Galaxy_Swapper_v2.Workspace.CProvider;
+using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Properties;
-using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
 using Galaxy_Swapper_v2.Workspace.Swapping.Sterilization;
 using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
@@ -35,14 +35,14 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
         public bool Convert()
         {
-            var Deserializer = new Deserializer(Asset.Export.Buffer);
+            var Deserializer = new Deserializer(Asset.Export.UncompressedBuffer);
 
             Output(Languages.Read(Languages.Type.View, "SwapView", "Deserializing"), SwapView.Type.Info);
             Deserializer.Read();
 
             if (Asset.OverrideObject != null && !string.IsNullOrEmpty(Asset.OverrideObject))
             {
-                var OverrideDeserializer = new Deserializer(Asset.OverrideExport.Buffer);
+                var OverrideDeserializer = new Deserializer(Asset.OverrideExport.UncompressedBuffer);
                 OverrideDeserializer.Read();
 
                 OverrideDeserializer.ReplaceEntry(Deserializer, Asset.OverrideObject.Split('.')[0], Asset.Object.Split('.')[0]);
@@ -71,7 +71,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
                                 if (!string.IsNullOrEmpty(OverrideObjectPath) && !Object["UEFN"].KeyIsNullOrEmpty() && Object["UEFN"].Value<bool>())
                                 {
-                                    OverrideObjectPath = CProvider.FormatUEFNGamePath(OverrideObjectPath);
+                                    OverrideObjectPath = CProviderManager.FormatUEFNGamePath(OverrideObjectPath);
                                 }
 
                                 Deserializer.ReplaceEntry(ObjectPath, OverrideObjectPath);
@@ -127,7 +127,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
             byte[] BufferToWrite = Buffer.ToArray();
 
-            string Ucas = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks\\{(Asset.Export.LastPartition == 0 ? Asset.Export.Ucas : $"{Asset.Export.Utoc}_s{Asset.Export.LastPartition}")}.ucas";
+            string Ucas = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks\\{Asset.Export.LastUcas}.ucas";
             string Utoc = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks\\{Asset.Export.Utoc}.utoc";
 
             Output(Languages.Read(Languages.Type.View, "SwapView", "Preparing"), SwapView.Type.Info);
@@ -153,7 +153,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
             using (BinaryWriter UtocEdit = new BinaryWriter(File.Open(Utoc, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite)))
             {
                 UtocEdit.Seek((int)Asset.Export.CompressionBlock.Position, SeekOrigin.Begin);
-                UtocEdit.Write(Misc.CompressionBlock((uint)position, (uint)BufferToWrite.Length, (uint)BufferToWrite.Length, Asset.Export.LastPartition, false), 0, 12);
+                UtocEdit.Write(Misc.CompressionBlock((uint)position, (uint)BufferToWrite.Length, (uint)BufferToWrite.Length, (uint)Asset.Export.LastPartition, false), 0, 12);
 
                 Log.Information($"Wrote to: {Utoc} at Offset: {Asset.Export.CompressionBlock.Position}");
 

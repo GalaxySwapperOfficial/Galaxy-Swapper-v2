@@ -1,4 +1,5 @@
-﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
+﻿using Galaxy_Swapper_v2.Workspace.CProvider;
+using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Swapping;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
@@ -133,13 +134,16 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
         }
 
         private BackgroundWorker Worker { get; set; } = default!;
+        private bool IsWorkerBusy = false;
         private void Worker_Click(object sender, RoutedEventArgs e)
         {
-            if (Worker != null && Worker.IsBusy)
+            if (IsWorkerBusy)
             {
                 Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Languages.Read(Languages.Type.View, "SwapView", "WorkerBusy"), MessageBoxButton.OK);
                 return;
             }
+
+            IsWorkerBusy = true;
 
             string epicinstallation = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
             if (string.IsNullOrEmpty(epicinstallation) || !File.Exists(epicinstallation))
@@ -171,11 +175,12 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
         private void Worker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
+            IsWorkerBusy = false;
             Interface.SetElementAnimations(new Interface.BaseAnim { Element = Amount, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 0, To = 1, Duration = new TimeSpan(0, 0, 0, 0, 100), BeginTime = new TimeSpan(0, 0, 0, 0, 100) } }, new Interface.BaseAnim { Element = LOG, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 100) } }).Begin();
             Slider.IsEnabled = true;
         }
 
-        private async void Worker_Convert(object sender, DoWorkEventArgs e)
+        private void Worker_Convert(object sender, DoWorkEventArgs e)
         {
             try
             {
@@ -183,10 +188,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 Stopwatch.Start();
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                CProvider.InitDefault();
-
-                List<string> Ucas = new List<string>();
-                List<string> Utocs = new List<string>();
+                CProviderManager.InitDefault();
 
                 var Parse = Endpoint.Read(Endpoint.Type.FOV);
 
@@ -195,7 +197,9 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
                 Output(string.Format(Languages.Read(Languages.Type.View, "SwapView", "Exporting"), "Asset"), Type.Info);
 
-                if (!CProvider.Save(Parse["Object"].Value<string>()))
+                var exported = CProviderManager.DefaultProvider.Save(Parse["Object"].Value<string>());
+
+                if (exported is null)
                     throw new Exception($"Failed to export asset");
 
                 var Swaps = new JArray(JObject.FromObject(new
@@ -205,8 +209,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     replace = string.Format(Parse["Replace"].Value<string>(), Misc.ByteToHex(BitConverter.GetBytes(GetSliderValue())))
                 }));
 
-                Ucas.AddRange(Ucas.Contains(CProvider.Export.Ucas) ? Enumerable.Empty<string>() : new[] { CProvider.Export.Ucas });
-                Utocs.AddRange(Utocs.Contains(CProvider.Export.Utoc) ? Enumerable.Empty<string>() : new[] { CProvider.Export.Utoc });
+                List<string> Ucas = new() { exported.Ucas };
+                List<string> Utocs = new() { exported.Utoc };
 
                 if (Settings.Read(Settings.Type.KickWarning).Value<bool>())
                 {
@@ -224,7 +228,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "ConvertingAssets"), Type.Info);
 
-                var Swap = new Swap(null, this, new Asset() { Object = FormatObject(Parse["Object"].Value<string>()), Swaps = Swaps, Export = CProvider.Export });
+                var Swap = new Swap(null, this, new Asset() { Object = FormatObject(Parse["Object"].Value<string>()), Swaps = Swaps, Export = exported });
                 if (!Swap.Convert())
                     return;
 
@@ -250,7 +254,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     Memory.MainView.SetOverlay(new FortniteDirEmpty());
                 });
             }
-            catch (Global.CustomException CustomException)
+            catch (CustomException CustomException)
             {
                 Log.Error(CustomException.Message, "Caught CustomException");
                 Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "ConvertError"), "FOV", CustomException.Message), discord: true);
@@ -270,7 +274,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 Stopwatch.Start();
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
-                CProvider.InitDefault();
+                CProviderManager.InitDefault();
 
                 var Parse = Endpoint.Read(Endpoint.Type.FOV);
 
@@ -279,12 +283,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
                 Output(string.Format(Languages.Read(Languages.Type.View, "SwapView", "Exporting"), "Asset"), Type.Info);
 
-                if (!CProvider.Save(Parse["Object"].Value<string>()))
+                var exported = CProviderManager.DefaultProvider.Save(Parse["Object"].Value<string>());
+
+                if (exported is null)
                     throw new Exception($"Failed to export asset");
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "RevertingAssets"), Type.Info);
 
-                var Swap = new Swap(null, this, new Asset() { Object = FormatObject(Parse["Object"].Value<string>()), Export = CProvider.Export });
+                var Swap = new Swap(null, this, new Asset() { Object = FormatObject(Parse["Object"].Value<string>()), Export = exported });
                 if (!Swap.Revert())
                     return;
 
