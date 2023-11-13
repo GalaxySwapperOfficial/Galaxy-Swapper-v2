@@ -170,7 +170,7 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
                     ref var fileEntry = ref fileEntries[file];
 
                     var path = string.Concat(subDirectoryName, stringTable[fileEntry.Name]);
-                    var gamefile = new GameFile(path, fileEntry.UserData, FIoStoreTocResource.ChunkOffsetLengths[fileEntry.UserData]);
+                    var gamefile = new GameFile(path, fileEntry.UserData, FIoStoreTocResource.ChunkOffsetLengths[fileEntry.UserData], IoStoreTocHeader);
 
                     Files[path] = gamefile;
                     file = fileEntry.NextFileEntry;
@@ -212,6 +212,7 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
 
             if (IoStoreTocHeader.ContainerFlags.HasFlag(EIoContainerFlags.Encrypted))
             {
+                gamefile.IsEncrypted = true;
                 if (DefaultFileProvider.Keys.ContainsKey(IoStoreTocHeader.EncryptionKeyGuid))
                 {
                     compressedbuffer = UnrealAes.Decrypt(compressedbuffer, DefaultFileProvider.Keys[IoStoreTocHeader.EncryptionKeyGuid]);

@@ -55,7 +55,7 @@ namespace Galaxy_Swapper_v2
 
             base.OnStartup(e);
         }
-
+        
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             Log.Fatal("Application caught a unexpected error and can not recover");

@@ -1,4 +1,5 @@
 ﻿using Galaxy_Swapper_v2.Workspace.CProvider;
+using Galaxy_Swapper_v2.Workspace.CProvider.Encryption;
 using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Swapping.Sterilization;
@@ -126,6 +127,11 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
             }
 
             byte[] BufferToWrite = Buffer.ToArray();
+
+            if (Asset.Export.IsEncrypted)
+            {
+                BufferToWrite = UnrealAes.Encrypt(BufferToWrite, CProviderManager.DefaultProvider.Keys[Asset.Export.IoStoreTocHeader.EncryptionKeyGuid].Key);
+            }
 
             string Ucas = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks\\{Asset.Export.LastUcas}.ucas";
             string Utoc = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks\\{Asset.Export.Utoc}.utoc";

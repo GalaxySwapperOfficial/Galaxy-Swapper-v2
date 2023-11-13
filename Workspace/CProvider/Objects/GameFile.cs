@@ -6,8 +6,7 @@
         public readonly long Size;
         public readonly uint TocEntryIndex;
         public readonly FIoOffsetAndLength ChunkOffsetLengths;
-
-
+        public readonly FIoStoreTocHeader IoStoreTocHeader;
         public FIoStoreTocCompressedBlockEntry CompressionBlock;
         public string Ucas;
         public string LastUcas;
@@ -17,12 +16,13 @@
         public byte[] CompressedBuffer;
         public byte[] UncompressedBuffer;
         public bool IsEncrypted;
-        public GameFile(string path, uint tocentryindex, FIoOffsetAndLength chunkOffsetLengths)
+        public GameFile(string path, uint tocentryindex, FIoOffsetAndLength chunkOffsetLengths, FIoStoreTocHeader ioStoreTocHeader)
         {
             Path = path;
             TocEntryIndex = tocentryindex;
             ChunkOffsetLengths = chunkOffsetLengths;
             Size = (long)ChunkOffsetLengths.Length;
+            IoStoreTocHeader = ioStoreTocHeader;
         }
 
         public GameFile()
