@@ -15,8 +15,7 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
 {
     public static class CProviderManager
     {
-        public static DefaultFileProvider DefaultProvider = null!;
-        public static DefaultFileProvider UEFNProvider = null!;
+        public static DefaultFileProvider DefaultProvider = null!, UEFNProvider = null!;
         public const string Paks = "\\FortniteGame\\Content\\Paks";
 
         public static void InitDefault()

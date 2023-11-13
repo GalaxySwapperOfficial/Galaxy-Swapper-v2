@@ -190,9 +190,6 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 Output(Languages.Read(Languages.Type.View, "SwapView", "InitializingProvider"), Type.Info);
                 CProviderManager.InitDefault();
 
-                List<string> Ucas = new List<string>();
-                List<string> Utocs = new List<string>();
-
                 var Parse = Endpoint.Read(Endpoint.Type.FOV);
 
                 if (!Parse["Enabled"].Value<bool>())
@@ -212,8 +209,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     replace = string.Format(Parse["Replace"].Value<string>(), Misc.ByteToHex(BitConverter.GetBytes(GetSliderValue())))
                 }));
 
-                Ucas.AddRange(Ucas.Contains(exported.Ucas) ? Enumerable.Empty<string>() : new[] { exported.Ucas });
-                Utocs.AddRange(Utocs.Contains(exported.Utoc) ? Enumerable.Empty<string>() : new[] { exported.Utoc });
+                List<string> Ucas = new() { exported.Ucas };
+                List<string> Utocs = new() { exported.Utoc };
 
                 if (Settings.Read(Settings.Type.KickWarning).Value<bool>())
                 {

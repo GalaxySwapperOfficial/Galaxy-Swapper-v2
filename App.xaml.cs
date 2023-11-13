@@ -20,6 +20,7 @@ namespace Galaxy_Swapper_v2
             Process[] currentprocess = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName);
             if (currentprocess.Length > 1)
             {
+                Win32.SetProcessHigher(currentprocess);
                 Message.DisplaySTA("Info", "It has been detected that Galaxy Swapper is already running. The process will be brought to the front.\nIf there is an issue, please end the 'Galaxy Swapper v2' process in Task Manager and restart the application.");
                 Environment.Exit(0);
             }

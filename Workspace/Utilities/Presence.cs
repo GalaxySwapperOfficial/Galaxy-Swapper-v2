@@ -1,10 +1,7 @@
 ﻿using DiscordRPC;
-using DiscordRPC.Message;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Newtonsoft.Json.Linq;
-using Serilog;
-using System;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace Galaxy_Swapper_v2.Workspace.Utilities
 {
@@ -12,52 +9,27 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
     {
         private static RichPresence RichPresence;
         public static DiscordRpcClient Client;
-
-        public static string Username = "Anonymous";
-        public static string Avatar = "https://www.galaxyswapperv2.com/Icons/InvalidIcon.png";
-        public static ulong ID = 0;
-        public static int Tag = 0000;
-        public static User.Flag Flag = User.Flag.None;
-        public static User.PremiumType PremiumType = User.PremiumType.None;
-
+        public static User User;
         public static void Initialize()
         {
             var Parse = Endpoint.Read(Endpoint.Type.Presence);
 
             Client = new DiscordRpcClient(Parse["ApplicationID"].Value<string>());
             Client.Initialize();
-            Client.OnReady += delegate (object sender, ReadyMessage e)
+            Client.OnReady += (sender, e) =>
             {
                 if (!string.IsNullOrEmpty(e.User.Username) && !string.IsNullOrEmpty(e.User.GetAvatarURL(User.AvatarFormat.PNG)))
                 {
-                    Username = e.User.Username;
-                    Tag = e.User.Discriminator;
-                    Avatar = e.User.GetAvatarURL(User.AvatarFormat.PNG);
-                    ID = e.User.ID;
-                    Flag = e.User.Flags;
-                    PremiumType = e.User.Premium;
-
-                    if (ID is 1106620371307864085 or 852567052899844096 or 594557172784955392 or 598091052817186835 or 200364085508964354)
-                    {
-                        Log.Error("User is banned!");
-                        Environment.Exit(0);
-                    }
+                    User = e.User;
                 }
             };
-
-            List<Button> Buttons = new List<Button>();
-
-            foreach (var Button in Parse["Buttons"])
-            {
-                Buttons.Add(new DiscordRPC.Button { Label = Button["Label"].Value<string>(), Url = Button["URL"].Value<string>() });
-            }
 
             RichPresence = new RichPresence()
             {
                 Details = "Dashboard",
                 State = Parse["State"].Value<string>(),
                 Timestamps = Timestamps.Now,
-                Buttons = Buttons.ToArray(),
+                Buttons = Parse["Buttons"].Select(Button => new DiscordRPC.Button { Label = Button["Label"].Value<string>(), Url = Button["URL"].Value<string>() }).ToArray(),
                 Assets = new Assets()
                 {
                     LargeImageKey = Parse["LargeImageKey"].Value<string>(),
