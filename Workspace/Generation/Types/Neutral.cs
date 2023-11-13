@@ -179,7 +179,8 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                     Cosmetic.Options.Add(NewOption);
                 }
 
-                return;
+                if (Parse["Objects"] is null)
+                    return;
             }
 
             var BlackListed = new List<string>();
@@ -279,6 +280,16 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
 
                         NewOption.Exports.Add(NewAsset);
                     }
+                }
+
+                if (Settings.Read(Settings.Type.HeroDefinition).Value<bool>() && Parse["HeroDefinition"] is not null && !OParse["HeroDefinition"].KeyIsNullOrEmpty())
+                {
+                    var cid = new Asset() { Object = OParse["HeroDefinition"]["Object"].Value<string>(), OverrideObject = Parse["HeroDefinition"]["Object"].Value<string>() };
+
+                    if (Parse["HeroDefinition"]["Swaps"] is not null)
+                        cid.Swaps = Parse["HeroDefinition"]["Swaps"];
+
+                    NewOption.Exports.Add(cid);
                 }
 
                 NewOption.Message = Cosmetic.Message;
