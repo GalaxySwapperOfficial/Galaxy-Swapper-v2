@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -135,7 +136,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
         private BackgroundWorker Worker { get; set; } = default!;
         private bool IsWorkerBusy = false;
-        private void Worker_Click(object sender, RoutedEventArgs e)
+        private async void Worker_Click(object sender, RoutedEventArgs e)
         {
             if (IsWorkerBusy)
             {
@@ -155,20 +156,15 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
             EpicGamesLauncher.Close();
 
-            Worker = new BackgroundWorker();
-            Worker.RunWorkerCompleted += Worker_Completed;
-
-            if (((Button)sender).Name == "Convert")
-                Worker.DoWork += Worker_Convert;
-            else
-                Worker.DoWork += Worker_Revert;
-
             Slider.IsEnabled = false;
 
             var StoryBoard = Interface.SetElementAnimations(new Interface.BaseAnim { Element = Amount, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 1, To = 0, Duration = new TimeSpan(0, 0, 0, 0, 100) } }, new Interface.BaseAnim { Element = LOG, Property = new PropertyPath(Control.OpacityProperty), ElementAnim = new DoubleAnimation() { From = 0, To = 1, Duration = new TimeSpan(0, 0, 0, 0, 100), BeginTime = new TimeSpan(0, 0, 0, 0, 100) } });
-            StoryBoard.Completed += delegate
+            StoryBoard.Completed += async (s, e) =>
             {
-                Worker.RunWorkerAsync();
+                if (((Button)sender).Name == "Convert")
+                    await Task.Run(() => Worker_Convert(s, new DoWorkEventArgs(e)));
+                else
+                    await Task.Run(() => Worker_Revert(s, new DoWorkEventArgs(e)));
             };
             StoryBoard.Begin();
         }

@@ -8,23 +8,32 @@ using System.Windows.Media.Animation;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 {
-    /// <summary>
-    /// Interaction logic for LoginView.xaml
-    /// </summary>
     public partial class LoginView : UserControl
     {
+        private Storyboard Storyboard { get; set; } = default!;
+
         public LoginView()
         {
             InitializeComponent();
         }
 
-        private Storyboard Storyboard { get; set; } = default!;
         private void CharacterAnimation()
         {
-            Storyboard = Interface.SetThicknessAnimations(new Interface.ThicknessAnim() { Element = Character, ElementAnim = new ThicknessAnimation { From = new Thickness(0, 0, 0, 0), To = new Thickness(-5, -5, -5, -5), Duration = new TimeSpan(0, 0, 0, 4, 0) } });
+            var thicknessAnimation = new ThicknessAnimation
+            {
+                From = new Thickness(0, 0, 0, 0),
+                To = new Thickness(-5, -5, -5, -5),
+                Duration = new TimeSpan(0, 0, 0, 4, 0)
+            };
+
+            Storyboard = Interface.SetThicknessAnimations(new Interface.ThicknessAnim() { Element = Character, ElementAnim = thicknessAnimation });
+
             Storyboard.Completed += delegate
             {
-                Storyboard = Interface.SetThicknessAnimations(new Interface.ThicknessAnim() { Element = Character, ElementAnim = new ThicknessAnimation { From = new Thickness(-5, -5, -5, -5), To = new Thickness(0, 0, 0, 0), Duration = new TimeSpan(0, 0, 0, 4, 0) } });
+                thicknessAnimation.From = new Thickness(-5, -5, -5, -5);
+                thicknessAnimation.To = new Thickness(0, 0, 0, 0);
+
+                Storyboard = Interface.SetThicknessAnimations(new Interface.ThicknessAnim() { Element = Character, ElementAnim = thicknessAnimation });
                 Storyboard.Completed += delegate
                 {
                     CharacterAnimation();
