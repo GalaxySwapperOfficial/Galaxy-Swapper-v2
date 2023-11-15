@@ -56,7 +56,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
 
             if (!File.Exists(EpicInstalltion))
             {
-                throw new CustomException($"Epic Games Launcher does not exist at:{EpicInstalltion}\nPlease ensure you have the corredct path for Epic Games Launcher selected!");
+                throw new CustomException($"Epic Games Launcher does not exist at:{EpicInstalltion}\nPlease ensure you have the correct path for Epic Games Launcher selected!");
             }
 
             if (!EpicInstalltion.CanEdit())
