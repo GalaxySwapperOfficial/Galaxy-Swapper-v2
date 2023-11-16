@@ -200,7 +200,11 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
                     if (!string.IsNullOrEmpty(Asset.OverrideObject))
                     {
-                        if (string.IsNullOrEmpty(Asset.OverrideBuffer))
+                        if (Asset.IsStreamData)
+                        {
+
+                        }
+                        else if (string.IsNullOrEmpty(Asset.OverrideBuffer))
                         {
                             Output(string.Format(Languages.Read(Languages.Type.View, "SwapView", "Exporting"), System.IO.Path.GetFileNameWithoutExtension(Asset.OverrideObject)), Type.Info);
 

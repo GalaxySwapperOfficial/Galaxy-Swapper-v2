@@ -164,6 +164,22 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                         NewOption.Exports.Add(NewAsset);
                     }
 
+                    if (Parse["Additional"] is not null)
+                    {
+                        foreach (var Additional in Parse["Additional"])
+                        {
+                            var NewAsset = new Asset() { Object = Additional["Object"].Value<string>(), Swaps = Additional["Swaps"] };
+                            if (Additional["OverrideObject"] != null)
+                                NewAsset.OverrideObject = Additional["OverrideObject"].Value<string>();
+                            if (Additional["Buffer"] != null && !string.IsNullOrEmpty(Additional["Buffer"].Value<string>()))
+                                NewAsset.OverrideBuffer = Additional["Buffer"].Value<string>();
+                            if (Additional["StreamData"] is not null)
+                                NewAsset.IsStreamData = Additional["StreamData"].Value<bool>();
+
+                            NewOption.Exports.Add(NewAsset);
+                        }
+                    }
+
                     if (Settings.Read(Settings.Type.HeroDefinition).Value<bool>() && Parse["HeroDefinition"] is not null && !option["HeroDefinition"].KeyIsNullOrEmpty())
                     {
                         var cid = new Asset() { Object = option["HeroDefinition"].Value<string>(), OverrideObject = Parse["HeroDefinition"]["Object"].Value<string>() };
@@ -278,6 +294,8 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                             NewAsset.OverrideObject = Additional["OverrideObject"].Value<string>();
                         if (Additional["Buffer"] != null && !string.IsNullOrEmpty(Additional["Buffer"].Value<string>()))
                             NewAsset.OverrideBuffer = Additional["Buffer"].Value<string>();
+                        if (Additional["StreamData"] is not null)
+                            NewAsset.IsStreamData = Additional["StreamData"].Value<bool>();
 
                         NewOption.Exports.Add(NewAsset);
                     }

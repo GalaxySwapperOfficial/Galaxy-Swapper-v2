@@ -9,6 +9,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Formats
         public string Object;
         public string OverrideObject;
         public string OverrideBuffer;
+        public bool IsStreamData = false;
         public JToken Swaps;
         public GameFile Export { get; set; } = default!;
         public GameFile OverrideExport { get; set; } = default!;
