@@ -12,6 +12,8 @@ using Serilog;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Galaxy_Swapper_v2.Workspace.Hashes;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
+using Galaxy_Swapper_v2.Workspace.Compression;
+using static Galaxy_Swapper_v2.Workspace.Global;
 
 namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
 {
@@ -48,11 +50,34 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
                     return null!;
                 }
 
-                var reader = new Reader(response.RawBytes);
+                var reader = new Reader(response.RawBytes); reader.BaseStream.Position += 4;
+                var compressionType = (CompressionType)reader.Read<int>();
 
-                reader.BaseStream.Position += 4;
+                switch (compressionType)
+                {
+                    case CompressionType.Zlib:
+                        ulong compressedHash = reader.Read<ulong>();
+                        ulong uncompressedHash = reader.Read<ulong>();
+                        int compressedSize = reader.Read<int>();
+                        int uncompressedSize = reader.Read<int>();
 
+                        byte[] compressedBuffer = reader.ReadBytes(compressedSize);
 
+                        if (compressedHash != CityHash.Hash(compressedBuffer))
+                        {
+                            Log.Error($"StreamData compressedHash miss match");
+                            throw new CustomException($"StreamData compressedHash miss match!");
+                        }
+
+                        byte[] uncompressedBuffer = zlib.Decompress(compressedBuffer, uncompressedSize);
+
+                        if (uncompressedHash != CityHash.Hash(uncompressedBuffer))
+                        {
+                            Log.Error($"StreamData uncompressedHash miss match");
+                            throw new CustomException($"StreamData uncompressedHash miss match!");
+                        }
+                        return uncompressedBuffer;
+                }
 
                 Log.Information($"Finished {request.Method} request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
                 return null!;

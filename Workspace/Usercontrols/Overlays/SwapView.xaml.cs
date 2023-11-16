@@ -5,6 +5,7 @@ using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Swapping;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
+using Galaxy_Swapper_v2.Workspace.Swapping.Providers;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -202,7 +203,16 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     {
                         if (Asset.IsStreamData)
                         {
+                            Output("Downloading StreamData", Type.Info);
+                            var streamDataBuffer = StreamDataProvider.Download(Asset.OverrideObject);
 
+                            if (streamDataBuffer is null)
+                            {
+                                //
+                            }
+
+                            Asset.OverrideExport = new() { UncompressedBuffer = streamDataBuffer };
+                            continue;
                         }
                         else if (string.IsNullOrEmpty(Asset.OverrideBuffer))
                         {
