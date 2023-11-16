@@ -13,6 +13,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Formats
         public string Message;
         public bool Nsfw = false;
         public bool UseMainUEFN = false;
+        public string UEFNTag;
         public int Stats = 0;
         public Generate.Type Type;
         public JToken Parse;

@@ -1,5 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.CProvider;
 using Galaxy_Swapper_v2.Workspace.Generation.Formats;
+using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Xml.Linq;
 using static Galaxy_Swapper_v2.Workspace.Global;
 
 namespace Galaxy_Swapper_v2.Workspace.Properties
@@ -42,7 +44,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             Log.Information("Successfully initialized UEFN");
         }
 
-        public static void DownloadMain(string paks)
+        public static void DownloadMain(string paks, string tag)
         {
             var parse = Endpoint.Read(Endpoint.Type.UEFN);
 
@@ -52,51 +54,66 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 throw new Exception($"UEFN game files are currently disabled");
             }
 
-            //So many things can go wrong so this nightmare of if checks will exist.
             if (Cache["Version"].KeyIsNullOrEmpty())
             {
-                Log.Information("Main UEFN version was set as null");
+                Log.Information("UEFN global version is null");
             }
             else if (parse["Version"].Value<int>() != Cache["Version"].Value<int>())
             {
-                Log.Information("Main UEFN files are outdated and will be removed");
+                Log.Information("UEFN global version miss match");
+                Clear(paks, externals: false);
             }
-            else if (((JArray)Cache["Downloadables"]).Count != ((JArray)parse["Downloadables"]).Count)
+
+            var cacheDownloadable = Cache["Downloadables"].OfType<JObject>().FirstOrDefault(d => d.Value<string>("tag") == tag);
+            var downloadable = parse["Downloadables"].OfType<JObject>().FirstOrDefault(d => d.Value<string>("tag") == tag);
+
+            if (cacheDownloadable is not null)
             {
-                Log.Information("Main UEFN files amount does not match the API. UEFN game files will be deleted");
-            }
-            else if (!Cache["Downloadables"].All(downloadable => File.Exists($"{paks}\\{downloadable}.ucas") && File.Exists($"{paks}\\{downloadable}.utoc") && File.Exists($"{paks}\\{downloadable}.pak") && File.Exists($"{paks}\\{downloadable}.sig")))
-            {
-                Log.Information("Cached main UEFN files are missing. UEFN game files will be deleted");
-            }
-            else
-            {
-                Log.Information("Cached main UEFN files are up to date!");
-                return;
+                if (!Exist(cacheDownloadable["Pakchunk"].Value<string>(), new[] { ".ucas", ".utoc", ".pak", ".sig" }))
+                {
+                    Log.Information($"UEFN {tag} is missing pakchunks");
+                    Delete(cacheDownloadable["Pakchunk"].Value<string>(), new[] { ".ucas", ".utoc", ".pak", ".sig" });
+                }
+                else if (downloadable["version"].Value<int>() == cacheDownloadable["version"].Value<int>())
+                {
+                    Log.Information($"UEFN {tag} is up to date");
+                    return;
+                }
+                else
+                {
+                    Log.Information($"UEFN {tag} is out of date");
+                    Delete(cacheDownloadable["Pakchunk"].Value<string>(), new[] {  ".ucas", ".utoc", ".pak", ".sig" });
+                }
+
+                (Cache["Downloadables"] as JArray).Remove(cacheDownloadable);
             }
 
             //Dispose UEFN file provider so files aren't in use.
             Dispose();
 
-            //Sort our uefn files to a struct
             var downloadables = new List<Downloadable>();
-            foreach (var downloadable in parse["Downloadables"])
+            if (downloadable["zip"].KeyIsNullOrEmpty())
             {
-                if (downloadable["zip"].KeyIsNullOrEmpty())
-                {
-                    downloadables.Add(new() { Ucas = downloadable["ucas"].Value<string>(), Utoc = downloadable["utoc"].Value<string>(), Pak = downloadable["pak"].Value<string>(), Sig = downloadable["sig"].Value<string>() });
-                }
-                else
-                {
-                    downloadables.Add(new() { Zip = downloadable["zip"].Value<string>() });
-                }
+                downloadables.Add(new() { Ucas = downloadable["ucas"].Value<string>(), Utoc = downloadable["utoc"].Value<string>(), Pak = downloadable["pak"].Value<string>(), Sig = downloadable["sig"].Value<string>() });
+            }
+            else
+            {
+                downloadables.Add(new() { Zip = downloadable["zip"].Value<string>() });
             }
 
-            Log.Information($"Downloading {downloadables.Count} downloadables");
+            Log.Information($"Downloading {tag} downloadable");
             Download(new DirectoryInfo(paks), downloadables, out List<string> usedslots);
 
+            var newobject = JObject.FromObject(new
+            {
+                tag = tag,
+                version = downloadable["version"].Value<int>(),
+                Pakchunk = $"{paks}\\{usedslots.First()}"
+            });
+
             Cache["Version"] = parse["Version"].Value<int>();
-            Cache["Downloadables"] = new JArray(usedslots);
+            (Cache["Downloadables"] as JArray).Add(newobject);
+
 
             File.WriteAllText(Path, Cache.ToString());
             Log.Information($"Wrote UEFN cache to {Path}");
@@ -290,30 +307,37 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             Log.Information($"Wrote UEFN cache to {Path}");
         }
 
-        public static void Clear(string paks)
+        public static void Clear(string paks, bool main = true, bool externals = true)
         {
-            Log.Information("Removing main UEFN game files");
-
-            if (!Cache["Downloadables"].KeyIsNullOrEmpty())
+            //Add a if check since we changed the main to pakchunk and not downloadables slots
+            if (main && !Cache["Downloadables"].KeyIsNullOrEmpty())
             {
-                foreach (string slot in Cache["Downloadables"])
+                Log.Information("Removing main UEFN game files");
+
+                //Old uefn config still has string array
+                if (Cache["Downloadables"].First().Type == JTokenType.String)
                 {
-                    Delete($"{paks}\\{slot}.ucas");
-                    Delete($"{paks}\\{slot}.utoc");
-                    Delete($"{paks}\\{slot}.pak");
-                    Delete($"{paks}\\{slot}.sig");
-                    Delete($"{paks}\\{slot}.backup");
+                    foreach (string slot in Cache["Downloadables"])
+                    {
+                        Delete($"{paks}\\{slot}", new[] { ".ucas", ".utoc", ".pak", ".sig", ".backup" });
+                    }
+                }
+                else
+                {
+                    foreach (var slot in Cache["Downloadables"])
+                    {
+                        Delete(slot["Pakchunk"].Value<string>(), new[] { ".ucas", ".utoc", ".pak", ".sig", ".backup" });
+                    }
                 }
             }
 
-            Log.Information("Removing externals");
-            foreach (var slot in Cache["Externals"])
+            if (externals)
             {
-                Delete($"{slot["Pakchunk"].Value<string>()}.ucas");
-                Delete($"{slot["Pakchunk"].Value<string>()}.utoc");
-                Delete($"{slot["Pakchunk"].Value<string>()}.pak");
-                Delete($"{slot["Pakchunk"].Value<string>()}.sig");
-                Delete($"{slot["Pakchunk"].Value<string>()}.backup");
+                Log.Information("Removing externals");
+                foreach (var slot in Cache["Externals"])
+                {
+                    Delete(slot["Pakchunk"].Value<string>(), new[] { ".ucas", ".utoc", ".pak", ".sig", ".backup" });
+                }
             }
 
             Reset();
@@ -348,6 +372,19 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             return available;
         }
 
+        public static bool Delete(string path, string[] extensions)
+        {
+            foreach (string extension in extensions)
+            {
+                if (!Delete($"{path}{extension}"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public static bool Delete(string path)
         {
             var fileInfo = new FileInfo(path);
@@ -364,6 +401,19 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                     throw new CustomException($"Failed to delete {fileInfo.FullName}");
                 }
             }
+            return true;
+        }
+
+        public static bool Exist(string path, string[] extensions)
+        {
+            foreach (string extension in extensions)
+            {
+                if (!File.Exists($"{path}{extension}"))
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
 

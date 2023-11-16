@@ -17,6 +17,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Formats
         public bool UseMainUEFN = false;
         public bool UEFNFormat = false;
         public bool IsPlugin = false;
+        public string UEFNTag;
         public Cosmetic Cosmetic;
         public JToken Parse;
         public List<Asset> Exports = new List<Asset>();

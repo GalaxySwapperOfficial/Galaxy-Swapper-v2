@@ -251,7 +251,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 if (Option.UseMainUEFN)
                 {
                     Output(Languages.Read(Languages.Type.View, "SwapView", "DownloadingMainUEFN"), Type.Info);
-                    UEFN.DownloadMain(paks);
+                    UEFN.DownloadMain(paks, Option.UEFNTag);
                 }
 
                 if (Option.Downloadables != null &&  Option.Downloadables.Count > 0)

@@ -147,6 +147,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                     NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
                     NewOption.Socials = Cosmetic.Socials;
                     NewOption.Cosmetic = Cosmetic;
+                    NewOption.UEFNTag = Cosmetic.UEFNTag;
 
                     foreach (var Asset in option["Assets"])
                     {
@@ -316,6 +317,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                 NewOption.OverrideIcon = Cosmetic.Icon;
                 NewOption.Nsfw = Cosmetic.Nsfw;
                 NewOption.UseMainUEFN = Cosmetic.UseMainUEFN;
+                NewOption.UEFNTag = Cosmetic.UEFNTag;
                 NewOption.Socials = Cosmetic.Socials;
                 NewOption.Cosmetic = Cosmetic;
 

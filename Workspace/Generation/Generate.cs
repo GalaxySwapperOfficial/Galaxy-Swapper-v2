@@ -80,6 +80,9 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
                             if (!Cosmetic["UseMainUEFN"].KeyIsNullOrEmpty())
                                 NewCosmetic.UseMainUEFN = Cosmetic["UseMainUEFN"].Value<bool>();
 
+                            if (!Cosmetic["UEFNTag"].KeyIsNullOrEmpty())
+                                NewCosmetic.UEFNTag = Cosmetic["UEFNTag"].Value<string>();
+
                             if (HideNsfw && NewCosmetic.Nsfw)
                                 continue;
 
