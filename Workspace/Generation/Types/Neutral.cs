@@ -174,6 +174,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                         NewOption.Exports.Add(cid);
                     }
 
+
                     var newfallback = new Asset() { Object = "/Game/Athena/Heroes/Meshes/Bodies/CP_Athena_Body_F_Fallback", OverrideObject = Parse["Object"].Value<string>(), Swaps = Parse["Swaps"] };
                     NewOption.Exports.Add(newfallback);
                     Cosmetic.Options.Add(NewOption);

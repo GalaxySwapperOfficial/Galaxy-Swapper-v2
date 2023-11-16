@@ -26,7 +26,8 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             HideNsfw,
             ShareStats,
             SortByStats,
-            HeroDefinition
+            HeroDefinition,
+            IsDev
         }
         public static void Initialize()
         {
@@ -78,7 +79,8 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 HideNsfw = false,
                 ShareStats = true,
                 SortByStats = true,
-                HeroDefinition = true
+                HeroDefinition = true,
+                IsDev = false
             });
 
             Parse = Object;

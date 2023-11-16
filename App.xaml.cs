@@ -1,4 +1,5 @@
 ﻿using Galaxy_Swapper_v2.Workspace;
+using Galaxy_Swapper_v2.Workspace.CProvider;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Serilog;
@@ -53,6 +54,14 @@ namespace Galaxy_Swapper_v2
             Binaries.Initialize();
             ImageCache.Initialize();
 
+
+            /*
+            CProviderManager.InitDefault();
+            var exported = CProviderManager.DefaultProvider.Save("/11875e40-4a49-deae-6968-20adc2585f91/MaterialsMaterialsMaterialsMaterial/M_MED_Dummeez_Body");
+
+            File.WriteAllBytes("Exported.uasset", exported.UncompressedBuffer);
+            Environment.Exit(0);
+            */
             base.OnStartup(e);
         }
         

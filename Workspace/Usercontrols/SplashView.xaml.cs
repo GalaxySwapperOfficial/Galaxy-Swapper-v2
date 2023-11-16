@@ -92,10 +92,10 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             if (parse["Warning"]["Enabled"].Value<bool>())
                 Message.DisplaySTA(parse["Warning"]["Header"].Value<string>(), parse["Warning"]["Content"].Value<string>(), MessageBoxButton.OK);
 
-            if (parse["DownTime"]["Enabled"].Value<bool>())
+            if (parse["DownTime"]["Enabled"].Value<bool>() && !Settings.Read(Settings.Type.IsDev).Value<bool>())
                 Message.DisplaySTA(parse["DownTime"]["Header"].Value<string>(), parse["DownTime"]["Content"].Value<string>(), discord: true, exit: true);
 
-            if (parse["Update"]["Enabled"].Value<bool>())
+            if (parse["Update"]["Enabled"].Value<bool>() && !Settings.Read(Settings.Type.IsDev).Value<bool>())
             {
                 if (parse["Update"]["Force"]["Enabled"].Value<bool>())
                 {
