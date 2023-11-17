@@ -92,6 +92,13 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
             Dispose();
 
             var downloadables = new List<Downloadable>();
+
+            if (downloadables is null)
+            {
+                Log.Warning($"Failed to find downloadables with tag {tag}");
+                throw new Exception($"Failed to find downloadables with tag {tag}");
+            }
+
             if (downloadable["zip"].KeyIsNullOrEmpty())
             {
                 downloadables.Add(new() { Ucas = downloadable["ucas"].Value<string>(), Utoc = downloadable["utoc"].Value<string>(), Pak = downloadable["pak"].Value<string>(), Sig = downloadable["sig"].Value<string>() });
