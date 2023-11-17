@@ -55,6 +55,13 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 ReadMore.Visibility = Visibility.Hidden;
             };
 
+            var versionParse = Endpoint.Read(Endpoint.Type.Version);
+
+            if (!versionParse[Global.Version]["Banner"].KeyIsNullOrEmpty())
+            {
+                BannerImage.LoadImage(versionParse[Global.Version]["Banner"].Value<string>(), invalid: "/WorkSpace/Assets/Banner.png");
+            }
+
             var Parse = Endpoint.Read(Endpoint.Type.News);
 
             foreach (var news in Parse)

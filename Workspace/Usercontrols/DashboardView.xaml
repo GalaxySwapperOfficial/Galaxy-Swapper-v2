@@ -13,7 +13,7 @@
     <Border Background="#090B0E" CornerRadius="0,0,10,0">
         <Grid>
             <Grid x:Name="Banner" Margin="10,10,10,338" MouseEnter="Banner_MouseEnter" MouseLeave="Banner_MouseLeave" Cursor="Hand" MouseLeftButtonDown="Banner_Click">
-                <Image Height="252" Width="965" Source="/WorkSpace/Assets/Banner.png" IsEnabled="False">
+                <Image x:Name="BannerImage" Height="252" Width="965" Source="/WorkSpace/Assets/Banner.png" IsEnabled="False">
                     <Image.Clip>
                         <RectangleGeometry RadiusX="5" RadiusY="5" Rect="0,0,965,252" />
                     </Image.Clip>
