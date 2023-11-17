@@ -30,7 +30,7 @@ namespace Galaxy_Swapper_v2.Workspace.Compression
             }
         }
 
-        public static string Decrypt(byte[] encryptedBytes, byte[] key)
+        public static byte[] Decrypt(byte[] encryptedBytes, byte[] key)
         {
             using (Aes aesAlg = Aes.Create())
             {
@@ -45,9 +45,12 @@ namespace Galaxy_Swapper_v2.Workspace.Compression
                 using (ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV))
                 using (MemoryStream memoryStream = new MemoryStream(encryptedBytes, 16, encryptedBytes.Length - 16))
                 using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
-                using (StreamReader streamReader = new StreamReader(cryptoStream))
                 {
-                    return streamReader.ReadToEnd();
+                    using (MemoryStream decryptedMemoryStream = new MemoryStream())
+                    {
+                        cryptoStream.CopyTo(decryptedMemoryStream);
+                        return decryptedMemoryStream.ToArray();
+                    }
                 }
             }
         }

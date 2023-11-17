@@ -119,7 +119,7 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
                         decompressed = Encoding.ASCII.GetString(compressedbuffer);
                         break;
                     case Type.Aes:
-                        decompressed = aes.Decrypt(compressedbuffer, key);
+                        decompressed = Encoding.ASCII.GetString(aes.Decrypt(compressedbuffer, key));
                         break;
                     case Type.Zlib:
                         decompressed = Encoding.ASCII.GetString(zlib.Decompress(compressedbuffer, uncompressedsize));

@@ -1,18 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Serilog;
-using Galaxy_Swapper_v2.Workspace.Utilities;
+﻿using Galaxy_Swapper_v2.Workspace.Compression;
 using Galaxy_Swapper_v2.Workspace.Hashes;
+using Galaxy_Swapper_v2.Workspace.Swapping.Compression.Types;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
-using Galaxy_Swapper_v2.Workspace.Compression;
+using Galaxy_Swapper_v2.Workspace.Utilities;
+using RestSharp;
+using Serilog;
+using System;
+using System.Diagnostics;
+using System.Net;
 using static Galaxy_Swapper_v2.Workspace.Global;
 
 namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
@@ -50,37 +45,124 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
                     return null!;
                 }
 
+                Log.Information($"Finished {request.Method} request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
+
                 var reader = new Reader(response.RawBytes); reader.BaseStream.Position += 4;
                 var compressionType = (CompressionType)reader.Read<int>();
 
                 switch (compressionType)
                 {
+                    case CompressionType.None:
+                        return response.RawBytes;
+                    case CompressionType.Aes:
+                        {
+                            ulong keyHash = reader.Read<ulong>();
+                            int keyLength = reader.Read<int>();
+                            byte[] key = reader.ReadBytes(keyLength);
+
+                            if (CityHash.Hash(key) != keyHash)
+                            {
+                                Log.Error($"StreamData encryption key hash miss match");
+                                throw new CustomException($"StreamData encryption key hash miss match");
+                            }
+
+                            ulong encryptedHash = reader.Read<ulong>();
+                            ulong unencryptedHash = reader.Read<ulong>();
+                            int encryptedLength = reader.Read<int>();
+                            byte[] encryptedBuffer = reader.ReadBytes(encryptedLength);
+
+                            if (CityHash.Hash(encryptedBuffer) != encryptedHash)
+                            {
+                                Log.Error($"StreamData encryptedBuffer hash miss match");
+                                throw new CustomException($"StreamData encryptedBuffer hash miss match");
+                            }
+
+                            byte[] unencryptedBuffer = aes.Decrypt(encryptedBuffer, key);
+
+                            if (CityHash.Hash(unencryptedBuffer) != unencryptedHash)
+                            {
+                                Log.Error($"StreamData unencryptedBuffer hash miss match");
+                                throw new CustomException($"StreamData unencryptedBuffer hash miss match");
+                            }
+
+                            return unencryptedBuffer;
+                        }
                     case CompressionType.Zlib:
-                        ulong compressedHash = reader.Read<ulong>();
-                        ulong uncompressedHash = reader.Read<ulong>();
-                        int compressedSize = reader.Read<int>();
-                        int uncompressedSize = reader.Read<int>();
-
-                        byte[] compressedBuffer = reader.ReadBytes(compressedSize);
-
-                        if (compressedHash != CityHash.Hash(compressedBuffer))
                         {
-                            Log.Error($"StreamData compressedHash miss match");
-                            throw new CustomException($"StreamData compressedHash miss match!");
+                            ulong compressedHash = reader.Read<ulong>();
+                            ulong uncompressedHash = reader.Read<ulong>();
+                            int compressedSize = reader.Read<int>();
+                            int uncompressedSize = reader.Read<int>();
+
+                            byte[] compressedBuffer = reader.ReadBytes(compressedSize);
+
+                            if (compressedHash != CityHash.Hash(compressedBuffer))
+                            {
+                                Log.Error($"StreamData compressedHash miss match");
+                                throw new CustomException($"StreamData compressedHash miss match!");
+                            }
+
+                            byte[] uncompressedBuffer = zlib.Decompress(compressedBuffer, uncompressedSize);
+
+                            if (uncompressedHash != CityHash.Hash(uncompressedBuffer))
+                            {
+                                Log.Error($"StreamData uncompressedHash miss match");
+                                throw new CustomException($"StreamData uncompressedHash miss match!");
+                            }
+                            return uncompressedBuffer;
                         }
-
-                        byte[] uncompressedBuffer = zlib.Decompress(compressedBuffer, uncompressedSize);
-
-                        if (uncompressedHash != CityHash.Hash(uncompressedBuffer))
+                    case CompressionType.Oodle:
                         {
-                            Log.Error($"StreamData uncompressedHash miss match");
-                            throw new CustomException($"StreamData uncompressedHash miss match!");
+                            ulong compressedHash = reader.Read<ulong>();
+                            ulong uncompressedHash = reader.Read<ulong>();
+                            int compressedSize = reader.Read<int>();
+                            int uncompressedSize = reader.Read<int>();
+
+                            byte[] compressedBuffer = reader.ReadBytes(compressedSize);
+
+                            if (compressedHash != CityHash.Hash(compressedBuffer))
+                            {
+                                Log.Error($"StreamData compressedHash miss match");
+                                throw new CustomException($"StreamData compressedHash miss match!");
+                            }
+
+                            byte[] uncompressedBuffer = Oodle.Decompress(compressedBuffer, uncompressedSize);
+
+                            if (uncompressedHash != CityHash.Hash(uncompressedBuffer))
+                            {
+                                Log.Error($"StreamData uncompressedHash miss match");
+                                throw new CustomException($"StreamData uncompressedHash miss match!");
+                            }
+                            return uncompressedBuffer;
                         }
-                        return uncompressedBuffer;
+                    case CompressionType.GZip:
+                        {
+                            ulong compressedHash = reader.Read<ulong>();
+                            ulong uncompressedHash = reader.Read<ulong>();
+                            int compressedSize = reader.Read<int>();
+ 
+
+                            byte[] compressedBuffer = reader.ReadBytes(compressedSize);
+
+                            if (compressedHash != CityHash.Hash(compressedBuffer))
+                            {
+                                Log.Error($"StreamData compressedHash miss match");
+                                throw new CustomException($"StreamData compressedHash miss match!");
+                            }
+
+                            byte[] uncompressedBuffer = gzip.Decompress(compressedBuffer);
+
+                            if (uncompressedHash != CityHash.Hash(uncompressedBuffer))
+                            {
+                                Log.Error($"StreamData uncompressedHash miss match");
+                                throw new CustomException($"StreamData uncompressedHash miss match!");
+                            }
+                            return uncompressedBuffer;
+                        }
+                    default:
+                        Log.Error($"StreamData unknown compression type");
+                        throw new CustomException($"StreamData unknown compression type");
                 }
-
-                Log.Information($"Finished {request.Method} request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
-                return null!;
             }
         }
     }
