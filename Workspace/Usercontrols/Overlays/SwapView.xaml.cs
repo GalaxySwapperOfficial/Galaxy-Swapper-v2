@@ -203,7 +203,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     {
                         if (Asset.IsStreamData)
                         {
-                            Output("Downloading StreamData", Type.Info);
+                            Output(Languages.Read(Languages.Type.View, "SwapView", "StreamData"), Type.Info);
                             var streamDataBuffer = StreamDataProvider.Download(Asset.OverrideObject);
 
                             if (streamDataBuffer is null)
