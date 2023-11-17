@@ -13,7 +13,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
 {
     public static class AesProvider
     {
-        private const string Domain = "https://fortnite-api.com/v2/aes";
+        private const string Domain = "https://galaxyswapperv2.com/API/Fortnite/Aes.json";
         public static Dictionary<FGuid, FAesKey> Keys = new Dictionary<FGuid, FAesKey>();
         public static void Initialize()
         {
@@ -36,19 +36,14 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Providers
                     Log.Error($"Failed to request aes keys from: {Domain} Expected: {HttpStatusCode.OK} Received: {response.StatusCode}");
                     return;
                 }
-                if (string.IsNullOrEmpty(response.Content))
-                {
-                    Log.Error($"Response from: {Domain} responded with empty content");
-                    return;
-                }
 
                 var parse = JsonConvert.DeserializeObject<JObject>(response.Content);
 
-                if (parse["data"]["dynamicKeys"] is not null)
+                if (parse["dynamicKeys"] is not null)
                 {
-                    foreach (var dynamickey in parse["data"]["dynamicKeys"])
+                    foreach (var dynamickey in parse["dynamicKeys"])
                     {
-                        var pakGuid = new FGuid(dynamickey["pakGuid"].Value<string>());
+                        var pakGuid = new FGuid(dynamickey["guid"].Value<string>());
                         if (!dynamickey["key"].KeyIsNullOrEmpty() && !Keys.ContainsKey(pakGuid))
                         {
                             string key = Format(dynamickey["key"].Value<string>());
