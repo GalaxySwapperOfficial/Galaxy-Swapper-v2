@@ -93,7 +93,7 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
 
             var downloadables = new List<Downloadable>();
 
-            if (downloadables is null)
+            if (downloadable is null)
             {
                 Log.Warning($"Failed to find downloadables with tag {tag}");
                 throw new Exception($"Failed to find downloadables with tag {tag}");
