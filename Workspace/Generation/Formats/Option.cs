@@ -23,9 +23,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Formats
         public List<Asset> Exports = new List<Asset>();
         public List<Downloadable> Downloadables = new List<Downloadable>();
         public List<Social> Socials = new List<Social>();
-        public object Clone()
-        {
-            return this.MemberwiseClone();
-        }
+
+        public object Clone() => new Option() { Name = Name, ID = ID, Icon = Icon, OptionMessage = OptionMessage, Parse = Parse };
     }
 }

@@ -208,7 +208,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
                             if (streamDataBuffer is null)
                             {
-                                //
+                                return;
                             }
 
                             Asset.OverrideExport = new() { UncompressedBuffer = streamDataBuffer };
