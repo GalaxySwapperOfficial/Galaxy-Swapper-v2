@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml.Linq;
 using static Galaxy_Swapper_v2.Workspace.Global;
 
 namespace Galaxy_Swapper_v2.Workspace.Utilities
@@ -85,45 +86,80 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             return CompressionData;
         }
 
-        public static void LoadImage(this Image Image, string url, string invalid = "https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API/blob/main/In%20Game/Icons/invalid.png?raw=true")
+        public static void LoadImage(this Image image, string url, string invalid = "https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API/blob/main/In%20Game/Icons/invalid.png?raw=true")
+        {
+            if (image is null)
+            {
+                Log.Error($"LoadImage image is null skipping");
+                return;
+            }
+
+            var bitmapImage = new BitmapImage();
+
+            if (url is null)
+            {
+                Log.Error($"LoadImage url Is null loading as invalid");
+                bitmapImage = new BitmapImage(new Uri(invalid, UriKind.RelativeOrAbsolute));
+                return;
+            }
+
+            string name = $"{Fnv1a.Hash(url)}-{image.Width}x{image.Height}.cache";
+
+            try
+            {
+                if (!ImageCache.ReadCache(name, bitmapImage))
+                {
+                    bitmapImage.DownloadFailed += IconDownloadFailed;
+                    bitmapImage.DownloadCompleted += IconDownloadComplete;
+                    bitmapImage = new BitmapImage(new Uri(url, UriKind.RelativeOrAbsolute));
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"LoadImage caught exception while loading {url} to 'bitmapImage': {ex.Message}");
+                bitmapImage = new BitmapImage(new Uri(invalid, UriKind.RelativeOrAbsolute));
+            }
+
+            image.Source = bitmapImage;
+
+            void IconDownloadFailed(object sender, ExceptionEventArgs e)
+            {
+                Log.Error($"IconDownloadFailed event was triggered loading as invalid url");
+                bitmapImage = new BitmapImage(new Uri(invalid, UriKind.RelativeOrAbsolute));
+                image.Source = bitmapImage;
+            }
+
+            void IconDownloadComplete(object sender, EventArgs e)
+            {
+                ImageCache.Cache(name, bitmapImage);
+            }
+        }
+
+        public static BitmapImage LoadImageToBitmap(string url, string invalid = "https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API/blob/main/In%20Game/Icons/invalid.png?raw=true")
         {
             var bitmapImage = new BitmapImage();
-            string name = $"{Fnv1a.Hash(url)}-{Image.Width}x{Image.Height}.cache";
 
-            if (!ImageCache.ReadCache(name, bitmapImage))
+            if (url is null)
+            {
+                Log.Error($"LoadImageToBitmap url Is null loading as invalid");
+                bitmapImage = new BitmapImage(new Uri(invalid, UriKind.RelativeOrAbsolute));
+                return bitmapImage;
+            }
+
+            try
             {
                 bitmapImage.BeginInit();
                 bitmapImage.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
                 bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.DownloadFailed += IconDownloadFailed;
-                bitmapImage.DownloadCompleted += IconDownloadComplete;
                 bitmapImage.EndInit();
             }
-
-            Image.Source = bitmapImage;
-
-            void IconDownloadFailed(object sender, ExceptionEventArgs e)
+            catch (Exception ex)
             {
-                bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.UriSource = new Uri(invalid, UriKind.RelativeOrAbsolute);
-                bitmapImage.CacheOption = BitmapCacheOption.None;
-                bitmapImage.EndInit();
-
-                Image.Source = bitmapImage;
+                Log.Error(ex, $"LoadImageToBitmap caught exception while loading {url} to 'bitmapImage': {ex.Message}");
+                bitmapImage = new BitmapImage(new Uri(invalid, UriKind.RelativeOrAbsolute));
             }
 
-            void IconDownloadComplete(object sender, EventArgs e) => ImageCache.Cache(name, bitmapImage);
-        }
-
-        public static BitmapImage LoadImageToBitmap(string url)
-        {
-            var Icon = new BitmapImage();
-            Icon.BeginInit();
-            Icon.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
-            Icon.CacheOption = BitmapCacheOption.OnLoad;
-            Icon.EndInit();
-            return Icon;
+            return bitmapImage;
         }
 
         public static string Hash(string filePath)
