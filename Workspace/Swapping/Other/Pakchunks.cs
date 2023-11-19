@@ -13,12 +13,23 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
     {
         public static void Validate(string path)
         {
-            Log.Error(path);
-
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
             var directoryInfo = new DirectoryInfo(path);
+
+            if (!directoryInfo.Exists)
+            {
+                Log.Error($"{directoryInfo.FullName} does not exist?");
+                throw new CustomException($"{directoryInfo.FullName}\nDoes not exist? Try selecting your Fortnite location in settings.");
+            }
+
+            if (!File.Exists($"{directoryInfo.FullName}\\global.utoc") || !File.Exists($"{directoryInfo.FullName}\\pakchunk10-WindowsClient.utoc") || !File.Exists($"{directoryInfo.FullName}\\pakchunk20-WindowsClient.utoc"))
+            {
+                Log.Error($"{directoryInfo.FullName} is missing core game files logging all available game files for debugging");
+                directoryInfo.GetFiles().ToList().ForEach(fileInfo => Log.Information(fileInfo.Name));
+                throw new CustomException($"{directoryInfo.FullName}\nIs missing core game files that are requried to mount correctly.");
+            }
 
             Log.Information("Checking if game files are in use");
             foreach (var file in directoryInfo.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
@@ -133,6 +144,13 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
                 {
                     Copy(directoryInfo, ioFileInfo, backupIoFileInfo.FullName);
                 }
+            }
+
+            if (!File.Exists($"{directoryInfo.FullName}\\global.backup") || !File.Exists($"{directoryInfo.FullName}\\pakchunk10-WindowsClient.backup") || !File.Exists($"{directoryInfo.FullName}\\pakchunk20-WindowsClient.backup"))
+            {
+                Log.Error($"{directoryInfo.FullName} io backup task did not backup core game files logging all available game files for debugging");
+                directoryInfo.GetFiles().ToList().ForEach(fileInfo => Log.Information(fileInfo.Name));
+                throw new CustomException($"{directoryInfo.FullName}\nIO backup task did not backup core game files?");
             }
 
             Log.Information($"Finished validating game files in {stopwatch.GetElaspedAndStop().TotalSeconds} seconds!");
