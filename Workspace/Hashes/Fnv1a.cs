@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 
 namespace Galaxy_Swapper_v2.Workspace.Hashes
 {

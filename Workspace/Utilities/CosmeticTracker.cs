@@ -13,6 +13,8 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
         {
             var stopwatch = new Stopwatch(); stopwatch.Start();
 
+            if (Presence.User is null) return;
+
             using (var client = new RestClient())
             {
                 var request = new RestRequest(new Uri(Domain), Method.Get);

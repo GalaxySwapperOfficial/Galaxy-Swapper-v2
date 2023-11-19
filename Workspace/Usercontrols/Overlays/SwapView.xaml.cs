@@ -45,6 +45,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                 }
             }
 
+            
             Icon.LoadImage(Option.Icon);
             OverrideIcon.LoadImage(Option.OverrideIcon);
 

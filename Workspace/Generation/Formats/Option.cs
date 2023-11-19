@@ -25,5 +25,6 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Formats
         public List<Social> Socials = new List<Social>();
 
         public object Clone() => new Option() { Name = Name, ID = ID, Icon = Icon, OptionMessage = OptionMessage, Parse = Parse };
+        public object Clone(bool all) => new Option() { Name = Name, ID = ID, Icon = Icon, OverrideIcon = OverrideIcon, Message = Message, OptionMessage = OptionMessage, Nsfw = Nsfw, UseMainUEFN = UseMainUEFN, UEFNFormat = UEFNFormat, IsPlugin = IsPlugin, UEFNTag = UEFNTag, Cosmetic = Cosmetic, Parse = Parse, Downloadables = Downloadables, Socials = Socials, Exports = Exports };
     }
 }

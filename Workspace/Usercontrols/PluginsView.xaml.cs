@@ -172,7 +172,6 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                 if (parse["Type"].KeyIsNullOrEmpty() || parse["Type"].Value<string>() == "default" || parse["Type"].Value<string>() == "Skin:Mesh")
                 {
                     newoption.Icon = swapicon;
-
                     foreach (var asset in parse["Assets"])
                     {
                         var newasset = new Asset() { Object = asset["AssetPath"].Value<string>() };
@@ -202,10 +201,11 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
                         foreach (var option in uefn["Swaps"])
                         {
-                            var uefnoption = (Option)newoption.Clone();
+                            var uefnoption = (Option)newoption.Clone(true);
 
                             uefnoption.Name = $"{option["Name"].Value<string>()} to {newoption.Name}";
                             uefnoption.Exports = new List<Asset>();
+                            uefnoption.OverrideIcon = icon;
 
                             if (!option["Override"].KeyIsNullOrEmpty())
                                 uefnoption.Icon = option["Override"].Value<string>();
