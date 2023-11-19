@@ -149,7 +149,7 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
             var ret = path;
             var root = path.SubstringBefore('/');
             var tree = path.SubstringAfter('/');
-
+            Log.Information(root);
             if (root.Equals("game") || root.Equals("engine"))
             {
                 var gameName = root.Equals("engine") ? "engine" : "fortnitegame";
@@ -168,11 +168,16 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
             {
                 // everything should be good
             }
+            else if (root.Equals("epicbasetextures"))
+            {
+                ret = string.Concat("fortnitegame", $"/plugins/contentlibraries/{root}/content/", tree);
+            }
             else
             {
                 ret = string.Concat("fortnitegame", $"/plugins/gamefeatures/{root}/content/", tree);
             }
 
+            Log.Information(ret);
             if (ret.Contains('.') && ret.EndsWith(".uasset"))
                 return ret.ToLower();
             else if (ret.Contains('.'))
