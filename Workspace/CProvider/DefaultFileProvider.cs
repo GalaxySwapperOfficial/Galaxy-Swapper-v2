@@ -28,6 +28,8 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
             var stopwatch = new Stopwatch(); stopwatch.Start();
             int failed = 0;
 
+            Log.Information($"Mounting at {PakDirectoryInfo.FullName}");
+
             foreach (var ioFileInfo in PakDirectoryInfo.GetFiles("*.backup*", SearchOption.TopDirectoryOnly))
             {
                 if (!ioFileInfo.Exists || ioFileInfo.Name.ToUpper() == "GLOBAL.BACKUP" || blacklisted is not null && blacklisted.Contains(ioFileInfo.Name.SubstringBefore('.'))) continue;
@@ -85,24 +87,25 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
 
         public GameFile Save(string path)
         {
-            path = FormatPath(path);
+            path = FormatPath(path).ToLower();
 
             foreach (var reader in IoStoreReaders)
             {
-                if (reader.Files.ContainsKey(path))
+                foreach (var gameFile in reader.Files)
                 {
-                    var gamefile = reader.Files[path];
-
-                    Log.Information($"Exporting {path}");
-
-                    if (!reader.Export(gamefile, path, (long)gamefile.ChunkOffsetLengths.Offset))
+                    if (gameFile.Key.ToLower().Contains(path))
                     {
-                        Log.Error($"Failed to export {path}");
-                        return null!;
-                    }
+                        Log.Information($"Exporting {path}");
 
-                    Log.Information($"Successfully exported {path}");
-                    return gamefile;
+                        if (!reader.Export(gameFile.Value, path, (long)gameFile.Value.ChunkOffsetLengths.Offset))
+                        {
+                            Log.Error($"Failed to export {path}");
+                            return null!;
+                        }
+
+                        Log.Information($"Successfully exported {path}");
+                        return gameFile.Value;
+                    }
                 }
             }
 

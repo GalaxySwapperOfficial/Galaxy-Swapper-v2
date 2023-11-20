@@ -140,7 +140,6 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
                 Log.Information($"Finished {request.Method} request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
 
                 var parse = JsonConvert.DeserializeObject<JObject>(response.Content);
-                
                 switch (parse["status"].Value<int>())
                 {
                     case 200:
