@@ -86,47 +86,52 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
                                 Deserializer.ReplaceEntry(Object["search"].Value<string>(), Object["replace"].Value<string>());
                             }
                             break;
+                        case "hex":
+                            {
+                                var buffer = new List<byte>(Deserializer.RestOfData);
+                                byte[] searchBuffer = Misc.HexToByte(Object["search"].Value<string>());
+                                byte[] replaceBuffer = Misc.HexToByte(Object["replace"].Value<string>());
+
+                                int pos = 0;
+
+                                if (!Object["SearchAfter"].KeyIsNullOrEmpty())
+                                {
+                                    byte[] searchAfterBuffer = Misc.HexToByte(Object["SearchAfter"]["hex"].Value<string>());
+                                    pos = buffer.ToArray().IndexOfSequence(searchBuffer, pos);
+                                    pos = pos == -1 ? 0 : pos;
+                                }
+
+                                pos = buffer.ToArray().IndexOfSequence(searchBuffer, pos);
+
+                                if (pos > 0)
+                                {
+                                    buffer.RemoveRange(pos, searchBuffer.Length);
+                                    buffer.InsertRange(pos, replaceBuffer);
+
+                                    if (searchBuffer.Length != replaceBuffer.Length)
+                                    {
+                                        Log.Information(Deserializer.ExportMap[0].CookedSerialSize.ToString());
+                                        if (searchBuffer.Length > 0)
+                                        {
+                                            Deserializer.ExportMap[0].CookedSerialSize += (ulong)(replaceBuffer.Length - searchBuffer.Length);
+                                        }
+                                        else
+                                        {
+                                            Deserializer.ExportMap[0].CookedSerialSize -= (ulong)(replaceBuffer.Length - searchBuffer.Length);
+                                        }
+                                        Log.Information(Deserializer.ExportMap[0].CookedSerialSize.ToString());
+                                    }
+                                }
+
+                                Deserializer.RestOfData = buffer.ToArray();
+                            }
+                            break;
                     }
                 }
             }
 
             Output(Languages.Read(Languages.Type.View, "SwapView", "Sterilizing"), SwapView.Type.Info);
-            List<byte> Buffer = new List<byte>(new Serializer(Deserializer).Write());
-
-            if (Asset.Swaps != null)
-            {
-                Output(Languages.Read(Languages.Type.View, "SwapView", "SwappingHex"), SwapView.Type.Info);
-
-                foreach (var Object in Asset.Swaps)
-                {
-                    if (Object["type"].Value<string>() != "hex")
-                        continue;
-
-                    byte[] Search = Misc.HexToByte(Object["search"].Value<string>());
-                    byte[] Replace = Misc.HexToByte(Object["replace"].Value<string>());
-
-                    int HexPos = 0;
-
-                    if (!Object["SearchAfter"].KeyIsNullOrEmpty())
-                    {
-                        byte[] SearchAfter = Misc.HexToByte(Object["SearchAfter"]["hex"].Value<string>());
-                        HexPos = Buffer.ToArray().IndexOfSequence(SearchAfter, 0);
-                        HexPos = HexPos == -1 ? 0 : HexPos;
-                    }
-
-                    HexPos = Buffer.ToArray().IndexOfSequence(Search, HexPos);
-
-                    if (HexPos > 0)
-                    {
-                        Buffer.RemoveRange(HexPos, Search.Length);
-                        Buffer.InsertRange(HexPos, Replace);
-                    }
-
-                    Log.Information("Replaced hex");
-                }
-            }
-
-            byte[] BufferToWrite = Buffer.ToArray();
+            byte[] BufferToWrite = new Serializer(Deserializer).Write();
 
             if (Asset.Export.IsEncrypted)
             {
