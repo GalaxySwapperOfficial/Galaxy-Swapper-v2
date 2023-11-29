@@ -64,31 +64,36 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
 
                 var response = client.Execute(request);
 
-                if (response.StatusCode != HttpStatusCode.OK)
+                try
                 {
-                    Log.Fatal($"Failed to download response from endpoint! Expected: {HttpStatusCode.OK} Received: {response.StatusCode}");
+                    if (response.StatusCode != HttpStatusCode.OK) new Exception($"response did not return as status code OK");
+
+
+                    Parse = JsonConvert.DeserializeObject<JObject>(response.Content);
+
+                    if (Parse["iscompressed"] is not null && Parse["iscompressed"].Value<bool>())
+                    {
+                        Log.Information("Decompressing response");
+
+                        try
+                        {
+                            byte[] decompressedBuffer = gzip.Decompress(Parse["compressedbuffer"].Value<string>());
+                            Parse = JObject.Parse(Encoding.ASCII.GetString(decompressedBuffer));
+                        }
+                        catch (Exception Exception)
+                        {
+                            Log.Fatal(Exception, "Failed to decompress response from endpoint");
+                            Message.DisplaySTA("Error", "Failed to decompress response from endpoint!", discord: true, solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, exit: true);
+                        }
+                    }
+
+                    Log.Information($"Finished {request.Method} request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
+                }
+                catch (Exception Exception)
+                {
+                    Log.Fatal(Exception, $"Failed to download response from endpoint! Expected: {HttpStatusCode.OK} Received: {response.StatusCode}");
                     Message.DisplaySTA("Error", "Webclient caught a exception while downloading response from Endpoint.", discord: true, solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, exit: true);
                 }
-
-                Parse = JsonConvert.DeserializeObject<JObject>(response.Content);
-
-                if (Parse["iscompressed"] is not null && Parse["iscompressed"].Value<bool>())
-                {
-                    Log.Information("Decompressing response");
-
-                    try
-                    {
-                        byte[] decompressedBuffer = gzip.Decompress(Parse["compressedbuffer"].Value<string>());
-                        Parse = JObject.Parse(Encoding.ASCII.GetString(decompressedBuffer));
-                    }
-                    catch (Exception Exception)
-                    {
-                        Log.Fatal(Exception, "Failed to decompress response from endpoint");
-                        Message.DisplaySTA("Error", "Failed to decompress response from endpoint!", discord: true, solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares", "Turn on a VPN" }, exit: true);
-                    }
-                }
-
-                Log.Information($"Finished {request.Method} request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
             }
         }
 
