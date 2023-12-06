@@ -110,7 +110,6 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
                                     if (searchBuffer.Length != replaceBuffer.Length)
                                     {
-                                        Log.Information(Deserializer.ExportMap[0].CookedSerialSize.ToString());
                                         if (searchBuffer.Length > 0)
                                         {
                                             Deserializer.ExportMap[0].CookedSerialSize += (ulong)(replaceBuffer.Length - searchBuffer.Length);
@@ -119,7 +118,6 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
                                         {
                                             Deserializer.ExportMap[0].CookedSerialSize -= (ulong)(replaceBuffer.Length - searchBuffer.Length);
                                         }
-                                        Log.Information(Deserializer.ExportMap[0].CookedSerialSize.ToString());
                                     }
                                 }
 
@@ -128,6 +126,11 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
                             break;
                     }
                 }
+            }
+
+            if (Asset.MaterialData is not null)
+            {
+                Deserializer.ReplaceMaterialOverrideArray(Asset.MaterialData.SearchBuffer, (int)Asset.MaterialData.Offset, Asset.MaterialData.Materials, Asset.MaterialData.MaterialOverrideFlags);
             }
 
             Output(Languages.Read(Languages.Type.View, "SwapView", "Sterilizing"), SwapView.Type.Info);

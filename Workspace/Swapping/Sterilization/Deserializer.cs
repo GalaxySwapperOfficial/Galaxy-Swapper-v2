@@ -1,8 +1,10 @@
 ﻿using Galaxy_Swapper_v2.Workspace.CProvider.Objects;
 using Galaxy_Swapper_v2.Workspace.Hashes;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
+using Galaxy_Swapper_v2.Workspace.Utilities;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -171,6 +173,72 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
             Log.Information($"Replaced: {search} to {replace} with hashes");
 
             Adjust(replace.Length - search.Length);
+        }
+
+        public void ReplaceMaterialOverrideArray(byte[] searchBuffer, int offset, Dictionary<string, int> materials, int materialOverrideFlags = 31)
+        {
+            int arrayPos = offset;
+
+            if (searchBuffer?.Length > 0)
+            {
+                arrayPos = RestOfData.IndexOfSequence(searchBuffer, 0);
+                if (arrayPos < 0)
+                {
+                    Log.Error($"Failed to find 'MaterialOverrides' array");
+                    return;
+                }
+            }
+
+            var reader = new Reader(RestOfData, arrayPos);
+
+            //Orignal 'MaterialOverrides' data
+            int materialOverridesCount = reader.Read<int>();
+            int materialOverridesSize = sizeof(int) + 3 + 20;
+
+            if (materialOverridesCount > 1)
+            {
+                materialOverridesSize += 26 * (materialOverridesCount - 1);
+            }
+
+            byte[] materialOverridesBuffer = reader.ReadBytes(materialOverridesSize - sizeof(int));
+
+            //26 is the size of the new array objects
+            var writer = new Writer(new byte[materialOverridesSize + 26 * (materialOverridesCount + materials.Count)]);
+
+            writer.Write<int>(materialOverridesCount + materials.Count);
+            writer.WriteBytes(materialOverridesBuffer);
+
+            //Key = /Game/Characters/Player/Female/Medium/Bodies/F_Med_Soldier_01/Skins/TV_20/Materials/F_MED_Commando_Body_TV20.F_MED_Commando_Body_TV20 Value = MaterialOverrideIndex
+            foreach (var material in materials)
+            {
+                string entryPath = material.Key.SubstringBefore('.');
+                string entryName = material.Key.SubstringAfter('.');
+
+                writer.WriteBytes(new byte[] { 0, 5, (byte)material.Value, 0, 0, 0, (byte)Entires.Count(), 0, 0, 0, 0, 0, 0, 0, (byte)(Entires.Count() + 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+                AddEntry(entryPath, entryName);
+            }
+
+            byte[] newMaterialOverridesBuffer = writer.ToByteArray(writer.Position);
+            var restOfDataArray = new List<byte>(RestOfData);
+
+            //Insert our new 'MaterialOverrides' array
+            restOfDataArray.RemoveRange(arrayPos, materialOverridesSize);
+            restOfDataArray.InsertRange(arrayPos, newMaterialOverridesBuffer);
+
+            //Insert our new 'MaterialOverrideFlags'
+            restOfDataArray.RemoveRange(arrayPos + newMaterialOverridesBuffer.Length, sizeof(int));
+            restOfDataArray.InsertRange(arrayPos + newMaterialOverridesBuffer.Length, BitConverter.GetBytes(materialOverrideFlags));
+
+            RestOfData = restOfDataArray.ToArray();
+            ExportMap[^1].CookedSerialSize += (ulong)(newMaterialOverridesBuffer.Length - materialOverridesSize);
+        }
+
+        public void AddEntry(params string[] nameMaps)
+        {
+            Entires = Entires.Concat(nameMaps.Select(nameMap => new FNameEntrySerialized(nameMap))).ToArray();
+            Hashes = Hashes.Concat(nameMaps.Select(nameMap => CityHash.Hash(Encoding.ASCII.GetBytes(nameMap.ToLower())))).ToArray();
+
+            Adjust(nameMaps.Sum(nameMap => nameMap.Length) + 10 * nameMaps.Length);
         }
 
         public void Adjust(int diff)

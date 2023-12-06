@@ -191,8 +191,27 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                         NewOption.Exports.Add(cid);
                     }
 
-
                     var newfallback = new Asset() { Object = "/Game/Athena/Heroes/Meshes/Bodies/CP_Athena_Body_F_Fallback", OverrideObject = Parse["Object"].Value<string>(), Swaps = Parse["Swaps"] };
+
+                    if (Parse["MaterialOverridesArray"] is not null)
+                    {
+                        newfallback.MaterialData = new() { MaterialOverrideFlags = Parse["MaterialOverridesArray"]["MaterialOverrideFlags"].Value<int>() };
+
+                        if (Parse["MaterialOverridesArray"]["Search"].KeyIsNullOrEmpty())
+                        {
+                            newfallback.MaterialData.Offset = Parse["MaterialOverridesArray"]["Offset"].Value<long>();
+                        }
+                        else
+                        {
+                            newfallback.MaterialData.SearchBuffer = Parse["MaterialOverridesArray"]["Search"].Value<string>().HexToByte();
+                        }
+
+                        foreach (var material in Parse["MaterialOverridesArray"]["Materials"])
+                        {
+                            newfallback.MaterialData.Materials.Add(material["OverrideMaterial"].Value<string>(), material["MaterialOverrideIndex"].Value<int>());
+                        }
+                    }
+
                     NewOption.Exports.Add(newfallback);
                     Cosmetic.Options.Add(NewOption);
                 }
