@@ -2,12 +2,14 @@
 using Galaxy_Swapper_v2.Workspace.Generation.Types;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Structs;
+using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace Galaxy_Swapper_v2.Workspace.Generation
 {
@@ -244,6 +246,17 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
                 }
             }
             return Cache[Type].Cosmetics[Key].Options;
+        }
+
+        public static string CreateNameSwap(string name)
+        {
+            var writer = new Writer(new byte[sizeof(int) + name.Length + 1]);
+
+            writer.Write<int>(name.Length + 1);
+            writer.WriteBytes(Encoding.ASCII.GetBytes(name));
+            writer.WriteByte(0);
+
+            return Misc.ByteToHex(writer.ToByteArray(writer.Position));
         }
     }
 }
