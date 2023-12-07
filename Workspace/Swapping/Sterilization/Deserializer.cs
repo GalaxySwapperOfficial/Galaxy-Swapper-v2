@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Media.Media3D;
+using static Galaxy_Swapper_v2.Workspace.Global;
 
 namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
 {
@@ -176,75 +178,84 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
             Adjust(replace.Length - search.Length);
         }
 
-        public void ReplaceMaterialOverrideArray(byte[] searchBuffer, int offset, Dictionary<string, int> materials, int materialOverrideFlags = 31)
+        public void ReplaceMaterialOverrideArray(MaterialData materialData)
         {
-            int arrayPos = offset;
+            int arrayPos = (int)materialData.Offset;
 
-            if (searchBuffer?.Length > 0)
+            if (materialData.SearchBuffer?.Length > 0)
             {
-                arrayPos = RestOfData.IndexOfSequence(searchBuffer, 0);
+                arrayPos = RestOfData.IndexOfSequence(materialData.SearchBuffer, 0);
                 if (arrayPos < 0)
                 {
                     Log.Error($"Failed to find 'MaterialOverrides' array");
-                    return;
+                    throw new CustomException($"Failed to find 'MaterialOverrides' array");
                 }
             }
 
             var reader = new Reader(RestOfData, arrayPos);
 
-            //Orignal 'MaterialOverrides' data
             int materialOverridesCount = reader.Read<int>();
-            int materialOverridesSize = sizeof(int) + 3 + 20;
+            int materialOverridesSize = sizeof(int) + 3 + 20 + 26 * (materialOverridesCount - 1);
 
-            if (materialOverridesCount > 1)
+            var writer = new Writer(new byte[sizeof(int) + 26 * materialData.Materials.Count]);
+
+            writer.Write<int>(materialData.Materials.Count);
+
+            foreach (var material in materialData.Materials)
             {
-                materialOverridesSize += 26 * (materialOverridesCount - 1);
-            }
+                string entryPath = material.Material.SubstringBefore('.');
+                string entryName = material.Material.SubstringAfter('.');
 
-            byte[] materialOverridesBuffer = reader.ReadBytes(materialOverridesSize - sizeof(int));
+                writer.WriteByte(0);
+                writer.WriteByte(5);
+                writer.Write<int>(material.MaterialOverrideIndex);
+                writer.Write<int>(Entires.Count());
+                writer.Write<int>(0);
+                writer.Write<int>(Entires.Count() + 1);
+                writer.Write<int>(0);
+                writer.Write<int>(0);
 
-            //26 is the size of the new array objects
-            var writer = new Writer(new byte[materialOverridesSize + 26 * (materialOverridesCount + materials.Count)]);
-
-            writer.Write<int>(materialOverridesCount + materials.Count);
-            writer.WriteBytes(materialOverridesBuffer);
-
-            //Key = /Game/Characters/Player/Female/Medium/Bodies/F_Med_Soldier_01/Skins/TV_20/Materials/F_MED_Commando_Body_TV20.F_MED_Commando_Body_TV20 Value = MaterialOverrideIndex
-            foreach (var material in materials)
-            {
-                string entryPath = material.Key.SubstringBefore('.');
-                string entryName = material.Key.SubstringAfter('.');
-
-                writer.WriteBytes(new byte[] { 0, 5, (byte)material.Value, 0, 0, 0, (byte)Entires.Count(), 0, 0, 0, 0, 0, 0, 0, (byte)(Entires.Count() + 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
                 AddEntry(entryPath, entryName);
             }
 
-            byte[] newMaterialOverridesBuffer = writer.ToByteArray(writer.Position);
+            byte[] MaterialOverridesBuffer = writer.ToByteArray(writer.Position);
             var restOfDataArray = new List<byte>(RestOfData);
 
             //Insert our new 'MaterialOverrides' array
             restOfDataArray.RemoveRange(arrayPos, materialOverridesSize);
-            restOfDataArray.InsertRange(arrayPos, newMaterialOverridesBuffer);
+            restOfDataArray.InsertRange(arrayPos, MaterialOverridesBuffer);
 
-            //Insert our new 'MaterialOverrideFlags'
-            restOfDataArray.RemoveRange(arrayPos + newMaterialOverridesBuffer.Length, sizeof(int));
-            restOfDataArray.InsertRange(arrayPos + newMaterialOverridesBuffer.Length, BitConverter.GetBytes(materialOverrideFlags));
+            int materialOverrideFlagsPos = (int)materialData.MaterialOverrideFlags.Offset;
+
+            if (materialData.MaterialOverrideFlags.SearchBuffer?.Length > 0)
+            {
+                materialOverrideFlagsPos = restOfDataArray.ToArray().IndexOfSequenceReverse(materialData.MaterialOverrideFlags.SearchBuffer);
+
+                if (materialOverrideFlagsPos < 0)
+                {
+                    Log.Error($"Failed to find MaterialOverrideFlags array");
+                    throw new CustomException($"Failed to find MaterialOverrideFlags array");
+                }
+            }
+
+            restOfDataArray.RemoveRange(materialOverrideFlagsPos, sizeof(int));
+            restOfDataArray.InsertRange(materialOverrideFlagsPos, BitConverter.GetBytes(materialData.MaterialOverrideFlags.MaterialOverrideFlags));
 
             RestOfData = restOfDataArray.ToArray();
-            ExportMap[^1].CookedSerialSize += (ulong)(newMaterialOverridesBuffer.Length - materialOverridesSize);
+            ExportMap[^1].CookedSerialSize += (ulong)(MaterialOverridesBuffer.Length - materialOverridesSize);
         }
 
-        public void ReplaceTextureParametersArray(byte[] searchBuffer, int offset, List<TextureParameter> textureParameters)
+        public void ReplaceTextureParametersArray(TextureData textureData)
         {
-            int arrayPos = offset;
+            int arrayPos = (int)textureData.Offset;
 
-            if (searchBuffer?.Length > 0)
+            if (textureData.SearchBuffer?.Length > 0)
             {
-                arrayPos = RestOfData.IndexOfSequence(searchBuffer, 0);
+                arrayPos = RestOfData.IndexOfSequence(textureData.SearchBuffer, 0);
                 if (arrayPos < 0)
                 {
                     Log.Error($"Failed to find 'TextureParameters' array");
-                    return;
+                    throw new CustomException($"Failed to find 'TextureParameters' array");
                 }
             }
 
@@ -259,16 +270,25 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
                 textureParametersSize += 31 * (textureParametersCount - 1);
             }
 
-            var writer = new Writer(new byte[sizeof(int) + 34 * (textureParameters.Count)]);
+            var writer = new Writer(new byte[sizeof(int) + 34 * (textureData.TextureParameters.Count)]);
 
-            writer.Write<int>(textureParameters.Count);
+            writer.Write<int>(textureData.TextureParameters.Count);
 
-            foreach (var textureParameter in textureParameters)
+            foreach (var textureParameter in textureData.TextureParameters)
             {
                 string entryPath = textureParameter.TextureOverride.SubstringBefore('.');
                 string entryName = textureParameter.TextureOverride.SubstringAfter('.');
 
-                writer.WriteBytes(new byte[] { 0, 0x07, (byte)textureParameter.MaterialIndexForTextureParameter, 0, 0, 0, (byte)Entires.Count(), 0, 0, 0, 0, 0, 0, 0, (byte)(Entires.Count() + 1), 0, 0, 0, 0, 0, 0, 0, (byte)(Entires.Count() + 2), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+                writer.WriteByte(0);
+                writer.WriteByte(0x07);
+                writer.Write<int>(textureParameter.MaterialIndexForTextureParameter);
+                writer.Write<int>(Entires.Count());
+                writer.Write<int>(0);
+                writer.Write<int>(Entires.Count() + 1);
+                writer.Write<int>(0);
+                writer.Write<int>(Entires.Count() + 2);
+                writer.Write<int>(0);
+                writer.Write<int>(0);
 
                 AddEntry(textureParameter.TextureParameterNameForMaterial, entryPath, entryName);
             }

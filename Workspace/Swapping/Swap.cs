@@ -123,7 +123,12 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
             if (Asset.MaterialData is not null)
             {
-                Deserializer.ReplaceMaterialOverrideArray(Asset.MaterialData.SearchBuffer, (int)Asset.MaterialData.Offset, Asset.MaterialData.Materials, Asset.MaterialData.MaterialOverrideFlags);
+                Deserializer.ReplaceMaterialOverrideArray(Asset.MaterialData);
+            }
+
+            if (Asset.TextureData is not null)
+            {
+                Deserializer.ReplaceTextureParametersArray(Asset.TextureData);
             }
 
             Output(Languages.Read(Languages.Type.View, "SwapView", "Sterilizing"), SwapView.Type.Info);

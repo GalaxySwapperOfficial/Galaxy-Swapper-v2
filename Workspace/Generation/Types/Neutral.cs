@@ -193,24 +193,8 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
 
                     var newfallback = new Asset() { Object = "/Game/Athena/Heroes/Meshes/Bodies/CP_Athena_Body_F_Fallback", OverrideObject = Parse["Object"].Value<string>(), Swaps = Parse["Swaps"] };
 
-                    if (Parse["MaterialOverridesArray"] is not null)
-                    {
-                        newfallback.MaterialData = new() { MaterialOverrideFlags = Parse["MaterialOverridesArray"]["MaterialOverrideFlags"].Value<int>() };
-
-                        if (Parse["MaterialOverridesArray"]["Search"].KeyIsNullOrEmpty())
-                        {
-                            newfallback.MaterialData.Offset = Parse["MaterialOverridesArray"]["Offset"].Value<long>();
-                        }
-                        else
-                        {
-                            newfallback.MaterialData.SearchBuffer = Parse["MaterialOverridesArray"]["Search"].Value<string>().HexToByte();
-                        }
-
-                        foreach (var material in Parse["MaterialOverridesArray"]["Materials"])
-                        {
-                            newfallback.MaterialData.Materials.Add(material["OverrideMaterial"].Value<string>(), material["MaterialOverrideIndex"].Value<int>());
-                        }
-                    }
+                    Generate.AddMaterialOverridesArray(Parse, newfallback);
+                    Generate.AddTextureParametersArray(Parse, newfallback);
 
                     NewOption.Exports.Add(newfallback);
                     Cosmetic.Options.Add(NewOption);
@@ -254,7 +238,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
 
                 var NewOption = (Option)Option.Clone();
                 var Objects = OParse["Objects"].ToDictionary(obj => obj["Type"].Value<string>(), obj => obj["Object"].Value<string>());
-
+                
                 NewOption.Exports = new List<Asset>();
 
                 foreach (var Object in Parse["Objects"])
@@ -283,6 +267,9 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                         Continue = true;
                         break;
                     }
+
+                    Generate.AddMaterialOverridesArray(Object, NewAsset);
+                    Generate.AddTextureParametersArray(Object, NewAsset);
 
                     if (Object["Buffer"] != null && !string.IsNullOrEmpty(Object["Buffer"].Value<string>()))
                         NewAsset.OverrideBuffer = Object["Buffer"].Value<string>();
@@ -316,6 +303,9 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                             NewAsset.OverrideBuffer = Additional["Buffer"].Value<string>();
                         if (Additional["StreamData"] is not null)
                             NewAsset.IsStreamData = Additional["StreamData"].Value<bool>();
+
+                        Generate.AddMaterialOverridesArray(Additional, NewAsset);
+                        Generate.AddTextureParametersArray(Additional, NewAsset);
 
                         NewOption.Exports.Add(NewAsset);
                     }

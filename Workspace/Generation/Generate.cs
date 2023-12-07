@@ -159,6 +159,61 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
             return Cache[Type].Cosmetics;
         }
 
+        public static void AddMaterialOverridesArray(JToken parse, Asset asset)
+        {
+            if (parse["MaterialOverridesArray"] is not null)
+            {
+                asset.MaterialData = new();
+
+                if (parse["MaterialOverridesArray"]["Search"].KeyIsNullOrEmpty())
+                {
+                    asset.MaterialData.Offset = parse["MaterialOverridesArray"]["Offset"].Value<long>();
+                }
+                else
+                {
+                    asset.MaterialData.SearchBuffer = parse["MaterialOverridesArray"]["Search"].Value<string>().HexToByte();
+                }
+
+                foreach (var material in parse["MaterialOverridesArray"]["Materials"])
+                {
+                    asset.MaterialData.Materials.Add(new() { Material = material["OverrideMaterial"].Value<string>(), MaterialOverrideIndex = material["MaterialOverrideIndex"].Value<int>() });
+                }
+
+                asset.MaterialData.MaterialOverrideFlags = new() { MaterialOverrideFlags = parse["MaterialOverridesArray"]["MaterialOverrideFlags"]["Index"].Value<int>() };
+
+                if (parse["MaterialOverridesArray"]["MaterialOverrideFlags"]["Search"].KeyIsNullOrEmpty())
+                {
+                    asset.MaterialData.MaterialOverrideFlags.Offset = parse["MaterialOverridesArray"]["MaterialOverrideFlags"]["Offset"].Value<long>();
+                }
+                else
+                {
+                    asset.MaterialData.MaterialOverrideFlags.SearchBuffer = parse["MaterialOverridesArray"]["MaterialOverrideFlags"]["Search"].Value<string>().HexToByte();
+                }
+            }
+        }
+
+        public static void AddTextureParametersArray(JToken parse, Asset asset)
+        {
+            if (parse["TextureParametersArray"] is not null)
+            {
+                asset.TextureData = new();
+
+                if (parse["TextureParametersArray"]["Search"].KeyIsNullOrEmpty())
+                {
+                    asset.TextureData.Offset = parse["TextureParametersArray"]["Offset"].Value<long>();
+                }
+                else
+                {
+                    asset.TextureData.SearchBuffer = parse["TextureParametersArray"]["Search"].Value<string>().HexToByte();
+                }
+
+                foreach (var texture in parse["TextureParametersArray"]["Textures"])
+                {
+                    asset.TextureData.TextureParameters.Add(new() { TextureOverride = texture["TextureOverride"].Value<string>(), TextureParameterNameForMaterial = texture["TextureParameterNameForMaterial"].Value<string>(), MaterialIndexForTextureParameter = texture["MaterialIndexForTextureParameter"].Value<int>() });
+                }
+            }
+        }
+
         public static List<Option> Options(string Key, Type Type)
         {
             if (Cache[Type].Cosmetics[Key].Options.Count == 0)
