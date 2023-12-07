@@ -110,14 +110,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
                                     if (searchBuffer.Length != replaceBuffer.Length)
                                     {
-                                        if (searchBuffer.Length > 0)
-                                        {
-                                            Deserializer.ExportMap[0].CookedSerialSize += (ulong)(replaceBuffer.Length - searchBuffer.Length);
-                                        }
-                                        else
-                                        {
-                                            Deserializer.ExportMap[0].CookedSerialSize -= (ulong)(replaceBuffer.Length - searchBuffer.Length);
-                                        }
+                                        Deserializer.ExportMap[^1].CookedSerialSize += (ulong)(replaceBuffer.Length - searchBuffer.Length);
                                     }
                                 }
 

@@ -1,5 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.CProvider.Objects;
 using Galaxy_Swapper_v2.Workspace.Hashes;
+using Galaxy_Swapper_v2.Workspace.Structs;
 using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Serilog;
@@ -231,6 +232,56 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Sterilization
 
             RestOfData = restOfDataArray.ToArray();
             ExportMap[^1].CookedSerialSize += (ulong)(newMaterialOverridesBuffer.Length - materialOverridesSize);
+        }
+
+        public void ReplaceTextureParametersArray(byte[] searchBuffer, int offset, List<TextureParameter> textureParameters)
+        {
+            int arrayPos = offset;
+
+            if (searchBuffer?.Length > 0)
+            {
+                arrayPos = RestOfData.IndexOfSequence(searchBuffer, 0);
+                if (arrayPos < 0)
+                {
+                    Log.Error($"Failed to find 'TextureParameters' array");
+                    return;
+                }
+            }
+
+            var reader = new Reader(RestOfData, arrayPos);
+            
+            //Orignal 'TextureParameters' data
+            int textureParametersCount = reader.Read<int>();
+            int textureParametersSize = sizeof(int) + 3 + 28;
+
+            if (textureParametersCount > 1)
+            {
+                textureParametersSize += 31 * (textureParametersCount - 1);
+            }
+
+            var writer = new Writer(new byte[sizeof(int) + 34 * (textureParameters.Count)]);
+
+            writer.Write<int>(textureParameters.Count);
+
+            foreach (var textureParameter in textureParameters)
+            {
+                string entryPath = textureParameter.TextureOverride.SubstringBefore('.');
+                string entryName = textureParameter.TextureOverride.SubstringAfter('.');
+
+                writer.WriteBytes(new byte[] { 0, 0x07, (byte)textureParameter.MaterialIndexForTextureParameter, 0, 0, 0, (byte)Entires.Count(), 0, 0, 0, 0, 0, 0, 0, (byte)(Entires.Count() + 1), 0, 0, 0, 0, 0, 0, 0, (byte)(Entires.Count() + 2), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
+                AddEntry(textureParameter.TextureParameterNameForMaterial, entryPath, entryName);
+            }
+
+            byte[] newtextureParametersBuffer = writer.ToByteArray(writer.Position);
+            var restOfDataArray = new List<byte>(RestOfData);
+
+            //Insert our new 'TextureParameters' array
+            restOfDataArray.RemoveRange(arrayPos, textureParametersSize);
+            restOfDataArray.InsertRange(arrayPos, newtextureParametersBuffer);
+
+            RestOfData = restOfDataArray.ToArray();
+            ExportMap[^1].CookedSerialSize += (ulong)(newtextureParametersBuffer.Length - textureParametersSize);
         }
 
         public void AddEntry(params string[] nameMaps)
