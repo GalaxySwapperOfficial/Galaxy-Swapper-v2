@@ -162,6 +162,37 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                         if (Asset["Swaps"] != null)
                             NewAsset.Swaps = Asset["Swaps"];
 
+                        if (!Asset["IsID"].KeyIsNullOrEmpty() && Asset["IsID"].Value<bool>())
+                        {
+                            if (!Parse["LobbyName"].KeyIsNullOrEmpty() && !option["LobbyName"].KeyIsNullOrEmpty())
+                            {
+                                ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                {
+                                    type = "hex",
+                                    search = Generate.CreateNameSwap(option["LobbyName"].Value<string>()),
+                                    replace = Generate.CreateNameSwap(Parse["LobbyName"].Value<string>())
+                                }));
+                            }
+                            if (!Parse["Description"].KeyIsNullOrEmpty() && !option["Description"].KeyIsNullOrEmpty())
+                            {
+                                ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                {
+                                    type = "hex",
+                                    search = Generate.CreateNameSwap(option["Description"].Value<string>()),
+                                    replace = Generate.CreateNameSwap(Parse["Description"].Value<string>())
+                                }));
+                            }
+                            if (!Parse["Introduction"].KeyIsNullOrEmpty() && !option["Introduction"].KeyIsNullOrEmpty())
+                            {
+                                ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                {
+                                    type = "tag",
+                                    search = option["Introduction"].Value<string>(),
+                                    replace = Parse["Introduction"].Value<string>()
+                                }));
+                            }
+                        }
+
                         NewOption.Exports.Add(NewAsset);
                     }
 
