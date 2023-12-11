@@ -1,5 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Hashes;
 using Galaxy_Swapper_v2.Workspace.Properties;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
@@ -447,6 +448,19 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             }
 
             return false;
+        }
+
+        public static JObject TryParse(string content)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<JObject>(content);
+            }
+            catch (Exception Exception)
+            {
+                Log.Error(Exception, "Failed to parse Json content");
+                return null!;
+            }
         }
     }
 }

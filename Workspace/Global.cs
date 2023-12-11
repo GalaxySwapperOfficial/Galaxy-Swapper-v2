@@ -4,8 +4,8 @@ namespace Galaxy_Swapper_v2.Workspace
 {
     public static class Global
     {
-        public const string Version = "1.29";
-        public const string ApiVersion = "1.22";
+        public const string Version = "1.31";
+        public const string ApiVersion = "1.23";
         public static string Discord = "https://galaxyswapperv2.com/Discord.php";
         public static string Website = "https://galaxyswapperv2.com";
         public static string Download = "https://galaxyswapperv2.com/Downloads/InGame.php";

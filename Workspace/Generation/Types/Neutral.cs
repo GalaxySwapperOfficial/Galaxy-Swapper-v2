@@ -2,7 +2,6 @@
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
-using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -160,7 +159,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                             NewAsset.OverrideBuffer = Asset["Buffer"].Value<string>();
 
                         if (Asset["Swaps"] != null)
-                            NewAsset.Swaps = Asset["Swaps"];
+                            NewAsset.Swaps = Asset["Swaps"].DeepClone();
 
                         if (!Asset["IsID"].KeyIsNullOrEmpty() && Asset["IsID"].Value<bool>())
                         {

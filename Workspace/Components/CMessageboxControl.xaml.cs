@@ -28,6 +28,7 @@ namespace Galaxy_Swapper_v2.Workspace.Components
             Solutions = solutions;
             Button = buttons;
             Discord = discord;
+            Exit = exit;
         }
 
         private void MessageView_Loaded(object sender, RoutedEventArgs e)
