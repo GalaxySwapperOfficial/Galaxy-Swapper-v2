@@ -1,4 +1,4 @@
-﻿using Galaxy_Swapper_v2.Workspace.Properties;
+using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
@@ -95,21 +95,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             if (parse["DownTime"]["Enabled"].Value<bool>() && !Settings.Read(Settings.Type.IsDev).Value<bool>())
                 Message.DisplaySTA(parse["DownTime"]["Header"].Value<string>(), parse["DownTime"]["Content"].Value<string>(), discord: true, exit: true);
 
-            if (parse["Update"]["Enabled"].Value<bool>() && !Settings.Read(Settings.Type.IsDev).Value<bool>())
-            {
-                if (parse["Update"]["Force"]["Enabled"].Value<bool>())
-                {
-                    Message.DisplaySTA(parse["Update"]["Force"]["Header"].Value<string>(), parse["Update"]["Force"]["Content"].Value<string>(), discord: true, exit: true, links: new[] { Global.Download });
-                    Environment.Exit(0);
-                }
-                else if (Message.DisplaySTA(parse["Update"]["Header"].Value<string>(), parse["Update"]["Content"].Value<string>(), MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
-                {
-                    Global.Discord.UrlStart();
-                    Global.Download.UrlStart();
-                    Global.Website.UrlStart();
-                    Environment.Exit(0);
-                }
-            }
+            // Der Code, der die Update-Nachricht anzeigt, wurde entfernt
 
             Presence.Initialize();
 
