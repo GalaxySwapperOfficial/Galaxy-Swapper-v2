@@ -8,6 +8,13 @@ Note: It is recommended to download Galaxy Swapper v2 from [here](https://galaxy
 
 Galaxy Swapper v2 is a free Fortnite skin changer built in WPF that allows you to modify your game files to replace a cosmetic you own with a cosmetic you desire, all with ease. We have also developed a simple and user-friendly user-interface for your convenience.
 
+## Compiling 
+I prefer to use vscdoe for this if you dont want to use this to compile find out how yourself.
+
+Just clone the project and click the compile button found at the top, this will create a folder called bin/debug/net7.0windows (or something similar to this) in this folder there should be an exe called Galaxy Swapper v2.exe
+
+If this didnt work feel free to contact me on twitter(linked below)
+
 ## Social media links
 * [Discord of galaxy swapper](https://galaxyswapperv2.com/Discord)
 * [Website of the official Galaxy swapper](https://galaxyswapperv2.com)
@@ -35,10 +42,3 @@ Galaxy Swapper v2 is a free Fortnite skin changer built in WPF that allows you t
 Galaxy Swapper v2 is licensed under [GNU General Public License v3.0](https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-v2/blob/main/LICENSE)
 
 <a href="https://galaxyswapperv2.com/Guilded"><img src="https://cdn.discordapp.com/attachments/1122580592370921494/1129255436281983046/ServerBanner2.jpg"></a>
-
-## Compiling 
-I prefer to use vscdoe for this if you dont want to use this to compile find out how yourself.
-
-Just clone the project and click the compile button found at the top, this will create a folder called bin/debug/net7.0windows (or something similar to this) in this folder there should be an exe called Galaxy Swapper v2.exe
-
-If this didnt work feel free to contact me on twitter(linked above)
