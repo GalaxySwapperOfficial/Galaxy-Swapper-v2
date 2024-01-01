@@ -2,7 +2,7 @@
 
 Revamp your Fortnite experience with our skin swapper designed for the latest version of Fortnite. This repository contains the source code for Galaxy Swapper v2.
 
-Note: It is recommended to download Galaxy Swapper v2 from [here](https://galaxyswapperv2.com/Downloads/InGame.php) instead of rebuilding it yourself.
+Note: It is recommended to compile Galaxy Swapper v2 yourself but the actuall devs say otherwise(no clue why???).
 
 ## What is Galaxy Swapper v2?
 
