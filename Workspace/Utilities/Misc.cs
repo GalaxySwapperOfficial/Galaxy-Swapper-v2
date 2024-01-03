@@ -1,5 +1,6 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Hashes;
 using Galaxy_Swapper_v2.Workspace.Properties;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
@@ -281,6 +282,35 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             return -1;
         }
 
+        public static int IndexOfSequenceReverse(this byte[] data, byte[] pattern)
+        {
+            if (data == null || pattern == null || data.Length == 0 || pattern.Length == 0 || pattern.Length > data.Length)
+            {
+                return -1; // Invalid input
+            }
+
+            for (int i = data.Length - pattern.Length; i >= 0; i--)
+            {
+                bool match = true;
+
+                for (int j = 0; j < pattern.Length; j++)
+                {
+                    if (data[i + j] != pattern[j])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (match)
+                {
+                    return i; // Pattern found
+                }
+            }
+
+            return -1; // Pattern not found
+        }
+
         public static long IndexOfSequence(Stream stream, byte[] pattern, long pos = 0)
         {
             long bufferSize = 4096;
@@ -418,6 +448,19 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             }
 
             return false;
+        }
+
+        public static JObject TryParse(string content)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<JObject>(content);
+            }
+            catch (Exception Exception)
+            {
+                Log.Error(Exception, "Failed to parse Json content");
+                return null!;
+            }
         }
     }
 }

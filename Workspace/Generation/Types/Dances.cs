@@ -155,6 +155,33 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                 if (Continue)
                     continue;
 
+                Swaps.Add(JObject.FromObject(new
+                {
+                    type = "hex",
+                    search = Generate.CreateNameSwap(Option.Name),
+                    replace = Generate.CreateNameSwap(Cosmetic.Name)
+                }));
+
+                if (!Parse["Description"].KeyIsNullOrEmpty() && !OParse["Description"].KeyIsNullOrEmpty())
+                {
+                    Swaps.Add(JObject.FromObject(new
+                    {
+                        type = "hex",
+                        search = Generate.CreateNameSwap(OParse["Description"].Value<string>()),
+                        replace = Generate.CreateNameSwap(Parse["Description"].Value<string>())
+                    }));
+                }
+
+                if (!Parse["Introduction"].KeyIsNullOrEmpty() && !OParse["Introduction"].KeyIsNullOrEmpty())
+                {
+                    Swaps.Add(JObject.FromObject(new
+                    {
+                        type = "tag",
+                        search = OParse["Introduction"].Value<string>(),
+                        replace = Parse["Introduction"].Value<string>()
+                    }));
+                }
+
                 NewAsset.Swaps = Swaps;
                 NewOption.Exports.Add(NewAsset);
 

@@ -2,7 +2,6 @@
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
-using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -160,7 +159,38 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                             NewAsset.OverrideBuffer = Asset["Buffer"].Value<string>();
 
                         if (Asset["Swaps"] != null)
-                            NewAsset.Swaps = Asset["Swaps"];
+                            NewAsset.Swaps = Asset["Swaps"].DeepClone();
+
+                        if (!Asset["IsID"].KeyIsNullOrEmpty() && Asset["IsID"].Value<bool>())
+                        {
+                            if (!Parse["LobbyName"].KeyIsNullOrEmpty() && !option["LobbyName"].KeyIsNullOrEmpty())
+                            {
+                                ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                {
+                                    type = "hex",
+                                    search = Generate.CreateNameSwap(option["LobbyName"].Value<string>()),
+                                    replace = Generate.CreateNameSwap(Parse["LobbyName"].Value<string>())
+                                }));
+                            }
+                            if (!Parse["Description"].KeyIsNullOrEmpty() && !option["Description"].KeyIsNullOrEmpty())
+                            {
+                                ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                {
+                                    type = "hex",
+                                    search = Generate.CreateNameSwap(option["Description"].Value<string>()),
+                                    replace = Generate.CreateNameSwap(Parse["Description"].Value<string>())
+                                }));
+                            }
+                            if (!Parse["Introduction"].KeyIsNullOrEmpty() && !option["Introduction"].KeyIsNullOrEmpty())
+                            {
+                                ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                {
+                                    type = "tag",
+                                    search = option["Introduction"].Value<string>(),
+                                    replace = Parse["Introduction"].Value<string>()
+                                }));
+                            }
+                        }
 
                         NewOption.Exports.Add(NewAsset);
                     }
@@ -191,8 +221,11 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                         NewOption.Exports.Add(cid);
                     }
 
-
                     var newfallback = new Asset() { Object = "/Game/Athena/Heroes/Meshes/Bodies/CP_Athena_Body_F_Fallback", OverrideObject = Parse["Object"].Value<string>(), Swaps = Parse["Swaps"] };
+
+                    Generate.AddMaterialOverridesArray(Parse, newfallback);
+                    Generate.AddTextureParametersArray(Parse, newfallback);
+
                     NewOption.Exports.Add(newfallback);
                     Cosmetic.Options.Add(NewOption);
                 }
@@ -235,7 +268,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
 
                 var NewOption = (Option)Option.Clone();
                 var Objects = OParse["Objects"].ToDictionary(obj => obj["Type"].Value<string>(), obj => obj["Object"].Value<string>());
-
+                
                 NewOption.Exports = new List<Asset>();
 
                 foreach (var Object in Parse["Objects"])
@@ -264,6 +297,9 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                         Continue = true;
                         break;
                     }
+
+                    Generate.AddMaterialOverridesArray(Object, NewAsset);
+                    Generate.AddTextureParametersArray(Object, NewAsset);
 
                     if (Object["Buffer"] != null && !string.IsNullOrEmpty(Object["Buffer"].Value<string>()))
                         NewAsset.OverrideBuffer = Object["Buffer"].Value<string>();
@@ -297,6 +333,9 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                             NewAsset.OverrideBuffer = Additional["Buffer"].Value<string>();
                         if (Additional["StreamData"] is not null)
                             NewAsset.IsStreamData = Additional["StreamData"].Value<bool>();
+
+                        Generate.AddMaterialOverridesArray(Additional, NewAsset);
+                        Generate.AddTextureParametersArray(Additional, NewAsset);
 
                         NewOption.Exports.Add(NewAsset);
                     }

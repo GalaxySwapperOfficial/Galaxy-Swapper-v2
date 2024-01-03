@@ -57,14 +57,14 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
             if (Asset.Swaps != null)
             {
-                Output(Languages.Read(Languages.Type.View, "SwapView", "SwappingStrings"), SwapView.Type.Info);
-
                 foreach (var Object in Asset.Swaps)
                 {
                     switch (Object["type"].Value<string>())
                     {
                         case "string":
                             {
+                                Output(Languages.Read(Languages.Type.View, "SwapView", "SwappingStrings"), SwapView.Type.Info);
+
                                 string ObjectPath = (Object["search"].Value<string>().Contains('.') ? Object["search"].Value<string>().Split('.').First() : Object["search"].Value<string>()).Replace("FortniteGame/Plugins/GameFeatures/BRCosmetics/Content/", "/BRCosmetics/");
                                 string ObjectName = Object["search"].Value<string>().Split('.')?.Last();
                                 string OverrideObjectPath = (Object["replace"].Value<string>().Contains('.') ? Object["replace"].Value<string>().Split('.').First() : Object["replace"].Value<string>()).Replace("FortniteGame/Plugins/GameFeatures/BRCosmetics/Content/", "/BRCosmetics/");
@@ -83,11 +83,13 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
                             break;
                         case "tag":
                             {
+                                Output(Languages.Read(Languages.Type.View, "SwapView", "SwappingStrings"), SwapView.Type.Info);
                                 Deserializer.ReplaceEntry(Object["search"].Value<string>(), Object["replace"].Value<string>());
                             }
                             break;
                         case "hex":
                             {
+                                Output(Languages.Read(Languages.Type.View, "SwapView", "SwappingHex"), SwapView.Type.Info);
                                 var buffer = new List<byte>(Deserializer.RestOfData);
                                 byte[] searchBuffer = Misc.HexToByte(Object["search"].Value<string>());
                                 byte[] replaceBuffer = Misc.HexToByte(Object["replace"].Value<string>());
@@ -110,24 +112,26 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
                                     if (searchBuffer.Length != replaceBuffer.Length)
                                     {
-                                        Log.Information(Deserializer.ExportMap[0].CookedSerialSize.ToString());
-                                        if (searchBuffer.Length > 0)
-                                        {
-                                            Deserializer.ExportMap[0].CookedSerialSize += (ulong)(replaceBuffer.Length - searchBuffer.Length);
-                                        }
-                                        else
-                                        {
-                                            Deserializer.ExportMap[0].CookedSerialSize -= (ulong)(replaceBuffer.Length - searchBuffer.Length);
-                                        }
-                                        Log.Information(Deserializer.ExportMap[0].CookedSerialSize.ToString());
+                                        Deserializer.ExportMap[^1].CookedSerialSize += (ulong)(replaceBuffer.Length - searchBuffer.Length);
                                     }
                                 }
+                                else Log.Error($"Failed to find pos for hex");
 
                                 Deserializer.RestOfData = buffer.ToArray();
                             }
                             break;
                     }
                 }
+            }
+
+            if (Asset.MaterialData is not null)
+            {
+                Deserializer.ReplaceMaterialOverrideArray(Asset.MaterialData);
+            }
+
+            if (Asset.TextureData is not null)
+            {
+                Deserializer.ReplaceTextureParametersArray(Asset.TextureData);
             }
 
             Output(Languages.Read(Languages.Type.View, "SwapView", "Sterilizing"), SwapView.Type.Info);

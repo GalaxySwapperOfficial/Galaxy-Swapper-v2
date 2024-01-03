@@ -126,6 +126,9 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                 if (Parse["Buffer"] != null && !string.IsNullOrEmpty(Parse["Buffer"].Value<string>()))
                     NewAsset.OverrideBuffer = Parse["Buffer"].Value<string>();
 
+                Generate.AddMaterialOverridesArray(Parse, NewAsset);
+                Generate.AddTextureParametersArray(Parse, NewAsset);
+
                 NewOption.Exports.Add(NewAsset);
 
                 if (Parse["Additional"] != null)
@@ -137,6 +140,9 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                             NewAdditionalAsset.OverrideObject = Additional["OverrideObject"].Value<string>();
                         if (Additional["Buffer"] != null && !string.IsNullOrEmpty(Additional["Buffer"].Value<string>()))
                             NewAdditionalAsset.OverrideBuffer = Additional["Buffer"].Value<string>();
+
+                        Generate.AddMaterialOverridesArray(Additional, NewAdditionalAsset);
+                        Generate.AddTextureParametersArray(Additional, NewAdditionalAsset);
 
                         NewOption.Exports.Add(NewAdditionalAsset);
                     }

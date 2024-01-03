@@ -29,9 +29,13 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
             Name = file;
         }
 
-        public Reader(byte[] data)
-            : base(new MemoryStream(data))
+        public Reader(byte[] data) : base(new MemoryStream(data))
         {
+        }
+
+        public Reader(byte[] data, long offset) : base(new MemoryStream(data))
+        {
+            Position = offset;
         }
 
         public new byte[] ReadBytes(int length)
