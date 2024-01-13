@@ -82,9 +82,9 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             };
 
             if (string.IsNullOrEmpty(Frontend))
-                NewCosmetic.LoadImage(URL, invalid: "https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API/blob/main/In%20Game/Icons/InvalidCosmetic.png?raw=true");
+                NewCosmetic.LoadImage(URL, invalid: "/Workspace/Assets/FallBackCosmeticImage.png");
             else
-                NewCosmetic.LoadImage(Frontend, invalid: "https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API/blob/main/In%20Game/Icons/InvalidCosmetic.png?raw=true");
+                NewCosmetic.LoadImage(Frontend, invalid: "/Workspace/Assets/FallBackCosmeticImage.png");
 
             NewCosmetic.MouseEnter += Cosmetic_MouseEnter;
             NewCosmetic.MouseLeave += Cosmetic_MouseLeave;

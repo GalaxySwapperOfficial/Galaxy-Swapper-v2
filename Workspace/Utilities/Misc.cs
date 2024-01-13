@@ -92,7 +92,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             return CompressionData;
         }
 
-        public static void LoadImage(this Image image, string url, string invalid = "https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API/blob/main/In%20Game/Icons/invalid.png?raw=true")
+        public static void LoadImage(this Image image, string url, string invalid = "/Workspace/Assets/FallBackImage.png")
         {
             if (image is null)
             {
@@ -116,7 +116,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
 
                 if (response.StatusCode != HttpStatusCode.OK || response.RawBytes is null)
                 {
-                    Log.Error("Failed to download image from {0}. loading as fallback", HttpUtility.UrlEncode(url));
+                    Log.Error("Failed to download image from {0}. loading as fallback {1}", HttpUtility.UrlEncode(url), invalid);
                     bitmapImage = new BitmapImage(new Uri(invalid, UriKind.RelativeOrAbsolute));
                     image.Source = bitmapImage;
                     return;
@@ -136,7 +136,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             image.Source = bitmapImage;
         }
 
-        public static BitmapImage LoadImageToBitmap(string url, string invalid = "https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API/blob/main/In%20Game/Icons/invalid.png?raw=true")
+        public static BitmapImage LoadImageToBitmap(string url, string invalid = "/Workspace/Assets/FallBackCosmeticImage.png")
         {
             var bitmapImage = new BitmapImage();
 
