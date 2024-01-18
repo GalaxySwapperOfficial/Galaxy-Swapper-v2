@@ -172,8 +172,10 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
                 Log.Information($"Wrote to: {Utoc} at Offset: {Asset.Export.CompressionBlock.Position}");
 
+                int newSize = (int)Asset.Export.ChunkOffsetLengths.Length - Asset.Export.UncompressedBuffer.Length + BufferToWrite.Length;
+
                 UtocEdit.Seek((int)Asset.Export.ChunkOffsetLengths.Position + 5, SeekOrigin.Begin);
-                UtocEdit.Write(Misc.AssetLengthBlock(BufferToWrite.Length), 0, 5);
+                UtocEdit.Write(Misc.AssetLengthBlock(newSize), 0, 5);
 
                 Log.Information($"Wrote to: {Utoc} at Offset: {Asset.Export.ChunkOffsetLengths.Position + 5}");
 

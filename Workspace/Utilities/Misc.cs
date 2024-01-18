@@ -1,17 +1,22 @@
-﻿using Galaxy_Swapper_v2.Workspace.Hashes;
+﻿using Galaxy_Swapper_v2.Workspace.Compression;
+using Galaxy_Swapper_v2.Workspace.Hashes;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RestSharp;
 using Serilog;
 using System;
 using System.Diagnostics;
+using System.DirectoryServices.ActiveDirectory;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -87,7 +92,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
             return CompressionData;
         }
 
-        public static void LoadImage(this Image image, string url, string invalid = "https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API/blob/main/In%20Game/Icons/invalid.png?raw=true")
+        public static void LoadImage(this Image image, string url, string invalid = "/Workspace/Assets/FallBackImage.png")
         {
             if (image is null)
             {
@@ -97,46 +102,22 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
 
             var bitmapImage = new BitmapImage();
 
-            if (url is null)
-            {
-                Log.Error($"LoadImage url Is null loading as invalid");
-                bitmapImage = new BitmapImage(new Uri(invalid, UriKind.RelativeOrAbsolute));
-                return;
-            }
+            bitmapImage.BeginInit();
+            bitmapImage.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.EndInit();
 
-            string name = $"{Fnv1a.Hash(url)}-{image.Width}x{image.Height}.cache";
-
-            try
+            bitmapImage.DownloadFailed += delegate
             {
-                if (!ImageCache.ReadCache(name, bitmapImage))
-                {
-                    bitmapImage.DownloadFailed += IconDownloadFailed;
-                    bitmapImage.DownloadCompleted += IconDownloadComplete;
-                    bitmapImage = new BitmapImage(new Uri(url, UriKind.RelativeOrAbsolute));
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"LoadImage caught exception while loading {url} to 'bitmapImage': {ex.Message}");
-                bitmapImage = new BitmapImage(new Uri(invalid, UriKind.RelativeOrAbsolute));
-            }
-
-            image.Source = bitmapImage;
-
-            void IconDownloadFailed(object sender, ExceptionEventArgs e)
-            {
-                Log.Error($"IconDownloadFailed event was triggered loading as invalid url");
+                Log.Error("Failed to download image from {0}. loading as fallback {1}", HttpUtility.UrlEncode(url), invalid);
                 bitmapImage = new BitmapImage(new Uri(invalid, UriKind.RelativeOrAbsolute));
                 image.Source = bitmapImage;
-            }
+            };
 
-            void IconDownloadComplete(object sender, EventArgs e)
-            {
-                ImageCache.Cache(name, bitmapImage);
-            }
+            image.Source = bitmapImage;
         }
 
-        public static BitmapImage LoadImageToBitmap(string url, string invalid = "https://github.com/GalaxySwapperOfficial/Galaxy-Swapper-API/blob/main/In%20Game/Icons/invalid.png?raw=true")
+        public static BitmapImage LoadImageToBitmap(string url, string invalid = "/Workspace/Assets/FallBackCosmeticImage.png")
         {
             var bitmapImage = new BitmapImage();
 
