@@ -100,39 +100,20 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                 return;
             }
 
-            string cacheName = $"{Fnv1a.Hash(url)}-{image.Width}x{image.Height}.cache";
             var bitmapImage = new BitmapImage();
 
-            if (ImageCache.ReadCache(cacheName, bitmapImage))
+            bitmapImage.BeginInit();
+            bitmapImage.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.EndInit();
+
+            bitmapImage.DownloadFailed += delegate
             {
+                Log.Error("Failed to download image from {0}. loading as fallback {1}", HttpUtility.UrlEncode(url), invalid);
+                bitmapImage = new BitmapImage(new Uri(invalid, UriKind.RelativeOrAbsolute));
                 image.Source = bitmapImage;
-                return;
-            }
+            };
 
-            using (var client = new RestClient())
-            {
-                var request = new RestRequest(new Uri(url), Method.Get);
-                var response = client.Execute(request);
-
-                if (response.StatusCode != HttpStatusCode.OK || response.RawBytes is null)
-                {
-                    Log.Error("Failed to download image from {0}. loading as fallback {1}", HttpUtility.UrlEncode(url), invalid);
-                    bitmapImage = new BitmapImage(new Uri(invalid, UriKind.RelativeOrAbsolute));
-                    image.Source = bitmapImage;
-                    return;
-                }
-
-                using (var stream = new MemoryStream(response.RawBytes))
-                {
-                    bitmapImage.BeginInit();
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmapImage.StreamSource = stream;
-                    bitmapImage.EndInit();
-                    bitmapImage.Freeze();
-                }
-            }
-
-            ImageCache.Cache(cacheName, bitmapImage);
             image.Source = bitmapImage;
         }
 

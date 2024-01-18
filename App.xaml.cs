@@ -51,7 +51,6 @@ namespace Galaxy_Swapper_v2
             SwapLogs.Initialize();
             UEFN.Initialize();
             Binaries.Initialize();
-            ImageCache.Initialize();
 
             base.OnStartup(e);
         }
