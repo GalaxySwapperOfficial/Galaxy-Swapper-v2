@@ -58,6 +58,9 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             if (Parse["Message"] != null && !string.IsNullOrEmpty(Parse["Message"].Value<string>()) && Parse["Message"].Value<string>().ToLower() != "false")
                 Message.Display(Languages.Read(Languages.Type.Header, "Warning"), Parse["Message"].Value<string>(), MessageBoxButton.OK);
 
+            Slider.Maximum = Parse["Maximum"].Value<int>();
+            Slider.Minimum = Parse["Minimum"].Value<int>();
+
             foreach (var Preview in Parse["Previews"])
             {
                 var preview = new Image() { Name = $"Preview{Preview["Amount"].Value<string>()}", Visibility = Visibility.Hidden, Stretch = System.Windows.Media.Stretch.Fill };
@@ -148,8 +151,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             string epicinstallation = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
             if (string.IsNullOrEmpty(epicinstallation) || !File.Exists(epicinstallation))
             {
-                Log.Information(Languages.Read(Languages.Type.Message, "EpicGamesLauncherPathEmpty"));
-                Memory.MainView.SetOverlay(new EpicGamesLauncherDirEmpty());
+                Log.Error("Epic Games Launcher directory is null or empty");
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "EpicDirectoryInvalid"), links: new[] { Global.EpicGamesDirectoryTutorial });
                 return;
             }
 
@@ -248,11 +251,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             }
             catch (FortniteDirectoryEmptyException Exception)
             {
-                this.Dispatcher.Invoke(() =>
-                {
-                    Log.Error(Exception.Message, "Fortnite directory is null or empty");
-                    Memory.MainView.SetOverlay(new FortniteDirEmpty());
-                });
+                Log.Error(Exception.Message, "Fortnite directory is null or empty");
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "FortniteDirectoryInvalid"), links: new[] { Global.FortniteDirectoryTutorial });
             }
             catch (CustomException CustomException)
             {
@@ -310,11 +310,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             }
             catch (FortniteDirectoryEmptyException Exception)
             {
-                this.Dispatcher.Invoke(() =>
-                {
-                    Log.Error(Exception.Message, "Fortnite directory is null or empty");
-                    Memory.MainView.SetOverlay(new FortniteDirEmpty());
-                });
+                Log.Error(Exception.Message, "Fortnite directory is null or empty");
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "FortniteDirectoryInvalid"), links: new[] { Global.FortniteDirectoryTutorial });
             }
             catch (CustomException CustomException)
             {

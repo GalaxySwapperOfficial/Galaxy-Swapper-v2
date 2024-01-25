@@ -1,4 +1,5 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Components;
+using Galaxy_Swapper_v2.Workspace.Generation;
 using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Plugins;
 using Galaxy_Swapper_v2.Workspace.Properties;
@@ -18,9 +19,6 @@ using System.Windows.Input;
 
 namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 {
-    /// <summary>
-    /// Interaction logic for PluginsView.xaml
-    /// </summary>
     public partial class PluginsView : UserControl
     {
         public PluginsView()
@@ -97,7 +95,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             string swapicon = null!;
             string name = parse["Name"].Value<string>();
             var newcomsetic = new CPluginControl(this, plugindata, Languages.Read(Languages.Type.View, "PluginsView", "Remove"), Languages.Read(Languages.Type.View, "PluginsView", "Reimport")) { Height = 85, Width = 85, Margin = new Thickness(10), Cursor = Cursors.Hand, ToolTip = name };
-            
+
             if (!parse["FrontendIcon"].KeyIsNullOrEmpty())
                 frontendicon = parse["FrontendIcon"].Value<string>();
             if (!parse["Icon"].KeyIsNullOrEmpty())
@@ -182,6 +180,11 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                             newasset.OverrideBuffer = asset["Buffer"].Value<string>();
                         if (asset["Swaps"] != null)
                             newasset.Swaps = asset["Swaps"];
+                        if (asset["Invalidate"] is not null)
+                            newasset.Invalidate = asset["Invalidate"].Value<bool>();
+
+                        Generate.AddMaterialOverridesArray(asset, newasset);
+                        Generate.AddTextureParametersArray(asset, newasset);
 
                         newoption.Exports.Add(newasset);
                     }
@@ -189,7 +192,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                     ((MainView)App.Current.MainWindow).SetOverlay(new SwapView(newoption));
                     return;
                 }
-                
+
                 //Check for custom types like uefn fix, defaults ect!
                 switch (parse["Type"].Value<string>())
                 {
@@ -230,6 +233,9 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                                 if (Asset["Swaps"] != null)
                                     NewAsset.Swaps = Asset["Swaps"];
 
+                                if (Asset["Invalidate"] is not null)
+                                    NewAsset.Invalidate = Asset["Invalidate"].Value<bool>();
+
                                 uefnoption.Exports.Add(NewAsset);
                             }
 
@@ -244,10 +250,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                             }
 
                             var fallback = new Asset() { Object = "/Game/Athena/Heroes/Meshes/Bodies/CP_Athena_Body_F_Fallback", OverrideObject = parse["AssetPathTo"].Value<string>(), Swaps = parse["Swaps"] };
+
+                            Generate.AddMaterialOverridesArray(parse, fallback);
+                            Generate.AddTextureParametersArray(parse, fallback);
+
                             uefnoption.Exports.Add(fallback);
                             optionlist.Add(uefnoption);
                         }
-                        
+
                         ((MainView)App.Current.MainWindow).SetOverlay(new OptionsView(newoption.Name, optionlist));
                         return;
                 }

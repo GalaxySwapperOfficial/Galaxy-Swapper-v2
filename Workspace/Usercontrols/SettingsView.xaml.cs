@@ -155,14 +155,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
             if (string.IsNullOrEmpty(epicinstallation) || !File.Exists(epicinstallation))
             {
-                Log.Information(Languages.Read(Languages.Type.Message, "EpicGamesLauncherPathEmpty"));
-                Memory.MainView.SetOverlay(new EpicGamesLauncherDirEmpty());
+                Log.Error("Epic Games Launcher directory is null or empty");
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "EpicDirectoryInvalid"), links: new[] { Global.EpicGamesDirectoryTutorial });
                 return;
             }
             if (string.IsNullOrEmpty(paks) || !Directory.Exists(paks))
             {
                 Log.Error("Fortnite directory is null or empty");
-                Memory.MainView.SetOverlay(new FortniteDirEmpty());
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "FortniteDirectoryInvalid"), links: new[] { Global.FortniteDirectoryTutorial });
                 return;
             }
 
@@ -196,14 +196,14 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
                 if (string.IsNullOrEmpty(epicinstallation) || !File.Exists(epicinstallation))
                 {
-                    Log.Information(Languages.Read(Languages.Type.Message, "EpicGamesLauncherPathEmpty"));
-                    Memory.MainView.SetOverlay(new EpicGamesLauncherDirEmpty());
+                    Log.Error("Epic Games Launcher directory is null or empty");
+                    Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "EpicDirectoryInvalid"), links: new[] { Global.EpicGamesDirectoryTutorial });
                     return;
                 }
                 if (!pakDirectoryInfo.Exists || string.IsNullOrEmpty(pakDirectoryInfo.FullName))
                 {
                     Log.Error("Fortnite directory is null or empty");
-                    Memory.MainView.SetOverlay(new FortniteDirEmpty());
+                    Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "FortniteDirectoryInvalid"), links: new[] { Global.FortniteDirectoryTutorial });
                     return;
                 }
 

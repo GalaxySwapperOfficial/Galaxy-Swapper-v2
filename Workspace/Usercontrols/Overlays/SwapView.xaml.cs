@@ -144,8 +144,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             string epicinstallation = Settings.Read(Settings.Type.EpicInstalltion).Value<string>();
             if (string.IsNullOrEmpty(epicinstallation) || !File.Exists(epicinstallation))
             {
-                Log.Information(Languages.Read(Languages.Type.Message, "EpicGamesLauncherPathEmpty"));
-                Memory.MainView.SetOverlay(new EpicGamesLauncherDirEmpty());
+                Log.Error("Epic Games Launcher directory is null or empty");
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "EpicDirectoryInvalid"), links: new[] { Global.EpicGamesDirectoryTutorial });
                 return;
             }
 
@@ -269,11 +269,15 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
 
                 Output(Languages.Read(Languages.Type.View, "SwapView", "ConvertingAssets"), Type.Info);
 
+                int totalRemoveAssetCount = 0;
                 foreach (var Export in Option.Exports)
                 {
                     var Swap = new Swap(this, null, Export);
-                    if (!Swap.Convert())
+                    if (!Swap.Convert(out bool removeAssetCount))
                         return;
+
+                    if (removeAssetCount)
+                        totalRemoveAssetCount++;
                 }
 
                 if (Option.Cosmetic is not null && !Option.IsPlugin && Settings.Read(Settings.Type.ShareStats).Value<bool>())
@@ -281,7 +285,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
                     CosmeticTracker.Update(Option.Cosmetic.Name, Option.Cosmetic.ID, Option.Cosmetic.Type.ToString());
                 }
 
-                SwapLogs.Add(Option.Name, Option.Icon, Option.OverrideIcon, Option.Exports.Count, Ucas, Utocs, Option.UEFNFormat);
+                SwapLogs.Add(Option.Name, Option.Icon, Option.OverrideIcon, Option.Exports.Count - totalRemoveAssetCount, Ucas, Utocs, Option.UEFNFormat);
 
                 this.Dispatcher.Invoke(() =>
                 {
@@ -297,11 +301,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             }
             catch (FortniteDirectoryEmptyException Exception)
             {
-                this.Dispatcher.Invoke(() =>
-                {
-                    Log.Error(Exception.Message, "Fortnite directory is null or empty");
-                    Memory.MainView.SetOverlay(new FortniteDirEmpty());
-                });
+                Log.Error(Exception.Message, "Fortnite directory is null or empty");
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "FortniteDirectoryInvalid"), links: new[] { Global.FortniteDirectoryTutorial });
             }
             catch (CustomException CustomException)
             {
@@ -372,11 +373,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             }
             catch (FortniteDirectoryEmptyException Exception)
             {
-                this.Dispatcher.Invoke(() =>
-                {
-                    Log.Error(Exception.Message, "Fortnite directory is null or empty");
-                    Memory.MainView.SetOverlay(new FortniteDirEmpty());
-                });
+                Log.Error(Exception.Message, "Fortnite directory is null or empty");
+                Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "FortniteDirectoryInvalid"), links: new[] { Global.FortniteDirectoryTutorial });
             }
             catch (CustomException CustomException)
             {

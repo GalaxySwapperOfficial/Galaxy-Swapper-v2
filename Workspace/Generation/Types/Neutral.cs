@@ -59,6 +59,9 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                                 NewOption.Socials = Cosmetic.Socials;
                                 NewOption.Cosmetic = Cosmetic;
 
+                                if (Override["UEFNTag"] is not null)
+                                    NewOption.UEFNTag = Override["UEFNTag"].Value<string>();
+
                                 if (Override["Downloadables"] != null)
                                 {
                                     foreach (var downloadable in Override["Downloadables"])
@@ -81,6 +84,9 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                                     if (Asset["Swaps"] != null)
                                         NewAsset.Swaps = Asset["Swaps"];
 
+                                    if (Asset["Invalidate"] is not null)
+                                        NewAsset.Invalidate = Asset["Invalidate"].Value<bool>();
+
                                     NewOption.Exports.Add(NewAsset);
                                 }
 
@@ -96,6 +102,9 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
 
                                     if (Override["HID"]["Swaps"] != null)
                                         NewAsset.Swaps = Override["HID"]["Swaps"];
+
+                                    if (Override["HID"]["Invalidate"] is not null)
+                                        NewAsset.Invalidate = Override["HID"]["Invalidate"].Value<bool>();
 
                                     NewOption.Exports.Add(NewAsset);
                                 }
@@ -161,6 +170,9 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                         if (Asset["Swaps"] != null)
                             NewAsset.Swaps = Asset["Swaps"].DeepClone();
 
+                        if (Asset["Invalidate"] is not null)
+                            NewAsset.Invalidate = Asset["Invalidate"].Value<bool>();
+
                         if (!Asset["IsID"].KeyIsNullOrEmpty() && Asset["IsID"].Value<bool>())
                         {
                             if (!Parse["LobbyName"].KeyIsNullOrEmpty() && !option["LobbyName"].KeyIsNullOrEmpty())
@@ -206,6 +218,8 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                                 NewAsset.OverrideBuffer = Additional["Buffer"].Value<string>();
                             if (Additional["StreamData"] is not null)
                                 NewAsset.IsStreamData = Additional["StreamData"].Value<bool>();
+                            if (Additional["Invalidate"] is not null)
+                                NewAsset.Invalidate = Additional["Invalidate"].Value<bool>();
 
                             NewOption.Exports.Add(NewAsset);
                         }
