@@ -11,6 +11,7 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Formats
         public string OverrideObject;
         public string OverrideBuffer;
         public bool IsStreamData = false;
+        public bool Invalidate = false;
         public JToken Swaps;
         public MaterialData MaterialData;
         public TextureData TextureData;

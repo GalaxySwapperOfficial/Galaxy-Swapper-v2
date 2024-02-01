@@ -8,6 +8,7 @@
         public readonly FIoOffsetAndLength ChunkOffsetLengths;
         public readonly FIoStoreTocHeader IoStoreTocHeader;
         public FIoStoreTocCompressedBlockEntry CompressionBlock;
+        public FIoChunkId ChunkId;
         public string Ucas;
         public string LastUcas;
         public string Utoc;

@@ -7,6 +7,7 @@ using Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,6 +37,36 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
         public bool Convert()
         {
+            return Convert(out bool removeAssetCount);
+        }
+
+        public bool Convert(out bool removeAssetCount)
+        {
+            string Ucas = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks\\{Asset.Export.LastUcas}.ucas";
+            string Utoc = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks\\{Asset.Export.Utoc}.utoc";
+
+            removeAssetCount = false;
+
+            if (Asset.Invalidate)
+            {
+                Output(Languages.Read(Languages.Type.View, "SwapView", "Preparing"), SwapView.Type.Info);
+
+                using (BinaryWriter UtocEdit = new BinaryWriter(File.Open(Utoc, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite)))
+                {
+                    UtocEdit.Seek((int)Asset.Export.ChunkId.Position, SeekOrigin.Begin);
+                    UtocEdit.Write(new byte[sizeof(ulong)], 0, sizeof(ulong));
+
+                    Log.Information($"Wrote to: {Utoc} at Offset: {Asset.Export.ChunkId.Position}");
+
+                    UtocEdit.Close();
+                }
+
+                Output(string.Format(Languages.Read(Languages.Type.View, "SwapView", "Wrote"), "utoc"), SwapView.Type.Info);
+
+                removeAssetCount = true;
+                return true;
+            }
+
             var Deserializer = new Deserializer(Asset.Export.UncompressedBuffer);
 
             Output(Languages.Read(Languages.Type.View, "SwapView", "Deserializing"), SwapView.Type.Info);
@@ -142,9 +173,6 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
                 BufferToWrite = UnrealAes.Encrypt(BufferToWrite, CProviderManager.DefaultProvider.Keys[Asset.Export.IoStoreTocHeader.EncryptionKeyGuid].Key);
             }
 
-            string Ucas = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks\\{Asset.Export.LastUcas}.ucas";
-            string Utoc = $"{Settings.Read(Settings.Type.Installtion).Value<string>()}\\FortniteGame\\Content\\Paks\\{Asset.Export.Utoc}.utoc";
-
             Output(Languages.Read(Languages.Type.View, "SwapView", "Preparing"), SwapView.Type.Info);
 
             if (!Ucas.CanEdit())
@@ -203,6 +231,11 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 
                 UtocEdit.BaseStream.Position = Asset.Export.ChunkOffsetLengths.Position;
                 UtocEdit.Write(Asset.Export.ChunkOffsetLengths.Buffer, 0, 12);
+
+                Log.Information($"Wrote to: {Utoc} at Offset: {Asset.Export.ChunkOffsetLengths.Position}");
+
+                UtocEdit.BaseStream.Position = Asset.Export.ChunkId.Position;
+                UtocEdit.Write(BitConverter.GetBytes(Asset.Export.ChunkId.ChunkId), 0, sizeof(ulong));
 
                 Log.Information($"Wrote to: {Utoc} at Offset: {Asset.Export.ChunkOffsetLengths.Position}");
 

@@ -199,6 +199,7 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
             gamefile.LastPartition = Partitions.Last().Key;
             gamefile.Utoc = IoFileInfo.Name.SubstringBefore('.');
             gamefile.CompressionBlock = compressionBlock;
+            gamefile.ChunkId = FIoStoreTocResource.ChunkIds[gamefile.TocEntryIndex];
 
             var reader = new Reader($"{PakDirectoryInfo.FullName}\\{gamefile.Ucas}.ucas");
 

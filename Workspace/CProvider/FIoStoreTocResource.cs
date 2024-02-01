@@ -11,10 +11,14 @@ namespace Galaxy_Swapper_v2.Workspace.CProvider
         public readonly byte[]? DirectoryIndexBuffer;
         public readonly FIoStoreTocCompressedBlockEntry[] CompressionBlocks;
         public readonly FIoOffsetAndLength[] ChunkOffsetLengths;
+        public readonly FIoChunkId[] ChunkIds;
         public FIoStoreTocResource(Reader reader, FIoStoreTocHeader header)
         {
-            //We don't need chunkids so skip var chunkIds = reader.ReadArray<FIoChunkId>((int)header.EntryCount);
-            reader.Position += 12 * header.EntryCount;
+            ChunkIds = new FIoChunkId[header.EntryCount];
+            for (int i = 0; i < header.EntryCount; i++)
+            {
+                ChunkIds[i] = new FIoChunkId(reader);
+            }
 
             ChunkOffsetLengths = new FIoOffsetAndLength[header.EntryCount];
             for (int i = 0; i < header.EntryCount; i++)
