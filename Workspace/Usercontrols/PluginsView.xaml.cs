@@ -239,6 +239,24 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                                 uefnoption.Exports.Add(NewAsset);
                             }
 
+                            if (parse["Additional"] is not null)
+                            {
+                                foreach (var Additional in parse["Additional"])
+                                {
+                                    var NewAsset = new Asset() { Object = Additional["AssetPath"].Value<string>(), Swaps = Additional["Swaps"] };
+                                    if (Additional["AssetPathTo"] != null)
+                                        NewAsset.OverrideObject = Additional["AssetPathTo"].Value<string>();
+                                    if (Additional["Buffer"] != null && !string.IsNullOrEmpty(Additional["Buffer"].Value<string>()))
+                                        NewAsset.OverrideBuffer = Additional["Buffer"].Value<string>();
+                                    if (Additional["StreamData"] is not null)
+                                        NewAsset.IsStreamData = Additional["StreamData"].Value<bool>();
+                                    if (Additional["Invalidate"] is not null)
+                                        NewAsset.Invalidate = Additional["Invalidate"].Value<bool>();
+
+                                    uefnoption.Exports.Add(NewAsset);
+                                }
+                            }
+
                             if (Settings.Read(Settings.Type.HeroDefinition).Value<bool>() && parse["HeroDefinition"] is not null && !option["HeroDefinition"].KeyIsNullOrEmpty())
                             {
                                 var cid = new Asset() { Object = option["HeroDefinition"].Value<string>(), OverrideObject = parse["HeroDefinition"]["Object"].Value<string>() };
