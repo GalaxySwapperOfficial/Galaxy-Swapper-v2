@@ -254,6 +254,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                                             }));
                                         }
                                     }
+
                                     if (!parse["Description"].KeyIsNullOrEmpty() && !option["Description"].KeyIsNullOrEmpty())
                                     {
                                         string description = option["Description"].Value<string>();
@@ -269,6 +270,7 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                                             }));
                                         }
                                     }
+
                                     if (!parse["Introduction"].KeyIsNullOrEmpty() && !option["Introduction"].KeyIsNullOrEmpty())
                                     {
                                         ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
@@ -276,6 +278,16 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
                                             type = "tag",
                                             search = option["Introduction"].Value<string>(),
                                             replace = parse["Introduction"].Value<string>()
+                                        }));
+                                    }
+
+                                    if (!parse["Set"].KeyIsNullOrEmpty() && !option["Set"].KeyIsNullOrEmpty())
+                                    {
+                                        ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                        {
+                                            type = "tag",
+                                            search = option["Set"].Value<string>(),
+                                            replace = parse["Set"].Value<string>()
                                         }));
                                     }
                                 }

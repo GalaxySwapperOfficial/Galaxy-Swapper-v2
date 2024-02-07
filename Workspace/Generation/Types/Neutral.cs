@@ -2,7 +2,6 @@
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
-using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -216,6 +215,16 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                                     type = "tag",
                                     search = option["Introduction"].Value<string>(),
                                     replace = Parse["Introduction"].Value<string>()
+                                }));
+                            }
+
+                            if (!Parse["Set"].KeyIsNullOrEmpty() && !option["Set"].KeyIsNullOrEmpty())
+                            {
+                                ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                {
+                                    type = "tag",
+                                    search = option["Set"].Value<string>(),
+                                    replace = Parse["Set"].Value<string>()
                                 }));
                             }
                         }
