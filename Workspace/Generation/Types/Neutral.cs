@@ -2,8 +2,10 @@
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Galaxy_Swapper_v2.Workspace.Generation.Types
 {
@@ -177,22 +179,36 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                         {
                             if (!Parse["LobbyName"].KeyIsNullOrEmpty() && !option["LobbyName"].KeyIsNullOrEmpty())
                             {
-                                ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                string lobbyName = option["LobbyName"].Value<string>();
+                                string overrideLobbyName = Parse["LobbyName"].Value<string>();
+
+                                if (lobbyName.Length > overrideLobbyName.Length || lobbyName.Length.Equals(overrideLobbyName.Length))
                                 {
-                                    type = "hex",
-                                    search = Generate.CreateNameSwap(option["LobbyName"].Value<string>()),
-                                    replace = Generate.CreateNameSwap(Parse["LobbyName"].Value<string>())
-                                }));
+                                    ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                    {
+                                        type = "hex",
+                                        search = Misc.ByteToHex(Encoding.ASCII.GetBytes(lobbyName)),
+                                        replace = Generate.CreateNameSwapWithoutAnyLength(overrideLobbyName, lobbyName.Length)
+                                    }));
+                                }
                             }
+
                             if (!Parse["Description"].KeyIsNullOrEmpty() && !option["Description"].KeyIsNullOrEmpty())
                             {
-                                ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                string description = option["Description"].Value<string>();
+                                string overrideDescription = Parse["Description"].Value<string>();
+
+                                if (description.Length > overrideDescription.Length || description.Equals(overrideDescription))
                                 {
-                                    type = "hex",
-                                    search = Generate.CreateNameSwap(option["Description"].Value<string>()),
-                                    replace = Generate.CreateNameSwap(Parse["Description"].Value<string>())
-                                }));
+                                    ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                    {
+                                        type = "hex",
+                                        search = Misc.ByteToHex(Encoding.ASCII.GetBytes(description)),
+                                        replace = Generate.CreateNameSwapWithoutAnyLength(overrideDescription, description.Length)
+                                    }));
+                                }
                             }
+
                             if (!Parse["Introduction"].KeyIsNullOrEmpty() && !option["Introduction"].KeyIsNullOrEmpty())
                             {
                                 ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new

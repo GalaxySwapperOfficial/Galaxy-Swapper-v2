@@ -1,6 +1,7 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Generation.Formats;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -155,20 +156,23 @@ namespace Galaxy_Swapper_v2.Workspace.Generation.Types
                 if (Continue)
                     continue;
 
-                Swaps.Add(JObject.FromObject(new
-                {
-                    type = "hex",
-                    search = Generate.CreateNameSwap(Option.Name),
-                    replace = Generate.CreateNameSwap(Cosmetic.Name)
-                }));
-
-                if (!Parse["Description"].KeyIsNullOrEmpty() && !OParse["Description"].KeyIsNullOrEmpty())
+                if (Option.Name.Length > Cosmetic.Name.Length || Option.Name.Length.Equals(Cosmetic.Name.Length))
                 {
                     Swaps.Add(JObject.FromObject(new
                     {
                         type = "hex",
-                        search = Generate.CreateNameSwap(OParse["Description"].Value<string>()),
-                        replace = Generate.CreateNameSwap(Parse["Description"].Value<string>())
+                        search = Misc.ByteToHex(Encoding.ASCII.GetBytes(Option.Name)),
+                        replace = Generate.CreateNameSwapWithoutAnyLength(Cosmetic.Name, Option.Name.Length)
+                    }));
+                }
+
+                if (OParse["Description"].Value<string>().Length > Parse["Description"].Value<string>().Length || OParse["Description"].Value<string>().Length.Equals(Parse["Description"].Value<string>().Length))
+                {
+                    Swaps.Add(JObject.FromObject(new
+                    {
+                        type = "hex",
+                        search = Misc.ByteToHex(Encoding.ASCII.GetBytes(OParse["Description"].Value<string>())),
+                        replace = Generate.CreateNameSwapWithoutAnyLength(Parse["Description"].Value<string>(), OParse["Description"].Value<string>().Length)
                     }));
                 }
 

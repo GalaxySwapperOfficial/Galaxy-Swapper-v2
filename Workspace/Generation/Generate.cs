@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using Serilog;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -255,6 +256,20 @@ namespace Galaxy_Swapper_v2.Workspace.Generation
             writer.Write<int>(name.Length + 1);
             writer.WriteBytes(Encoding.ASCII.GetBytes(name));
             writer.WriteByte(0);
+
+            return Misc.ByteToHex(writer.ToByteArray(writer.Position));
+        }
+
+        public static string CreateNameSwapWithoutAnyLength(string name, int length)
+        {
+            var writer = new Writer(new byte[length]);
+
+            writer.WriteBytes(Encoding.ASCII.GetBytes(name));
+
+            for (int i = 0; i < length - name.Length; i++)
+            {
+                writer.WriteByte(0x20);
+            }
 
             return Misc.ByteToHex(writer.ToByteArray(writer.Position));
         }
