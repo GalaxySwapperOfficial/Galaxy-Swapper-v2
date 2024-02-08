@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -235,6 +236,61 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
 
                                 if (Asset["Invalidate"] is not null)
                                     NewAsset.Invalidate = Asset["Invalidate"].Value<bool>();
+
+                                if (!Asset["IsID"].KeyIsNullOrEmpty() && Asset["IsID"].Value<bool>())
+                                {
+                                    if (!parse["LobbyName"].KeyIsNullOrEmpty() && !option["LobbyName"].KeyIsNullOrEmpty())
+                                    {
+                                        string lobbyName = option["LobbyName"].Value<string>();
+                                        string overrideLobbyName = parse["LobbyName"].Value<string>();
+
+                                        if (lobbyName.Length > overrideLobbyName.Length || lobbyName.Length.Equals(overrideLobbyName.Length))
+                                        {
+                                            ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                            {
+                                                type = "hex",
+                                                search = Misc.ByteToHex(Encoding.ASCII.GetBytes(lobbyName)),
+                                                replace = Generate.CreateNameSwapWithoutAnyLength(overrideLobbyName, lobbyName.Length)
+                                            }));
+                                        }
+                                    }
+
+                                    if (!parse["Description"].KeyIsNullOrEmpty() && !option["Description"].KeyIsNullOrEmpty())
+                                    {
+                                        string description = option["Description"].Value<string>();
+                                        string overrideDescription = parse["Description"].Value<string>();
+
+                                        if (description.Length > overrideDescription.Length || description.Equals(overrideDescription))
+                                        {
+                                            ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                            {
+                                                type = "hex",
+                                                search = Misc.ByteToHex(Encoding.ASCII.GetBytes(description)),
+                                                replace = Generate.CreateNameSwapWithoutAnyLength(overrideDescription, description.Length)
+                                            }));
+                                        }
+                                    }
+
+                                    if (!parse["Introduction"].KeyIsNullOrEmpty() && !option["Introduction"].KeyIsNullOrEmpty())
+                                    {
+                                        ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                        {
+                                            type = "tag",
+                                            search = option["Introduction"].Value<string>(),
+                                            replace = parse["Introduction"].Value<string>()
+                                        }));
+                                    }
+
+                                    if (!parse["Set"].KeyIsNullOrEmpty() && !option["Set"].KeyIsNullOrEmpty())
+                                    {
+                                        ((JArray)NewAsset.Swaps).Add(JObject.FromObject(new
+                                        {
+                                            type = "tag",
+                                            search = option["Set"].Value<string>(),
+                                            replace = parse["Set"].Value<string>()
+                                        }));
+                                    }
+                                }
 
                                 uefnoption.Exports.Add(NewAsset);
                             }
