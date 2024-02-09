@@ -17,9 +17,10 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
 {
     public class Swap
     {
-        private SwapView SwapView { get; set; } = default!;
-        private FovView FovView { get; set; } = default!;
-        private Asset Asset { get; set; } = default!;
+        private SwapView SwapView { get; set; }
+        private FovView FovView { get; set; }
+        private Asset Asset { get; set; }
+
         public Swap(SwapView swapview, FovView fovview, Asset asset)
         {
             SwapView = swapview;

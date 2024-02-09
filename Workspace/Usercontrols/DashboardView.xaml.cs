@@ -47,8 +47,8 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols
             if (IsLoaded)
                 return;
 
-            Storyboard = Interface.SetThicknessAnimations(new Interface.ThicknessAnim() { Element = ReadMore, ElementAnim = new ThicknessAnimation { To = new Thickness(0, 0, 12, 7), Duration = new TimeSpan(0, 0, 0, 0, 200) } });
-            Storyboard2 = Interface.SetThicknessAnimations(new Interface.ThicknessAnim() { Element = ReadMore, ElementAnim = new ThicknessAnimation { To = new Thickness(0, 0, 0, 7), Duration = new TimeSpan(0, 0, 0, 0, 200) } });
+            Storyboard = Interface.SetThicknessAnimations(new Interface.ThicknessAnim() { Element = ReadMore, ElementAnim = new ThicknessAnimation { To = new Thickness(0, 0, 12, 7), Duration = new TimeSpan(0, 0, 0, 0, 200), EasingFunction = new QuadraticEase() } });
+            Storyboard2 = Interface.SetThicknessAnimations(new Interface.ThicknessAnim() { Element = ReadMore, ElementAnim = new ThicknessAnimation { To = new Thickness(0, 0, 0, 7), Duration = new TimeSpan(0, 0, 0, 0, 200), EasingFunction = new QuadraticEase() } });
 
             Storyboard2.Completed += delegate
             {

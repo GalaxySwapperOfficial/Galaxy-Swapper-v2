@@ -21,7 +21,7 @@
             <Image Name="Character" Source="/Workspace/Assets/Character.png" Margin="0,0,0,0"/>
 
             <!-- Logo -->
-            <TextBlock Text="Galaxy Swapper v2" TextAlignment="Left" Foreground="#EFEFF0" Margin="70,24,836,601" FontWeight="SemiBold" FontSize="15"/>
+            <TextBlock Text="Galaxy Swapper v2" TextAlignment="Left" Foreground="#EFEFF0" Margin="70,28,836,597" FontWeight="SemiBold" FontSize="15"/>
             <Image Source="/Workspace/Assets/Logo.png" Height="35" Width="35" Stretch="Fill" Margin="22,22,991,592" MouseLeftButtonDown="Discord_Click"/>
 
             <!-- Key Tip -->

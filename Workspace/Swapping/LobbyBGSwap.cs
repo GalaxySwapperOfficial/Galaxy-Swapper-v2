@@ -14,6 +14,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
     {
         private static readonly string PersistentDownloadDir = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\FortniteGame\\Saved\\PersistentDownloadDir\\CMS";
         private static readonly string DownloadCache = "DownloadCache.json";
+
         private static string[] List()
         {
             var paths = new List<string>();
@@ -22,7 +23,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
             {
                 Log.Error($"Caught exception while converting lobby screen: Directory does not exist: {PersistentDownloadDir}");
                 Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), string.Format(Languages.Read(Languages.Type.Message, "PersistentDownloadDirError"), PersistentDownloadDir), discord: true, solutions: Languages.ReadSolutions(Languages.Type.Message, "PersistentDownloadDirError"));
-                return null!;
+                return null;
             }
 
             string content = File.ReadAllText($"{PersistentDownloadDir}\\{DownloadCache}");
@@ -31,7 +32,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
             {
                 Log.Error($"Caught exception while converting lobby screen: DownloadCache.json is not in a valid JSON format");
                 Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), Languages.Read(Languages.Type.Message, "DownloadCacheInvalidJSON"), discord: true, solutions: Languages.ReadSolutions(Languages.Type.Message, "DownloadCacheInvalidJSON"));
-                return null!;
+                return null;
             }
 
             var parse = JObject.Parse(content);
@@ -51,7 +52,7 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
                     {
                         Log.Error($"{filePath} is currently in use!");
                         Message.DisplaySTA(Languages.Read(Languages.Type.Header, "Error"), $"{filePath} is currently in use! Please close Fortnite and try swapping again.", discord: true);
-                        return null!;
+                        return null;
                     }
 
                     paths.Add(filePath);

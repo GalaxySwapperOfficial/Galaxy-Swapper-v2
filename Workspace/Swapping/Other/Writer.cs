@@ -11,25 +11,13 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
     {
         public long Position
         {
-            get
-            {
-                return base.BaseStream.Position;
-            }
-            set
-            {
-                base.BaseStream.Position = value;
-            }
+            get => base.BaseStream.Position;
+            set => base.BaseStream.Position = value;
         }
 
-        public Writer(string file)
-            : base(File.OpenWrite(file))
-        {
-        }
+        public Writer(string file) : base(File.OpenWrite(file)) { }
 
-        public Writer(byte[] data)
-            : base(new MemoryStream(data))
-        {
-        }
+        public Writer(byte[] data) : base(new MemoryStream(data)) { }
 
         public byte[] ToByteArray(long length)
         {
@@ -43,15 +31,9 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
             return array;
         }
 
-        public void WriteBytes(byte[] buf)
-        {
-            Write(buf, 0, buf.Length);
-        }
+        public void WriteBytes(byte[] buf) => Write(buf, 0, buf.Length);
 
-        public void WriteByte(byte b)
-        {
-            Write(new byte[1] { b }, 0, 1);
-        }
+        public void WriteByte(byte b) => Write(new byte[1] { b }, 0, 1);
 
         public void Write<T>(T value, bool writeLengthForString = true, bool swap = false)
         {
