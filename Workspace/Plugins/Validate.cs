@@ -52,17 +52,18 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
 
             if (!Misc.ValidImage(parse["Icon"].Value<string>()))
             {
-                Log.Error($"{fileInfo.Name} 'Icon' url is invalid");
-                Message.Display("Error", $"{fileInfo.Name} 'Icon' url is invalid", MessageBoxButton.OK);
+                Log.Error($"{fileInfo.Name} 'Icon' url is invalid and will be set to fallback");
+                parse["Icon"] = Global.InvalidPluginIcon;
                 return false;
             }
 
             if (!parse["FrontendIcon"].KeyIsNullOrEmpty() && !Misc.ValidImage(parse["FrontendIcon"].Value<string>()))
             {
-                Log.Error($"{fileInfo.Name} 'FrontendIcon' url is invalid");
-                Message.Display("Error", $"{fileInfo.Name} 'FrontendIcon' url is invalid", MessageBoxButton.OK);
+                Log.Error($"{fileInfo.Name} 'FrontendIcon' url is invalid and will be set to fallback");
+                parse["FrontendIcon"] = Global.InvalidPluginIcon;
                 return false;
             }
+            
 
             if (parse["Downloadables"] is not null)
             {
@@ -141,9 +142,8 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
 
             if (!Misc.ValidImage(parse["Swapicon"].Value<string>()))
             {
-                Log.Error($"{fileInfo.Name} 'Swapicon' url is invalid");
-                Message.Display("Error", $"{fileInfo.Name} 'Swapicon' url is invalid", MessageBoxButton.OK);
-                return false;
+                Log.Error($"{fileInfo.Name} 'Swapicon' url is invalid and will be set to fallback");
+                parse["Swapicon"] = Global.InvalidPluginIcon;
             }
 
             foreach (var asset in parse["Assets"])

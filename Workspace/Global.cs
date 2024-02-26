@@ -12,6 +12,7 @@ namespace Galaxy_Swapper_v2.Workspace
         public static string Key = "https://galaxyswapperv2.com/Downloads/Discord.php";
         public static string FortniteDirectoryTutorial = "https://galaxyswapperv2.com/Videos/FortniteDirectoryInvalid.mp4";
         public static string EpicGamesDirectoryTutorial = "https://galaxyswapperv2.com/Videos/EpicGamesDirectoryInvalid.mp4";
+        public const string InvalidPluginIcon = "https://galaxyswapperv2.com/Icons/FallBackPluginImage.png";
         public class CustomException : Exception
         {
             public CustomException(string message) : base(message)

@@ -41,6 +41,7 @@
     <None Remove="Workspace\Assets\Embed.png" />
     <None Remove="Workspace\Assets\FallBackCosmeticImage.png" />
     <None Remove="Workspace\Assets\FallBackImage.png" />
+    <None Remove="Workspace\Assets\FallBackPluginImage.png" />
     <None Remove="Workspace\Assets\Gliders.png" />
     <None Remove="Workspace\Assets\Gliders_Clicked.png" />
     <None Remove="Workspace\Assets\Hide.png" />
@@ -102,6 +103,7 @@
     <Resource Include="Workspace\Assets\Embed.png" />
     <Resource Include="Workspace\Assets\FallBackCosmeticImage.png" />
     <Resource Include="Workspace\Assets\FallBackImage.png" />
+    <Resource Include="Workspace\Assets\FallBackPluginImage.png" />
     <Resource Include="Workspace\Assets\Gliders.png" />
     <Resource Include="Workspace\Assets\Gliders_Clicked.png" />
     <Resource Include="Workspace\Assets\Hide.png" />
