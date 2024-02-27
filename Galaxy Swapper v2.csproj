@@ -50,7 +50,7 @@
     <None Remove="Workspace\Assets\Minimize.png" />
     <None Remove="Workspace\Assets\Misc.png" />
     <None Remove="Workspace\Assets\Misc_Clicked.png" />
-    <None Remove="Workspace\Assets\oo2core_5_win64.dll" />
+    <None Remove="Workspace\Assets\oo2core_9_win64.dll" />
     <None Remove="Workspace\Assets\Pickaxes.png" />
     <None Remove="Workspace\Assets\Pickaxes_Clicked.png" />
     <None Remove="Workspace\Assets\Plugins.png" />
@@ -113,7 +113,7 @@
     <Resource Include="Workspace\Assets\Misc.png" />
     <Resource Include="Workspace\Assets\Misc_Clicked.png" />
     <EmbeddedResource Include="README.md" />
-    <EmbeddedResource Include="Workspace\Assets\oo2core_5_win64.dll" />
+    <EmbeddedResource Include="Workspace\Assets\oo2core_9_win64.dll" />
     <Resource Include="Workspace\Assets\Pickaxes.png" />
     <Resource Include="Workspace\Assets\Pickaxes_Clicked.png" />
     <Resource Include="Workspace\Assets\Plugins.png" />
