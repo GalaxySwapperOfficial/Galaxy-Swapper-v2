@@ -54,6 +54,9 @@
     <Compile Update="Workspace\Usercontrols\MiscView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Workspace\Usercontrols\Overlays\AuthenticateView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Workspace\Usercontrols\Overlays\DiscordView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -147,6 +150,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Usercontrols\MiscView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Workspace\Usercontrols\Overlays\AuthenticateView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Workspace\Usercontrols\Overlays\DiscordView.xaml">

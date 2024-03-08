@@ -16,11 +16,9 @@
         </Border.Effect>
         <Grid>
             <Slider Style="{StaticResource Horizontal_Slider}" x:Name="Slider" Minimum="60" Maximum="160" TickFrequency="5" IsSnapToTickEnabled="True" TickPlacement="None" ValueChanged="Slider_ValueChanged" Margin="10,327,10,51"/>
-            <Button x:Name="Convert" Content="Convert" Margin="438,355,10,10" Foreground="#D3D3D6" Click="Worker_Click"/>
-            <Button x:Name="Revert" Content="Revert" Margin="10,355,438,10" Foreground="#D3D3D6" Click="Worker_Click"/>
+            <Button x:Name="Convert" Content="Convert" Margin="438,355,10,10" Foreground="#D3D3D6" Click="Convert_Click"/>
+            <Button x:Name="Revert" Content="Revert" Margin="10,355,438,10" Foreground="#D3D3D6" Click="Revert_Click"/>
             <TextBlock x:Name="Amount" Text="Amount: 120" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="14" FontWeight="SemiBold" Foreground="#D3D3D6" IsEnabled="False" Margin="0,305,0,0"/>
-            <TextBlock x:Name="LOG" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="14" FontWeight="SemiBold" Foreground="#D3D3D6" IsEnabled="False" Margin="0,305,0,0" Opacity="0"/>
-            <TextBlock x:Name="Converted" Text="OFF" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="14" FontWeight="SemiBold" Foreground="#454B56" IsEnabled="False" Margin="0,362,0,0"/>
             <Border Margin="11,48,11,105" Background="#0B0F16" BorderThickness="1" BorderBrush="#050608">
                 <Grid x:Name="Previews"/>
             </Border>

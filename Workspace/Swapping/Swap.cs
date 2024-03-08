@@ -31,8 +31,6 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping
         {
             if (FovView == null)
                 SwapView.Output(Content, Type);
-            else
-                FovView.Output(Content, (FovView.Type)Type);
         }
 
         public bool Convert()

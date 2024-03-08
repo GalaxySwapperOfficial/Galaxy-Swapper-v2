@@ -45,6 +45,7 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                 //Parse["version"] = JObject.Parse(File.ReadAllText("D:\\Galaxy Swapper v2\\Backend\\API\\Version.json"));
                 Parse["uefn"] = JObject.Parse(File.ReadAllText("D:\\Galaxy Swapper v2\\Frontend\\API\\1.23\\UEFN.json"));
                 Parse["cosmetics"] = JObject.Parse(File.ReadAllText("D:\\Galaxy Swapper v2\\Frontend\\API\\1.13\\Cosmetics.json"));
+                Parse["fov"] = JObject.Parse(File.ReadAllText("D:\\Galaxy Swapper v2\\Frontend\\API\\1.23\\FOV.json"));
             }
 
             return Parse[type.ToString().ToLower()];

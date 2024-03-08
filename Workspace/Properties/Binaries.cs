@@ -14,7 +14,8 @@ namespace Galaxy_Swapper_v2.Workspace.Properties
 
         private static readonly List<BinaryData> BinaryData = new List<BinaryData>
         {
-            new BinaryData("8A06BB79F400AEC933CD8BADD5B63DF54DA5B02B95CF7C0EA29E0CDB40F72E6E", "oo2core_5_win64.dll", "Galaxy_Swapper_v2.Workspace.Assets.oo2core_5_win64.dll"),
+            //new BinaryData("8A06BB79F400AEC933CD8BADD5B63DF54DA5B02B95CF7C0EA29E0CDB40F72E6E", "oo2core_5_win64.dll", "Galaxy_Swapper_v2.Workspace.Assets.oo2core_5_win64.dll"), - No longer in use
+            new BinaryData("6F5D41A7892EA6B2DB420F2458DAD2F84A63901C9A93CE9497337B16C195F457", "oo2core_9_win64.dll", "Galaxy_Swapper_v2.Workspace.Assets.oo2core_9_win64.dll"),
         };
 
         public static void Initialize()
