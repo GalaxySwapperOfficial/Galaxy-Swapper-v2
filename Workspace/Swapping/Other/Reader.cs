@@ -194,5 +194,12 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
             }
             return dictionary;
         }
+
+        public bool ReadBoolean(bool longBool)
+        {
+            var returnBool = Read<bool>();
+            BaseStream.Position += 3;
+            return returnBool;
+        }
     }
 }
