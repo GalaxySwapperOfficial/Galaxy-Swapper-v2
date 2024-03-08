@@ -1,4 +1,5 @@
 ﻿using Galaxy_Swapper_v2.Workspace;
+using Galaxy_Swapper_v2.Workspace.ClientSettings;
 using Galaxy_Swapper_v2.Workspace.Properties;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using Serilog;

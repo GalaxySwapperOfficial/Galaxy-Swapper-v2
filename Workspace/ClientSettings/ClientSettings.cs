@@ -1,8 +1,15 @@
 ﻿using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using RestSharp;
 using Serilog;
+using System;
 using System.IO;
+using System.Diagnostics;
+using System.DirectoryServices.ActiveDirectory;
+using System.Windows.Automation;
 
 namespace Galaxy_Swapper_v2.Workspace.ClientSettings
 {
@@ -10,10 +17,8 @@ namespace Galaxy_Swapper_v2.Workspace.ClientSettings
     {
         public byte[] Buffer = null!;
 
-        public ClientSettings(byte[] buffer)
-        {
-            Buffer = buffer;
-        }
+        public string AccessToken = null!;
+        public string AccountID = null!;
 
         public uint Magic;
         public int Engine;
@@ -84,6 +89,114 @@ namespace Galaxy_Swapper_v2.Workspace.ClientSettings
             Buffer = writer.ToByteArray(writer.BaseStream.Length);
 
             return true;
+        }
+
+        public bool Authenticate(string authorization_code)
+        {
+            var stopwatch = new Stopwatch(); stopwatch.Start();
+            const string url = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token";
+
+            using (var client = new RestClient())
+            {
+                var request = new RestRequest(new Uri(url), Method.Post);
+                request.AddHeader("Authorization", "Basic MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=");
+
+                request.AddParameter("grant_type", "authorization_code");
+                request.AddParameter("token_type", "eg1");
+                request.AddParameter("code", authorization_code);
+
+                Log.Information($"Sending {request.Method} request to {url}");
+
+                var response = client.Execute(request);
+
+                if (response is null)
+                {
+                    Message.DisplaySTA("Error", "Failed to execute authenticate to epic games server.", discord: true, solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares" });
+                    return false;
+                }
+
+                if (response.StatusCode != System.Net.HttpStatusCode.OK || response.Content is null || !response.Content.ValidJson())
+                {
+                    Message.DisplaySTA("Error", "Authorization code is expired. Please make sure you copied and\npasted the code correctly and that it has not expired!", discord: true);
+                    return false;
+                }
+
+                var parse = JsonConvert.DeserializeObject<JObject>(response.Content);
+
+                AccessToken = parse["access_token"].Value<string>();
+                AccountID = parse["account_id"].Value<string>();
+
+                Log.Information($"Finished {request.Method} request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
+
+                return true;
+            }
+        }
+
+        public bool Download()
+        {
+            var stopwatch = new Stopwatch(); stopwatch.Start();
+            string url = $"https://fngw-mcp-gc-livefn.ol.epicgames.com/fortnite/api/cloudstorage/user/{AccountID}/ClientSettings.Sav";
+
+            using (var client = new RestClient())
+            {
+                var request = new RestRequest(new Uri(url), Method.Get);
+                request.AddHeader("Authorization", $"Bearer {AccessToken}");
+
+                Log.Information($"Sending {request.Method} request to {url}");
+
+                var response = client.Execute(request);
+
+                if (response is null)
+                {
+                    Message.DisplaySTA("Error", "Failed to download 'ClientSettings.Sav' file from epic games server!", discord: true, solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares" });
+                    return false;
+                }
+
+                if (response.StatusCode != System.Net.HttpStatusCode.OK || response.RawBytes is null)
+                {
+                    Message.DisplaySTA("Error", "Authorization code is expired. Please make sure you copied and\npasted the code correctly and that it has not expired!", discord: true);
+                    return false;
+                }
+
+                Buffer = response.RawBytes;
+
+                Log.Information($"Finished {request.Method} request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
+
+                return true;
+            }
+        }
+
+        public bool Upload(byte[] clientSettingsBuffer)
+        {
+            var stopwatch = new Stopwatch(); stopwatch.Start();
+            string url = $"https://fngw-mcp-gc-livefn.ol.epicgames.com/fortnite/api/cloudstorage/user/{AccountID}/ClientSettings.Sav";
+
+            using (var client = new RestClient())
+            {
+                var request = new RestRequest(new Uri(url), Method.Put);
+                request.AddHeader("Authorization", $"Bearer {AccessToken}");
+                request.AddParameter("application/octet-stream", clientSettingsBuffer, ParameterType.RequestBody);
+
+                Log.Information($"Sending {request.Method} request to {url}");
+
+                var response = client.Execute(request);
+
+                if (response is null)
+                {
+                    Message.DisplaySTA("Error", "Failed to upload 'ClientSettings.Sav' file to epic games server!", discord: true, solutions: new[] { "Disable Windows Defender Firewall", "Disable any anti-virus softwares" });
+                    return false;
+                }
+
+                if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    Message.DisplaySTA("Error", "Authorization code is expired. Please make sure you copied and\npasted the code correctly and that it has not expired!", discord: true);
+                    return false;
+                }
+
+                Log.Information($"Finished {request.Method} request in {stopwatch.GetElaspedAndStop().ToString("mm':'ss")} received {response.Content.Length}");
+
+                return true;
+            }
         }
 
         #region Compression
