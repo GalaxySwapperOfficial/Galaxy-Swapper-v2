@@ -160,9 +160,9 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
 
         public static bool ValidImage(string URL)
         {
-            using (HttpClient client = new HttpClient())
+            try
             {
-                try
+                using (HttpClient client = new HttpClient())
                 {
                     HttpResponseMessage response = client.Send(new HttpRequestMessage(HttpMethod.Head, URL));
 
@@ -175,10 +175,10 @@ namespace Galaxy_Swapper_v2.Workspace.Utilities
                         return false;
                     }
                 }
-                catch (HttpRequestException)
-                {
-                    return false;
-                }
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 

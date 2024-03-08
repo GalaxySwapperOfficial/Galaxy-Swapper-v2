@@ -54,14 +54,12 @@ namespace Galaxy_Swapper_v2.Workspace.Plugins
             {
                 Log.Error($"{fileInfo.Name} 'Icon' url is invalid and will be set to fallback");
                 parse["Icon"] = Global.InvalidPluginIcon;
-                return false;
             }
 
             if (!parse["FrontendIcon"].KeyIsNullOrEmpty() && !Misc.ValidImage(parse["FrontendIcon"].Value<string>()))
             {
                 Log.Error($"{fileInfo.Name} 'FrontendIcon' url is invalid and will be set to fallback");
                 parse["FrontendIcon"] = Global.InvalidPluginIcon;
-                return false;
             }
             
 
