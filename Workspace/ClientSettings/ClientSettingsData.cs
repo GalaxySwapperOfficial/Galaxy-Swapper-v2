@@ -88,15 +88,18 @@ namespace Galaxy_Swapper_v2.Workspace.ClientSettings
 
             try
             {
-                int minFovPos = Buffer.IndexOfSequence(minFov, 0) + minFov.Length;
-                int maxFovPos = Buffer.IndexOfSequence(maxFov, 0) + maxFov.Length;
+                int minFovPos = Buffer.IndexOfSequence(minFov, 0);
+                int maxFovPos = Buffer.IndexOfSequence(maxFov, 0);
 
                 if (minFovPos < 0 || maxFovPos < 0)
                 {
                     throw new Exception("Failed to find fov position in clientsettings.sav buffer");
                 }
-
+                
                 Log.Information("minFovPos: {0}, maxFovPos: {1}", minFovPos, maxFovPos);
+
+                minFovPos += minFov.Length;
+                maxFovPos += maxFov.Length;
 
                 var writer = new Writer(Buffer);
 
