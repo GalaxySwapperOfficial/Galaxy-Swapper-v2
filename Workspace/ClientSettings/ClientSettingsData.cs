@@ -1,4 +1,5 @@
-﻿using Galaxy_Swapper_v2.Workspace.Swapping.Other;
+﻿using Galaxy_Swapper_v2.Workspace.ClientSettings.Objects;
+using Galaxy_Swapper_v2.Workspace.Swapping.Other;
 using Galaxy_Swapper_v2.Workspace.Utilities;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Newtonsoft.Json;
@@ -8,6 +9,7 @@ using Serilog;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 
 namespace Galaxy_Swapper_v2.Workspace.ClientSettings
 {
@@ -18,8 +20,20 @@ namespace Galaxy_Swapper_v2.Workspace.ClientSettings
         public string AccessToken = null!;
         public string AccountID = null!;
 
+        //Compressed Header
         public uint Magic;
         public int Engine;
+
+        //Decompressed Data
+        public byte[] DecompressedMagic = null!;
+        public string FortniteVersion = null!;
+
+        public int _reserved0;
+        public byte _reserved1;
+        public byte _reserved2;
+
+        public FCustomVersion[] CustomVersions = null!;
+        public byte[] RestOfData = null!;
 
         public bool Deserialize()
         {
@@ -31,89 +45,148 @@ namespace Galaxy_Swapper_v2.Workspace.ClientSettings
 
                 Magic = reader.Read<uint>();
 
-                if (!Magic.Equals(0x44464345)) //ClientSettings.sav is not compressed
+                if (!Magic.Equals(0x44464345))
                 {
-                    reader.Position = 0;
-                    Buffer = reader.ReadBytes((int)(reader.BaseStream.Length));
-                    return true;
+                    throw new Exception("ClientSettings.sav magic is not valid");
                 }
 
                 Engine = reader.Read<int>();
 
                 var isCompressed = reader.ReadBoolean(true);
 
-                Log.Information("ClientSettings is compressed: {0}", isCompressed);
-
                 if (isCompressed)
                 {
-                    var decompressedSize = reader.Read<int>();
-                    var compressedSize = (int)(reader.BaseStream.Length - reader.BaseStream.Position);
-                    byte[] compressedBuffer = reader.ReadBytes(compressedSize);
-
                     Log.Information("Decompressing ClientSettings buffer");
 
-                    Buffer = Decompress(compressedBuffer, decompressedSize);
+                    var decompressedSize = reader.Read<int>();
+                    var compressedSize = (int)(reader.BaseStream.Length - reader.BaseStream.Position);
+
+                    byte[] compressedBuffer = reader.ReadBytes(compressedSize);
+                    byte[] decompressedBuffer = Decompress(compressedBuffer, decompressedSize);
+
+                    reader = new Reader(decompressedBuffer);
                 }
                 else
                 {
-                    Buffer = reader.ReadBytes((int)(reader.BaseStream.Length - reader.Position));
+                    Log.Warning("ClientSettings is not compressed as expected and may not work correctly");
                 }
 
-                //I will write the full deserilize when I'm back from vacation but due to me being on a time contrant it will be left as this.
+                DecompressedMagic = reader.ReadBytes(22);
+                FortniteVersion = reader.ReadFString();
+
+                _reserved0 = reader.Read<int>();
+                _reserved1 = reader.ReadByte();
+                _reserved2 = reader.ReadByte();
+
+                var customVersionCount = reader.Read<int>();
+
+                CustomVersions = new FCustomVersion[customVersionCount];
+                for (int i = 0; i < customVersionCount; i++)
+                {
+                    CustomVersions[i] = new FCustomVersion(reader);
+                }
+
+                RestOfData = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
 
                 return true;
             }
             catch (Exception exception)
             {
                 Log.Error(exception.Message);
-                Message.DisplaySTA("Error", $"Failed to deserialize clientsettings.sav buffer!\n\n{exception.Message}", System.Windows.MessageBoxButton.OK, discord: true);
+                Message.DisplaySTA("Error", $"Failed to deserialize ClientSettings.Sav buffer!\n\n{exception.Message}", System.Windows.MessageBoxButton.OK, discord: true, solutions: new string[] { "Please restore Fortnite settings to default, then apply them and attempt to swap again." });
                 return false;
             }
         }
 
         public bool Serialize(out byte[] serialized)
         {
-            //I will write the full Serialize when I'm back from vacation but due to me being on a time contrant it will be left as this.
+            serialized = null!;
 
-            serialized = Buffer;
-            return false;
-        }
-
-        public bool ModifyFov(float fov)
-        {
-            byte[] minFov = new byte[] { 0x46, 0x4F, 0x56, 0x4D, 0x69, 0x6E, 0x69, 0x6D, 0x75, 0x6D, 0x00, 0x0E, 0x00, 0x00, 0x00, 0x46, 0x6C, 0x6F, 0x61, 0x74, 0x50, 0x72, 0x6F, 0x70, 0x65, 0x72, 0x74, 0x79, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-            byte[] maxFov = new byte[] { 0x46, 0x4F, 0x56, 0x4D, 0x61, 0x78, 0x69, 0x6D, 0x75, 0x6D, 0x00, 0x0E, 0x00, 0x00, 0x00, 0x46, 0x6C, 0x6F, 0x61, 0x74, 0x50, 0x72, 0x6F, 0x70, 0x65, 0x72, 0x74, 0x79, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-
-            Log.Information("Modifying fov values");
+            Log.Information("Serializing ClientSettings buffer");
 
             try
             {
-                int minFovPos = Buffer.IndexOfSequence(minFov, 0) + minFov.Length;
-                int maxFovPos = Buffer.IndexOfSequence(maxFov, 0) + maxFov.Length;
+                var writer = new Writer(new byte[RestOfData.Length + 80000]);
 
-                if (minFovPos < 0 || maxFovPos < 0)
+                writer.WriteBytes(DecompressedMagic);
+                writer.WriteFString(FortniteVersion);
+
+                writer.Write<int>(_reserved0);
+                writer.WriteByte(_reserved1);
+                writer.WriteByte(_reserved2);
+
+                writer.Write<int>(CustomVersions.Length);
+
+                foreach (var customVersion in CustomVersions)
                 {
-                    throw new Exception("Failed to find fov position in clientsettings.sav buffer");
+                    customVersion.Write(writer);
                 }
 
-                Log.Information("minFovPos: {0}, maxFovPos: {1}", minFovPos, maxFovPos);
+                writer.WriteBytes(RestOfData);
 
-                var writer = new Writer(Buffer);
+                byte[] serializedBuffer = writer.ToByteArray(writer.Position);
+                byte[] compressedSerializedBuffer = Compress(serializedBuffer);
 
-                writer.Position = minFovPos;
-                writer.Write<float>(fov - 1);
+                writer = new Writer(new byte[RestOfData.Length + 50000]);
 
-                writer.Position = maxFovPos;
-                writer.Write<float>(fov);
+                writer.Write<uint>(Magic);
+                writer.Write<int>(Engine);
 
-                Buffer = writer.ToByteArray(writer.BaseStream.Length);
+                writer.WriteBoolean(true, true);
+
+                writer.Write<int>(serializedBuffer.Length);
+
+                writer.WriteBytes(compressedSerializedBuffer);
+
+                serialized = writer.ToByteArray(writer.Position);
 
                 return true;
             }
             catch (Exception exception)
             {
                 Log.Error(exception.Message);
-                Message.DisplaySTA("Error", $"Failed to modify FOV values!\n\n{exception.Message}", System.Windows.MessageBoxButton.OK, discord: true);
+                Message.DisplaySTA("Error", $"Failed to serialize ClientSettings.Sav buffer!\n\n{exception.Message}", System.Windows.MessageBoxButton.OK, discord: true, solutions: new string[] { "Please restore Fortnite settings to default, then apply them and attempt to swap again." });
+                return false;
+            }
+        }
+
+        public bool ModifyFov(float fov)
+        {
+            try
+            {
+                Log.Information("Modifying FOVMinimum/FOVMaximum values");
+
+                var minFovSearch = Encoding.ASCII.GetBytes("FOVMinimum");
+                var maxFovSearch = Encoding.ASCII.GetBytes("FOVMaximum");
+
+                int minFovPos = RestOfData.IndexOfSequence(minFovSearch, 0);
+                int maxFovPos = RestOfData.IndexOfSequence(maxFovSearch, 0);
+
+                if (minFovPos < 0 || maxFovPos < 0)
+                {
+                    throw new Exception("Failed to find fov position in clientsettings.sav buffer");
+                }
+
+                minFovPos += minFovSearch.Length;
+                maxFovPos += maxFovSearch.Length;
+
+                var writer = new Writer(RestOfData);
+
+                writer.Position = minFovPos + 29;
+                writer.Write<float>(fov - 1);
+
+                writer.Position = maxFovPos + 29;
+                writer.Write<float>(fov);
+
+                writer.Position = 0;
+                RestOfData = writer.ToByteArray(writer.BaseStream.Length);
+
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Log.Error(exception.Message);
+                Message.DisplaySTA("Error", $"Failed to modify fov values!\n\n{exception.Message}", System.Windows.MessageBoxButton.OK, discord: true, solutions: new string[] { "Please restore Fortnite settings to default, then apply them and attempt to swap again." });
                 return false;
             }
         }

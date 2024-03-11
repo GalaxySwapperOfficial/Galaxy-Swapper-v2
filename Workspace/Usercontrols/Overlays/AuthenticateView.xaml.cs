@@ -79,7 +79,10 @@ namespace Galaxy_Swapper_v2.Workspace.Usercontrols.Overlays
             if (!clientSettingsData.ModifyFov(FovAmount))
                 return;
 
-            if (!clientSettingsData.Upload(clientSettingsData.Buffer))
+            if (!clientSettingsData.Serialize(out byte[] serializedBuffer))
+                return;
+
+            if (!clientSettingsData.Upload(serializedBuffer))
                 return;
 
             var timeSpan = stopWatch.GetElaspedAndStop();

@@ -114,5 +114,18 @@ namespace Galaxy_Swapper_v2.Workspace.Swapping.Other
                 }
             }
         }
+
+        public void WriteBoolean(bool value, bool longBool)
+        {
+            Write<bool>(value);
+            WriteBytes(new byte[3]);
+        }
+
+        public void WriteFString(string fstring)
+        {
+            Write<int>(fstring.Length + 1);
+            WriteBytes(Encoding.ASCII.GetBytes(fstring));
+            WriteByte(0);
+        }
     }
 }

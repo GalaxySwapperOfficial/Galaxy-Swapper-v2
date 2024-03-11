@@ -144,8 +144,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Workspace\ClientSettings\Objects\" />
-  </ItemGroup>
-
 </Project>
